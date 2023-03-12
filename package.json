@@ -1,0 +1,37 @@
+{
+  "name": "ikatoo-backend",
+  "version": "0.0.1",
+  "description": "Backend API from ikatoo.com.br",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/server.js",
+    "test": "tsx --test **/*.test.ts",
+    "test:watch": "tsx watch --test **/*.test.ts",
+    "dev": "tsx src/server.ts",
+    "dev:watch": "tsx watch src/server.ts",
+    "build": "rimraf dist && tsc --project tsconfig.build.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ikatoo/backend.git"
+  },
+  "author": "Milton Carlos Katoo (mckatoo@gmail.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ikatoo/backend/issues"
+  },
+  "homepage": "https://ikatoo.com.br",
+  "engines": {
+    "node": "18.15.0",
+    "npm": "9.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.0",
+    "rimraf": "^4.4.0",
+    "tsx": "^3.12.3",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3"
+  }
+}
