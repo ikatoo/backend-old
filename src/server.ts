@@ -1,5 +1,28 @@
-function do_something() {
-  console.log("doing something...");
-}
+import { server } from "@hapi/hapi";
+import { env } from "./env";
+import routes from "./routes";
 
-console.log(`Server is running on http://localhost:8001`);
+const hapiServer = server({
+  port: env.PORT,
+  host: env.HOST,
+});
+
+hapiServer.route(routes);
+
+const init = async () => {
+  await hapiServer.initialize();
+  return hapiServer;
+};
+
+const start = async () => {
+  await hapiServer.start();
+  console.log(`Server running at: ${hapiServer.info.uri}`);
+  return hapiServer;
+};
+
+process.on("unhandledRejection", (err) => {
+  console.log(err);
+  process.exit(1);
+});
+
+export { init, start };
