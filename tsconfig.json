@@ -10,9 +10,9 @@
 
     /* Modules */
     "module": "commonjs",
-    "baseUrl": "./",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*", "src"]
     },
     "resolveJsonModule": true,
     "outDir": "./dist",

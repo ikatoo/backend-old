@@ -1,19 +1,18 @@
-import assert from "node:assert";
-import { after, before, describe, it } from "node:test";
+// import assert from "node:assert";
+// import test, { after, before, describe } from "node:test";
+import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { env } from "./env";
 
 describe("App test", () => {
-
-  before(() => {
-    console.log('before init test suit')
-  })
-
-  after(() => {
-    console.log('After end test suit')
-  })
-  
-  it('should get PORT value', () => {
-    assert.equal(env.PORT, 'dev')
+  beforeAll(() => {
+    console.log("before init test suit");
   });
-  
+
+  afterAll(() => {
+    console.log("After end test suit");
+  });
+
+  test("should get PORT value", () => {
+    expect(env.PORT).toBe(8000);
+  });
 });

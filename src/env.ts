@@ -1,7 +1,17 @@
 import dotenv from "dotenv";
 
-dotenv.config()
+dotenv.config();
+
+const getEnv = (key: string) => {
+  if (process.env[key] === undefined) {
+    console.error(`*** ${key} IS UNDEFINED. ***`);
+    process.exit(1)
+  }
+  
+  return `${process.env[key] ?? ""}`;
+};
 
 export const env = {
-  PORT: process.env.PORT,
-}
+  PORT: +(getEnv("PORT")),
+  HOST: (getEnv("HOST")),
+};
