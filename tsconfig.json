@@ -12,7 +12,8 @@
     "module": "commonjs",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*", "src"]
+      "@/*": ["src/*", "src"],
+      "hapi/*": ["src/infra/http/hapi/*", "src/infra/http/hapi"]
     },
     "resolveJsonModule": true,
     "outDir": "./dist",
