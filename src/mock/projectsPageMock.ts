@@ -1,4 +1,4 @@
-export const mockProjects = [
+export default [
   {
     snapshot: '/images/snap-calm.png',
     description: {

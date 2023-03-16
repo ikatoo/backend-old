@@ -1,4 +1,4 @@
-import { aboutPageMock } from "@/mock/aboutPageMock";
+import aboutPageMock from "@/mock/aboutPageMock";
 
 function aboutPageHandler () {
   return aboutPageMock;
