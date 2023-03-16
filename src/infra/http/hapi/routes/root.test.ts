@@ -1,7 +1,5 @@
-import { init } from "@/server";
 import { Server, ServerApplicationState } from "@hapi/hapi";
-// import assert from "node:assert";
-// import test, { afterEach, beforeEach, describe } from "node:test";
+import { init } from "hapi/server";
 
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 

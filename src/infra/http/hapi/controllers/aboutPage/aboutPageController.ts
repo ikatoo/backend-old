@@ -1,5 +1,9 @@
 import { aboutPageMock } from "@/mock/aboutPageMock";
 
-export default function () {
+function aboutPageHandler () {
   return aboutPageMock;
+}
+
+export {
+  aboutPageHandler
 }

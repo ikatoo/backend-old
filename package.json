@@ -4,12 +4,17 @@
   "description": "Backend API from ikatoo.com.br",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/main.js",
+    "start": "node dist/infra/http/hapi/main.js",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:routes": "vitest run src/routes/**/*.test.ts",
-    "test:routes:watch": "vitest src/routes/**/*.test.ts",
-    "dev": "tsx --watch src/main.ts",
+    "test:domain": "vitest run src/domain/**/*.test.ts",
+    "test:domain:watch": "vitest src/domain/**/*.test.ts",
+    "test:application": "vitest run src/application/**/*.test.ts",
+    "test:application:watch": "vitest src/application/**/*.test.ts",
+    "test:infra": "vitest run src/infra",
+    "test:infra:watch": "vitest src/infra",
+    "dev": "tsx --watch src/infra/http/hapi/main.ts",
     "build": "rimraf dist && tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "repository": {
