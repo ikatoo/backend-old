@@ -1,4 +1,4 @@
-export const mockSkillsPageData = {
+export default {
   title: 'Habilidades e Experiências',
   description: `<p>Trabalhei como programador em VBA usando o MS Access em 2003, logo após formado no curso técnico do SENAC. Não dei muita sorte pois a empresa fechou 3 meses após eu entrar.</p>
   <p>Precisando de emprego mudei de área, fui trabalhar em uma grande indústria farmacêutica da cidade e lá fiquei durante 7 anos trabalhando como operador de máquinas na produção de medicamentos injetáveis, mas sempre com um pézinho na programação. Lá eu criei um programa em Delphi 7 com banco em MS Access para controle de produção de medicamentos liofilizados que utilizávamos para melhorar o fluxo de produção do setor e diminuir o tempo nos processos de fabricação.</p>

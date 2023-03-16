@@ -1,7 +1,7 @@
 import { Server, ServerApplicationState } from "@hapi/hapi";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { init } from "hapi/server";
-import { aboutPageMock } from "@/mock/aboutPageMock";
+import aboutPageMock from "@/mock/aboutPageMock";
 
 describe("/about routes", () => {
   let server: Server<ServerApplicationState>;
