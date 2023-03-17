@@ -1,5 +1,6 @@
 import { ReqRefDefaults, ServerRoute } from "@hapi/hapi";
 import aboutPageRoutes from "./aboutPage";
+import skillsPageRoutes from "./skillsPage";
 
 const routes: ServerRoute<ReqRefDefaults>[] = [
   {
@@ -10,6 +11,7 @@ const routes: ServerRoute<ReqRefDefaults>[] = [
     },
   },
   ...aboutPageRoutes,
+  ...skillsPageRoutes
 ];
 
 export default routes;
