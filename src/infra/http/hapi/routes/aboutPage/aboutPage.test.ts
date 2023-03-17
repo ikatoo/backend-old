@@ -5,6 +5,7 @@ import aboutPageMock from "@/mock/aboutPageMock";
 import { AboutPageRepository } from "@/infra/db";
 
 describe("/about routes", () => {
+  const repository = new AboutPageRepository();
   let server: Server<ServerApplicationState>;
 
   beforeEach(async () => {
@@ -15,17 +16,7 @@ describe("/about routes", () => {
     await server.stop();
   });
 
-  test("responds with 200", async () => {
-    const res = await server.inject({
-      method: "get",
-      url: "/",
-    });
-
-    expect(res.statusCode).toBe(200);
-  });
-
   test("result is equal the mock", async () => {
-    const repository = new AboutPageRepository();
     await repository.createAboutPage(aboutPageMock);
     const res = await server.inject({
       method: "get",
@@ -33,5 +24,14 @@ describe("/about routes", () => {
     });
 
     expect(res.result).toEqual(aboutPageMock);
+  });
+
+  test("responds with 200", async () => {
+    const res = await server.inject({
+      method: "get",
+      url: "/about",
+    });
+
+    expect(res.statusCode).toBe(200);
   });
 });
