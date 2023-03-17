@@ -2,6 +2,7 @@ import { Server, ServerApplicationState } from "@hapi/hapi";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { init } from "hapi/server";
 import aboutPageMock from "@/mock/aboutPageMock";
+import { AboutPageRepository } from "@/infra/db";
 
 describe("/about routes", () => {
   let server: Server<ServerApplicationState>;
@@ -24,14 +25,13 @@ describe("/about routes", () => {
   });
 
   test("result is equal the mock", async () => {
+    const repository = new AboutPageRepository();
+    await repository.createAboutPage(aboutPageMock);
     const res = await server.inject({
       method: "get",
       url: "/about",
     });
 
-    const expected = JSON.stringify(aboutPageMock);
-    const actual = JSON.stringify(res.result);
-
-    expect(actual).toBe(expected);
+    expect(res.result).toEqual(aboutPageMock);
   });
 });

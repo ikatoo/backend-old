@@ -1,3 +1,3 @@
-import { aboutPageHandler } from "./aboutPage/aboutPageController";
+import { getAboutPageHandler } from "./aboutPage/aboutPageController";
 
-export { aboutPageHandler };
+export { getAboutPageHandler };

@@ -1,9 +1,10 @@
-import aboutPageMock from "@/mock/aboutPageMock";
+import { AboutPageRepository } from "@/infra/db";
+import { Request, ResponseToolkit } from "@hapi/hapi";
+import { notfoundResponse } from "hapi/routes/notFoundResponse";
 
-function aboutPageHandler () {
-  return aboutPageMock;
+async function getAboutPageHandler(_request?: Request, h?: ResponseToolkit) {
+  const repository = new AboutPageRepository();
+  return await repository.getAboutPage() ?? (!!h && notfoundResponse(h));
 }
 
-export {
-  aboutPageHandler
-}
+export { getAboutPageHandler };
