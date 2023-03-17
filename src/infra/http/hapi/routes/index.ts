@@ -1,5 +1,5 @@
 import { ReqRefDefaults, ServerRoute } from "@hapi/hapi";
-import aboutPageRoutes from "./aboutPage/aboutPage";
+import aboutPageRoutes from "./aboutPage";
 
 const routes: ServerRoute<ReqRefDefaults>[] = [
   {

@@ -1,12 +1,12 @@
 import { ReqRefDefaults, ServerRoute } from "@hapi/hapi";
-import { aboutPageHandler } from "hapi/controllers";
+import { getAboutPageHandler } from "hapi/controllers";
 const aboutPageRoutes: ServerRoute<
   ReqRefDefaults
 >[] = [
   {
     method: "GET",
     path: "/about",
-    handler: aboutPageHandler,
+    handler: getAboutPageHandler,
   },
 ];
 
