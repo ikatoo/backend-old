@@ -1,4 +1,6 @@
-import Skill from "./Skill";
+type Skill = {
+  title: string
+}
 
 export default class AboutPage {
   constructor(
