@@ -17,7 +17,11 @@ export default {
       jobTitle: 'Calm Organizador de Criptomoedas',
       jobDescription: 'Projeto pessoal para estudo.',
       yearMonthStart: '2022 - 03',
-      link: 'https://github.com/mckatoo/calm'
+      link: 'https://github.com/mckatoo/calm',
+      skills: [
+        { skillTitle: 'Back-end' },
+        { skillTitle: 'Modelagem de dados' }
+      ]
     },
     {
       jobTitle: 'Uniesi - Centro Universitário de Itapira',
@@ -25,7 +29,13 @@ export default {
         'Responsável pela infraestrutura local e suporte dos serviços dispostos pela mantenedora UNIP.',
       yearMonthStart: '2013 - 06',
       yearMonthEnd: '2021 - 07',
-      link: 'https://uniesi.edu.br'
+      link: 'https://uniesi.edu.br',
+      skills: [
+        { skillTitle: 'Back-end' },
+        { skillTitle: 'Modelagem de dados' },
+        { skillTitle: 'Front-end' },
+        { skillTitle: 'CI/CD' }
+      ]
     }
   ]
 }
