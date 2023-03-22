@@ -13,9 +13,10 @@ type Job = {
 
 export default class SkillsPage {
   constructor(
-    title: string,
-    description: string,
-    skills: Skill[],
-    lastJobs: Job[]
+    readonly id: number,
+    readonly title: string,
+    readonly description: string,
+    readonly skills: Skill[],
+    readonly lastJobs: Job[]
   ) {}
 }

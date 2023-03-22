@@ -3,7 +3,7 @@ import IAboutPage from "@/domain/repository/IAboutPage";
 import db from "./db";
 
 export default class AboutPagePgPromise implements IAboutPage {
-  async createAboutPage(page: AboutPage): Promise<void> {
+  async createAboutPage(page: Omit<AboutPage, "id">): Promise<void> {
     await db.none(`insert into about_page (
       title, description, illustration_url, illustration_alt
     ) values ($1,$2,$3,$4);`, [
@@ -14,6 +14,7 @@ export default class AboutPagePgPromise implements IAboutPage {
   async getAboutPage(): Promise<AboutPage> {
     const page = await db.oneOrNone('select * from about_page;')
     return {
+      id: page.id,
       title: page.title,
       description: page.description,
       skills: page.skills,
@@ -22,7 +23,7 @@ export default class AboutPagePgPromise implements IAboutPage {
     } ?? {}
   }
 
-  async updateAboutPage(page: Partial<AboutPage>): Promise<void> {
+  async updateAboutPage(page: Partial<Omit<AboutPage, "id">>): Promise<void> {
     for (const item of Object.keys(page)) {
 
     }

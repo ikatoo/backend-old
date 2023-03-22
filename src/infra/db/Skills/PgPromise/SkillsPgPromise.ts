@@ -1,15 +1,20 @@
 import ISkills, { SkillIn, SkillOut } from "@/domain/repository/ISkills";
+import { AboutPageRepository } from "../../AboutPage";
 import db from "./db";
 
 export default class SkillsPgPromise implements ISkills {
+  private readonly aboutPageRepository = new AboutPageRepository()
+
   async createSkill(skill: SkillIn): Promise<void> {
+    const aboutPage = await this.aboutPageRepository.getAboutPage()
     await db.none(
       `insert into skills (
-      title, description
-    ) values ($1,$2);`,
+      title, description, about_page_id
+    ) values ($1,$2, $3);`,
       [
         skill.title,
         skill.description,
+        aboutPage.id
       ],
     );
   }

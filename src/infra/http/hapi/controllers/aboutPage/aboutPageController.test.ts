@@ -9,8 +9,8 @@ describe("AboutPage Controller test", () => {
     await repository.createAboutPage(aboutPageMock);
 
     const result = await getAboutPageHandler();
-    const expected = aboutPageMock;
+    const expected = { id: result.id, ...aboutPageMock };
 
-    expect(expected).toBe(result);
+    expect(expected).toStrictEqual(result);
   });
 });
