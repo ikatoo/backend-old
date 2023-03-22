@@ -1,5 +1,5 @@
 import IJobs, { JobIn, JobOut } from "@/domain/repository/IJobs";
-import db from "../db";
+import db from "./db";
 
 export default class JobsPgPromise implements IJobs {
   async createJob(job: JobIn): Promise<void> {

@@ -1,4 +1,4 @@
-import { AboutPageRepository } from "@/infra/db";
+import { AboutPageRepository } from "@/infra/db/AboutPage";
 import { Request, ResponseToolkit } from "@hapi/hapi";
 import { notfoundResponse } from "hapi/routes/notFoundResponse";
 
