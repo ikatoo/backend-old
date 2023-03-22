@@ -1,4 +1,4 @@
-import { SkillsPageRepository } from "@/infra/db";
+import { SkillsPageRepository } from "@/infra/db/SkillsPage";
 import skillPageMock from "@/mock/skillPageMock";
 import { Server, ServerApplicationState } from "@hapi/hapi";
 import { init } from "hapi/server";
