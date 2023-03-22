@@ -1,5 +1,5 @@
-import AboutPageInMemory from "./InMemory/AboutPageInMemory"
+import AboutPagePgPromise from "./PgPromise/AboutPagePgPromise"
 
 export {
-  AboutPageInMemory as AboutPageRepository,
+  AboutPagePgPromise as AboutPageRepository,
 }
