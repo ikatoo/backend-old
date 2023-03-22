@@ -1,4 +1,4 @@
-import { SkillsPageRepository } from "@/infra/db";
+import { SkillsPageRepository } from "@/infra/db/SkillsPage";
 import skillPageMock from "@/mock/skillPageMock";
 import { describe, expect, test } from "vitest";
 import { getSkillsPageHandler } from "./skillsPageController";

@@ -1,6 +1,5 @@
 import ISkills, { SkillIn, SkillOut } from "@/domain/repository/ISkills";
-import { QueryParam } from "pg-promise";
-import db from "../db";
+import db from "./db";
 
 export default class SkillsPgPromise implements ISkills {
   async createSkill(skill: SkillIn): Promise<void> {

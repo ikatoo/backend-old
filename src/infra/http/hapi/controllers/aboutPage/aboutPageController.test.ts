@@ -1,4 +1,4 @@
-import { AboutPageRepository } from "@/infra/db";
+import { AboutPageRepository } from "@/infra/db/AboutPage";
 import aboutPageMock from "@/mock/aboutPageMock";
 import { describe, expect, test } from "vitest";
 import { getAboutPageHandler } from "./aboutPageController";

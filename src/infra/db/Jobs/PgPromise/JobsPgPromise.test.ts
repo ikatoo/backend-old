@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from "vitest";
-import db from "../db";
+import db from "./db";
 import JobsPgPromise from "./JobsPgPromise";
 
 describe("Basic operations in Jobs Postgres Database", () => {

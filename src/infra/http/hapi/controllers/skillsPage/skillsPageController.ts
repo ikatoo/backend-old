@@ -1,4 +1,4 @@
-import { SkillsPageRepository } from "@/infra/db";
+import { SkillsPageRepository } from "@/infra/db/SkillsPage";
 import { Request, ResponseToolkit } from "@hapi/hapi";
 import { notfoundResponse } from "hapi/routes/notFoundResponse";
 
