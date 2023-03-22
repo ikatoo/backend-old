@@ -5,10 +5,15 @@ import AboutPageInMemory from "./AboutPageInMemory";
 describe("Basic operations in AboutPage InMemory Database", () => {
   const repository = new AboutPageInMemory();
 
-  test("CREATE and READ Method", async () => {
+  test("CREATE Method", async () => {
+    await expect(repository.createAboutPage(aboutPageMock))
+      .resolves.not.toThrow()
+  });
+
+  test("READ Method", async () => {
     await repository.createAboutPage(aboutPageMock);
     const expected = aboutPageMock;
-    const actual = await repository.getAboutPage();
+    const { id, ...actual } = await repository.getAboutPage();
 
     expect(expected).toEqual(actual);
   });
@@ -18,9 +23,9 @@ describe("Basic operations in AboutPage InMemory Database", () => {
       description: "new description",
     };
     await repository.updateAboutPage(newValue);
-    const expected = { ...aboutPageMock, ...newValue };
     const actual = await repository.getAboutPage();
-    
+    const expected = { id: actual.id, ...aboutPageMock, ...newValue };
+
     expect(expected).toEqual(actual);
   });
 
@@ -28,7 +33,7 @@ describe("Basic operations in AboutPage InMemory Database", () => {
     await repository.deleteAboutPage()
     const expected = undefined;
     const actual = await repository.getAboutPage();
-    
+
     expect(expected).toEqual(actual);
   });
 });

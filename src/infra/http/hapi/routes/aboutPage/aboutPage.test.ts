@@ -1,3 +1,4 @@
+import AboutPage from "@/domain/entities/AboutPage";
 import { AboutPageRepository } from "@/infra/db/AboutPage";
 import aboutPageMock from "@/mock/aboutPageMock";
 import { Server, ServerApplicationState } from "@hapi/hapi";
@@ -18,12 +19,12 @@ describe("/about routes", () => {
 
   test("result is equal the mock", async () => {
     await repository.createAboutPage(aboutPageMock);
-    const res = await server.inject({
+    const { result } = await server.inject<AboutPage>({
       method: "get",
       url: "/about",
     });
 
-    expect(res.result).toEqual(aboutPageMock);
+    expect(result).toEqual({ id: result?.id, ...aboutPageMock });
   });
 
   test("responds with 200", async () => {
