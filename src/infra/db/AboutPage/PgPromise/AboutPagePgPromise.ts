@@ -1,5 +1,5 @@
 import AboutPage from "@/domain/entities/AboutPage";
-import IAboutPage from "@/domain/repository/IAboutPage";
+import IAboutPage, { AboutPageIn } from "@/domain/repository/IAboutPage";
 import db from "./db";
 
 export default class AboutPagePgPromise implements IAboutPage {
@@ -12,7 +12,7 @@ export default class AboutPagePgPromise implements IAboutPage {
   }
 
   async getAboutPage(): Promise<AboutPage> {
-    const page = await db.oneOrNone('select * from about_page;')
+    const page = await db.oneOrNone('select * from about_page;') ?? {}
     return {
       id: page.id,
       title: page.title,
@@ -20,18 +20,17 @@ export default class AboutPagePgPromise implements IAboutPage {
       skills: page.skills,
       illustrationURL: page.illustration_url,
       illustrationALT: page.illustration_alt
-    } ?? {}
+    }
   }
 
-  async updateAboutPage(page: Partial<Omit<AboutPage, "id">>): Promise<void> {
-    for (const item of Object.keys(page)) {
-
-    }
-
-    await db.none(`update about_page set `)
+  async updateAboutPage(page: Partial<AboutPageIn>): Promise<void> {
+    const query = `update about_page set ${Object.keys(page).map((key, index) =>
+      `${key} = '${Object.values(page)[index]}';`)
+    }`
+    await db.none(query);
   }
 
   async deleteAboutPage(): Promise<void> {
-    throw new Error("Method not implemented.");
+    await db.none('delete from about_page;')
   }
 }

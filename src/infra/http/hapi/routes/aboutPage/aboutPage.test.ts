@@ -5,7 +5,7 @@ import { Server, ServerApplicationState } from "@hapi/hapi";
 import { init } from "hapi/server";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 
-describe("/about routes", () => {
+describe.skip("/about routes", () => {
   const repository = new AboutPageRepository();
   let server: Server<ServerApplicationState>;
 

@@ -1,18 +1,18 @@
-import SkillsPage from "@/domain/entities/SkillsPage";
-import ISkillsPage from "@/domain/repository/ISkillsPage";
+import ISkillsPage, { SkillsPageIn, SkillsPageOut } from "@/domain/repository/ISkillsPage";
+import { randomInt } from "crypto";
 
-let skillsPage: SkillsPage[] = [];
+let skillsPage: SkillsPageOut[] = [];
 
 export default class SkillsPageInMemory implements ISkillsPage {
-  async createSkillsPage(page: SkillsPage): Promise<void> {
-    skillsPage = [page];
+  async createSkillsPage(page: SkillsPageIn): Promise<void> {
+    skillsPage = [{ id: randomInt(1, 2000), ...page }];
   }
 
-  async getSkillsPage(): Promise<SkillsPage> {
+  async getSkillsPage(): Promise<SkillsPageOut> {
     return skillsPage[0];
   }
 
-  async updateSkillsPage(page: Partial<SkillsPage>): Promise<void> {
+  async updateSkillsPage(page: Partial<SkillsPageIn>): Promise<void> {
     skillsPage = [{ ...skillsPage[0], ...page }];
   }
 

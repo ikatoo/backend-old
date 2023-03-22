@@ -13,10 +13,24 @@ describe("Basic operations in Skills Postgres Database", () => {
   });
 
   afterEach(async () => {
+    await db.none('delete from about_page;')
     await db.none("delete from skills;");
   });
 
-  test("CREATE and READ Method", async () => {
+  test("CREATE Method", async () => {
+    await aboutPageRepository.createAboutPage(aboutPageMock)
+    const aboutPage = await aboutPageRepository.getAboutPage()
+    const skillMock = {
+      title: "skill1",
+      description: "desc skill 1",
+      about_page_id: aboutPage.id
+    };
+
+    await expect(skillsRepository.createSkill(skillMock))
+      .resolves.not.toThrow()
+  })
+
+  test("READ Method", async () => {
     await aboutPageRepository.createAboutPage(aboutPageMock)
     const aboutPage = await aboutPageRepository.getAboutPage()
     const skillMock = {

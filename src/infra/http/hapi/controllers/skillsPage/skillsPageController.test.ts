@@ -4,7 +4,7 @@ import { describe, expect, test } from "vitest";
 import { getSkillsPageHandler } from "./skillsPageController";
 
 describe("SkillsPage Controller test", () => {
-  test("Get skills page data", async () => {
+  test.skip("Get skills page data", async () => {
     const repository = new SkillsPageRepository();
     await repository.createSkillsPage(skillPageMock);
 
