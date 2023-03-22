@@ -1,8 +1,8 @@
 import AboutPage from "@/domain/entities/AboutPage";
-import { AboutPageRepository } from "..";
+import IAboutPage from "@/domain/repository/IAboutPage";
 import db from "./db";
 
-export default class AboutPagePgPromise implements AboutPageRepository {
+export default class AboutPagePgPromise implements IAboutPage {
   async createAboutPage(page: AboutPage): Promise<void> {
     await db.none(`insert into about_page (
       title, description, illustration_url, illustration_alt
