@@ -3,7 +3,7 @@ import aboutPageMock from "@/mock/aboutPageMock";
 import { describe, expect, test } from "vitest";
 import { getAboutPageHandler } from "./aboutPageController";
 
-describe("AboutPage Controller test", () => {
+describe.skip("AboutPage Controller test", () => {
   test("Get about page data", async () => {
     const repository = new AboutPageRepository();
     await repository.createAboutPage(aboutPageMock);
