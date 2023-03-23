@@ -1,11 +1,15 @@
 import aboutPageMock from "@/mock/aboutPageMock";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, beforeAll, describe, expect, test } from "vitest";
 import AboutPagePgPromise from "./AboutPagePgPromise";
 import db from "./db";
 
 describe("Basic operations in AboutPage Postgres Database", () => {
   const repository = new AboutPagePgPromise();
   const { skills, ...rest } = aboutPageMock
+
+  beforeAll(async()=>{
+    await db.connect()
+  })
 
   afterEach(async () => {
     await db.none('delete from about_page;')
