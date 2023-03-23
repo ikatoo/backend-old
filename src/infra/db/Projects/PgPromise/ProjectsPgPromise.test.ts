@@ -5,10 +5,6 @@ import ProjectsPgPromise from "./ProjectsPgPromise";
 describe("Basic operations in Projects Postgres Database", () => {
   const repository = new ProjectsPgPromise();
 
-  beforeAll(async () => {
-    await db.connect();
-  });
-
   afterEach(async () => {
     await db.none("delete from projects;");
   });

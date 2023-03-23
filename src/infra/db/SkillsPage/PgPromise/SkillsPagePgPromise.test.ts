@@ -6,10 +6,6 @@ import SkillsPagePgPromise from "./SkillsPagePgPromise";
 describe("Basic operations in SkillsPage PgPromise Database", () => {
   const repository = new SkillsPagePgPromise();
 
-  beforeAll(async () => {
-    await db.connect()
-  })
-
   afterEach(async () => {
     await db.none('delete from skills_page;')
   })
