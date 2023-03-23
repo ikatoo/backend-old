@@ -8,10 +8,6 @@ describe("Basic operations in Skills Postgres Database", () => {
   const skillsRepository = new SkillsPgPromise();
   const aboutPageRepository = new AboutPageRepository()
 
-  beforeAll(async () => {
-    await db.connect();
-  });
-
   afterEach(async () => {
     await db.none('delete from about_page;')
     await db.none("delete from skills;");

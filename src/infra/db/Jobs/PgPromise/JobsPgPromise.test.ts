@@ -5,10 +5,6 @@ import JobsPgPromise from "./JobsPgPromise";
 describe("Basic operations in Jobs Postgres Database", () => {
   const repository = new JobsPgPromise();
 
-  beforeAll(async () => {
-    await db.connect();
-  });
-
   afterEach(async () => {
     await db.none("delete from jobs;");
   });
