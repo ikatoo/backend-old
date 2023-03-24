@@ -5,7 +5,7 @@ export default class Skill {
     readonly id: number,
     readonly title: string,
     readonly description?: string,
-  ) {}
+  ) { }
 
   monthsExperienceCalculator(jobs: Job[]): number {
     let totalMonthsExperience = 0;
@@ -14,8 +14,9 @@ export default class Skill {
         skill.title === this.title
       );
       if (skillExists) {
-        totalMonthsExperience += ((job.end ?? Date.now()) - job.start) / 1000 /
-          60 / 60 / 24 / 30;
+        totalMonthsExperience += (
+          (job.end?.getTime() ?? Date.now()) - job.start.getTime())
+          / 1000 / 60 / 60 / 24 / 30;
       }
     });
 
