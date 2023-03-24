@@ -14,6 +14,8 @@
     "test:application:watch": "vitest --no-threads src/application/**/*.test.ts",
     "test:infra": "vitest run --no-threads src/infra",
     "test:infra:watch": "vitest --no-threads src/infra",
+    "test:utils": "vitest run --no-threads src/utils",
+    "test:utils:watch": "vitest --no-threads src/utils",
     "dev": "tsx --watch src/infra/http/hapi/main.ts",
     "build": "rimraf dist && tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
@@ -32,6 +34,7 @@
     "npm": "9.5.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
     "@types/node": "^18.15.0",
     "globstar": "^1.0.0",
     "rimraf": "^4.4.0",
@@ -43,6 +46,7 @@
   },
   "dependencies": {
     "@hapi/hapi": "^21.3.0",
+    "bcrypt": "^5.1.0",
     "dotenv": "^16.0.3",
     "pg-promise": "^11.4.3"
   }
