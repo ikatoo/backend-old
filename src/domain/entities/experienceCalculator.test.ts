@@ -16,8 +16,8 @@ describe("Weeks amounts experience calculator", () => {
         "desc1",
         [skillToCalculate, new Skill(2, "other skill 2")],
         "http://github.com/user",
-        new Date(2013, 1).getTime(),
-        new Date(2013, 4).getTime(),
+        new Date(2013, 1),
+        new Date(2013, 4),
       ),
       new Job(
         2,
@@ -25,8 +25,8 @@ describe("Weeks amounts experience calculator", () => {
         "desc2",
         [new Skill(3, "other skill 3"), new Skill(4, "other skill 4")],
         "http://github.com/user",
-        new Date(2013, 5).getTime(),
-        new Date(2021, 5).getTime(),
+        new Date(2013, 5),
+        new Date(2021, 5),
       ),
       new Job(
         3,
@@ -34,7 +34,7 @@ describe("Weeks amounts experience calculator", () => {
         "desc3",
         [skillToCalculate],
         "http://github.com/user",
-        new Date(2021, 6).getTime(),
+        new Date(2021, 6),
       ),
     ];
 
