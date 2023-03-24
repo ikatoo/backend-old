@@ -17,7 +17,8 @@ describe("Basic operations in Contact Postgres Database", () => {
       localization: {
         latitude: contactPageMock.localization.lat,
         longitude: contactPageMock.localization.lng
-      }
+      },
+      contactPageId: 3
     };
     await expect(repository.createContact(contactMock))
       .resolves.not.toThrow()
@@ -36,7 +37,11 @@ describe("Basic operations in Contact Postgres Database", () => {
       "select * from contacts where email = $1",
       contactMock.email,
     );
-    const expected = [{ id: contactInDb.id, ...contactMock }];
+    const expected = [{
+      id: contactInDb.id,
+      ...contactMock,
+      contactPageId: contactInDb.contact_page_id
+    }];
     const actual = await repository.getContacts();
 
     expect(expected).toEqual(actual);
@@ -63,7 +68,12 @@ describe("Basic operations in Contact Postgres Database", () => {
       }
     };
     await repository.updateContact(contactInDb.id, newValue);
-    const expected = [{ id: contactInDb.id, ...contactMock, ...newValue }];
+    const expected = [{
+      id: contactInDb.id,
+      ...contactMock,
+      ...newValue,
+      contactPageId: contactInDb.contact_page_id
+    }];
     const actual = await repository.getContacts();
 
     expect(expected).toEqual(actual);

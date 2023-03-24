@@ -1,21 +1,21 @@
-import Contact from "@/domain/entities/Contact";
-import IContacts, { ContactIn } from "@/domain/repository/IContact";
+import IContacts, { ContactIn, ContactOut } from "@/domain/repository/IContact";
 import db from "./db";
 
 export default class ContactPgPromise implements IContacts {
   async createContact(contact: ContactIn): Promise<void> {
-    const query = `INSERT INTO "contacts" ("email"${contact.localization ? ', "localization"' : ''})
-      VALUES ($1${contact.localization ? ', \'$2,$3\'' : ''});`
-    const values = [
-      contact.email,
-      contact.localization?.latitude,
-      contact.localization?.longitude
-    ]
+    const query = `INSERT INTO "contacts" ("email"
+        ${contact.localization ? ', "localization"' : ''}
+        ${contact.contactPageId ? ', "contact_page_id"' : ''}
+      )
+      VALUES ($\{email\}
+        ${contact.localization ? ', \'${localization.latitude},${localization.longitude}\'' : ''}
+        ${contact.contactPageId ? ', ${contactPageId}' : ''}
+      );`
 
-    await db.none(query, values)
+    await db.none(query, contact)
   }
 
-  async getContacts(): Promise<Contact[]> {
+  async getContacts(): Promise<ContactOut[]> {
     const contacts = await db.manyOrNone('select * from contacts')
     const mappedContacts = contacts.map(contact => ({
       id: contact.id,
@@ -23,7 +23,8 @@ export default class ContactPgPromise implements IContacts {
       localization: {
         latitude: contact.localization.x,
         longitude: contact.localization.y
-      }
+      },
+      contactPageId: contact.contact_page_id
     }))
 
     return [...mappedContacts]
