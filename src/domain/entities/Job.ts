@@ -7,7 +7,7 @@ export default class Job {
     readonly description: string,
     readonly skills: Skill[],
     readonly link: string,
-    readonly start: number,
-    readonly end?: number,
+    readonly start: Date,
+    readonly end?: Date,
   ) {}
 }
