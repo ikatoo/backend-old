@@ -3,7 +3,7 @@ import pgPromise from 'pg-promise'
 
 const pgp = pgPromise({})
 
-export default pgp({
+global.DB = global.DB ?? pgp({
   user: env.POSTGRES_USER,
   password: env.POSTGRES_PASSWORD,
   host: env.NODE_ENV === "test" ? "localhost" : env.POSTGRES_HOSTNAME,
@@ -11,3 +11,7 @@ export default pgp({
   database: env.POSTGRES_DBNAME,
   idleTimeoutMillis: 100
 })
+
+const db = global.DB
+
+export default db
