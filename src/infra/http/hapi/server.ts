@@ -1,6 +1,6 @@
 import { server } from "@hapi/hapi";
 import routes from "./routes";
-import { env } from "@/env";
+import { env } from "@/utils/env";
 
 const hapiServer = server({
   port: env.PORT,
