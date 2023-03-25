@@ -98,4 +98,28 @@ describe("Basic operations in Contact Postgres Database", () => {
 
     expect(expected).toEqual(actual);
   });
+
+
+  test("Get contacts by contact_page_id", async () => {
+    let expected: ContactIn[] = []
+    for (let index = 0; index < 4; index++) {
+      const contact = {
+        email: `newemail${index}@email.com`,
+        localization: {
+          latitude: contactPageMock.localization.lat + ((index + 1) / 10),
+          longitude: contactPageMock.localization.lng + ((index + 1) / 10)
+        },
+        contactPageId: index < 3 ? 1 : index
+      }
+      expected = index < 3 ? [...expected, contact] : expected
+      await repository.createContact(contact);
+    }
+
+    const actual = (await repository.getContactsByContactPageId(1)).map(contact => {
+      const { id, ...rest } = contact
+      return rest
+    })
+
+    expect(expected).toEqual(actual);
+  });
 });

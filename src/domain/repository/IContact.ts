@@ -8,4 +8,5 @@ export default interface IContacts {
   getContacts(): Promise<ContactOut[]>;
   updateContact(id: number, contact: Partial<ContactIn>): Promise<void>;
   deleteContact(id: number): Promise<void>;
+  getContactsByContactPageId(contactPageId: number): Promise<ContactOut[]>;
 }
