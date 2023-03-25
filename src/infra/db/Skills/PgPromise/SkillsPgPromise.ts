@@ -1,9 +1,7 @@
 import ISkills, { SkillIn, SkillOut } from "@/domain/repository/ISkills";
-import { AboutPageRepository } from "../../AboutPage";
 import db from "./db";
 
 export default class SkillsPgPromise implements ISkills {
-  private readonly aboutPageRepository = new AboutPageRepository()
 
   async createSkill(skill: SkillIn): Promise<void> {
     await db.none(
@@ -20,7 +18,7 @@ export default class SkillsPgPromise implements ISkills {
 
   async getSkills(): Promise<SkillOut[]> {
     const skills = await db.manyOrNone("select * from skills;");
-    const mappedSkills:SkillOut[] = skills.map(skill => ({
+    const mappedSkills: SkillOut[] = skills.map(skill => ({
       id: skill.id,
       title: skill.title,
       description: skill.description,
@@ -45,7 +43,7 @@ export default class SkillsPgPromise implements ISkills {
       "select * from skills where about_page_id = $1;",
       aboutPageId
     );
-    const mappedSkills:SkillOut[] = skills.map(skill => ({
+    const mappedSkills: SkillOut[] = skills.map(skill => ({
       id: skill.id,
       title: skill.title,
       description: skill.description,
