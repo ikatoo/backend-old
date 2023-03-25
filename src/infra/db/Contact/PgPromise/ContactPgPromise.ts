@@ -2,6 +2,7 @@ import IContacts, { ContactIn, ContactOut } from "@/domain/repository/IContact";
 import db from "./db";
 
 export default class ContactPgPromise implements IContacts {
+
   async createContact(contact: ContactIn): Promise<void> {
     const query = `INSERT INTO "contacts" ("email"
         ${contact.localization ? ', "localization"' : ''}
@@ -43,6 +44,24 @@ export default class ContactPgPromise implements IContacts {
 
   async deleteContact(id: number): Promise<void> {
     await db.none('delete from contacts where id = $1', id)
+  }
+
+  async getContactsByContactPageId(contactPageId: number): Promise<ContactOut[]> {
+    const contacts = await db.manyOrNone(
+      'select * from contacts where contact_page_id = $1',
+      contactPageId
+    )
+    const mappedContacts = contacts.map(contact => ({
+      id: contact.id,
+      email: contact.email,
+      localization: {
+        latitude: contact.localization.x,
+        longitude: contact.localization.y
+      },
+      contactPageId: contact.contact_page_id
+    }))
+
+    return [...mappedContacts]
   }
 
 }
