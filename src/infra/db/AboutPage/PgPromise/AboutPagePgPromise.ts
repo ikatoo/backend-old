@@ -4,6 +4,7 @@ import db from "./db";
 
 export default class AboutPagePgPromise implements IAboutPage {
   async createAboutPage(page: Omit<AboutPage, "id">): Promise<void> {
+    await db.none('delete from about_page;')
     await db.none(`insert into about_page (
       title, description, illustration_url, illustration_alt
     ) values ($1,$2,$3,$4);`, [
@@ -26,7 +27,7 @@ export default class AboutPagePgPromise implements IAboutPage {
   async updateAboutPage(page: Partial<AboutPageIn>): Promise<void> {
     const query = `update about_page set ${Object.keys(page).map((key, index) =>
       `${key} = '${Object.values(page)[index]}';`)
-    }`
+      }`
     await db.none(query);
   }
 
