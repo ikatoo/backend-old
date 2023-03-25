@@ -6,7 +6,6 @@ export default class SkillsPgPromise implements ISkills {
   private readonly aboutPageRepository = new AboutPageRepository()
 
   async createSkill(skill: SkillIn): Promise<void> {
-    const aboutPage = await this.aboutPageRepository.getAboutPage()
     await db.none(
       `insert into skills (
       title, description, about_page_id
@@ -14,14 +13,20 @@ export default class SkillsPgPromise implements ISkills {
       [
         skill.title,
         skill.description,
-        aboutPage.id
+        skill.aboutPageId
       ],
     );
   }
 
   async getSkills(): Promise<SkillOut[]> {
-    const skills = await db.manyOrNone<SkillOut>("select * from skills;");
-    return [...skills];
+    const skills = await db.manyOrNone("select * from skills;");
+    const mappedSkills:SkillOut[] = skills.map(skill => ({
+      id: skill.id,
+      title: skill.title,
+      description: skill.description,
+      aboutPageId: skill.about_page_id
+    }))
+    return [...mappedSkills];
   }
 
   async updateSkills(id: number, skill: Partial<SkillIn>): Promise<void> {
@@ -33,5 +38,19 @@ export default class SkillsPgPromise implements ISkills {
 
   async deleteSkill(id: number): Promise<void> {
     await db.none(`delete from skills where id = $1`, id);
+  }
+
+  async getSkillsByAboutPageId(aboutPageId: number): Promise<SkillOut[]> {
+    const skills = await db.manyOrNone(
+      "select * from skills where about_page_id = $1;",
+      aboutPageId
+    );
+    const mappedSkills:SkillOut[] = skills.map(skill => ({
+      id: skill.id,
+      title: skill.title,
+      description: skill.description,
+      aboutPageId: skill.about_page_id
+    }))
+    return [...mappedSkills];
   }
 }

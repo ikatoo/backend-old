@@ -1,3 +1,4 @@
+import { SkillIn } from "@/domain/repository/ISkills";
 import aboutPageMock from "@/mock/aboutPageMock";
 import { afterEach, beforeAll, describe, expect, test } from "vitest";
 import { AboutPageRepository } from "../../AboutPage";
@@ -19,7 +20,7 @@ describe("Basic operations in Skills Postgres Database", () => {
     const skillMock = {
       title: "skill1",
       description: "desc skill 1",
-      about_page_id: aboutPage.id
+      aboutPageId: aboutPage.id
     };
 
     await expect(skillsRepository.createSkill(skillMock))
@@ -32,7 +33,7 @@ describe("Basic operations in Skills Postgres Database", () => {
     const skillMock = {
       title: "skill1",
       description: "desc skill 1",
-      about_page_id: aboutPage.id
+      aboutPageId: aboutPage.id
     };
     await skillsRepository.createSkill(skillMock);
     const skillInDb = await db.one(
@@ -51,7 +52,7 @@ describe("Basic operations in Skills Postgres Database", () => {
     const skillMock = {
       title: "update test",
       description: "desc update test",
-      about_page_id: aboutPage.id
+      aboutPageId: aboutPage.id
     };
     await skillsRepository.createSkill(skillMock);
     const skillInDb = await db.one(
@@ -74,7 +75,7 @@ describe("Basic operations in Skills Postgres Database", () => {
     const skillMock = {
       title: "update test",
       description: "desc update test",
-      about_page_id: aboutPage.id
+      aboutPageId: aboutPage.id
     };
     await skillsRepository.createSkill(skillMock);
     const skillInDb = await db.one(
@@ -84,6 +85,26 @@ describe("Basic operations in Skills Postgres Database", () => {
     await skillsRepository.deleteSkill(skillInDb.id);
     const expected: [] = [];
     const actual = await skillsRepository.getSkills();
+
+    expect(expected).toEqual(actual);
+  });
+
+  test("Get skills by about_page_id", async () => {
+    let expected: SkillIn[] = []
+    for (let index = 0; index < 4; index++) {
+      const skill: SkillIn = {
+        title: `title ${index}`,
+        description: `description ${index}`,
+        aboutPageId: index < 3 ? 1 : index
+      }
+      expected = index < 3 ? [...expected, skill] : expected
+      await skillsRepository.createSkill(skill);
+    }
+
+    const actual = (await skillsRepository.getSkillsByAboutPageId(1)).map(skill => {
+      const { id, ...rest } = skill
+      return rest
+    })
 
     expect(expected).toEqual(actual);
   });
