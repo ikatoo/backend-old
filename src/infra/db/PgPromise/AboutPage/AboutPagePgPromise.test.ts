@@ -8,6 +8,8 @@ describe("Basic operations in AboutPage Postgres Database", () => {
   const { skills, ...rest } = aboutPageMock
 
   afterEach(async () => {
+    await db.none('delete from skills_jobs;')
+    await db.none('delete from skills;')
     await db.none('delete from about_page;')
   })
 

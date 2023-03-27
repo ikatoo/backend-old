@@ -8,7 +8,6 @@ export default class AboutPagePgPromise implements IAboutPage {
   }
 
   async createAboutPage(page: Omit<AboutPage, "id">): Promise<void> {
-    await db.none('delete from about_page;')
     await db.none(`insert into about_page (
       title, description, illustration_url, illustration_alt
     ) values ($1,$2,$3,$4);`, [
