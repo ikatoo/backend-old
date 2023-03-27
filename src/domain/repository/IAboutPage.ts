@@ -8,4 +8,5 @@ export default interface IAboutPage {
   getAboutPage(): Promise<AboutPageOut>;
   updateAboutPage(page: Partial<AboutPageIn>): Promise<void>;
   deleteAboutPage(): Promise<void>;
+  clear(): Promise<void>
 }

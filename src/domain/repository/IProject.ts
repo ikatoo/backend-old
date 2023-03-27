@@ -7,4 +7,5 @@ export default interface IProjects {
   getProjects(): Promise<Project[]>;
   updateProject(id: number, project: Partial<ProjectIn>): Promise<void>;
   deleteProject(id: number): Promise<void>;
+  clear(): Promise<void>
 }

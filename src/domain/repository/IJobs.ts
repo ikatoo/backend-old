@@ -13,4 +13,5 @@ export default interface IJobs {
   getJobs(): Promise<JobOut[]>;
   updateJob(id: number, job: Partial<JobIn>): Promise<void>;
   deleteJob(id: number): Promise<void>;
+  clear(): Promise<void>
 }

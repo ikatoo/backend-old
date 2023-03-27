@@ -8,4 +8,5 @@ export default interface IContactPage {
   getContactPage(): Promise<ContactPageOut>;
   updateContactPage(page: Partial<ContactPageIn>): Promise<void>;
   deleteContactPage(): Promise<void>;
+  clear(): Promise<void>
 }

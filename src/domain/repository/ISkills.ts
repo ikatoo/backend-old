@@ -12,4 +12,5 @@ export default interface ISkills {
   updateSkills(id: number, skill: Partial<SkillIn>): Promise<void>;
   deleteSkill(id: number): Promise<void>;
   getSkillsByAboutPageId(aboutPageId: number): Promise<SkillOut[]>
+  clear(): Promise<void>
 }

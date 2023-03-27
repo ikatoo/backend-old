@@ -7,4 +7,5 @@ export interface IProjectsPage {
   getProjectsPage(): Promise<ProjectsPage>;
   updateProjectsPage(page: Partial<ProjectsPageIn>): Promise<void>;
   deleteProjectsPage(): Promise<void>;
+  clear(): Promise<void>
 }

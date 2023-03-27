@@ -8,4 +8,5 @@ export default interface ISkillsPage {
   getSkillsPage(): Promise<SkillsPageOut>;
   updateSkillsPage(page: Partial<SkillsPageIn>): Promise<void>;
   deleteSkillsPage(): Promise<void>;
+  clear(): Promise<void>
 }
