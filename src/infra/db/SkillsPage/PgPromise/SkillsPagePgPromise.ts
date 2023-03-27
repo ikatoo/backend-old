@@ -2,6 +2,11 @@ import ISkillsPage, { SkillsPageIn, SkillsPageOut } from "@/domain/repository/IS
 import db from "./db";
 
 export default class SkillsPagePgPromise implements ISkillsPage {
+
+  async clear(): Promise<void> {
+    await db.none('delete from skills_page;')
+  }
+
   async createSkillsPage(page: SkillsPageIn): Promise<void> {
     await db.none(
       `insert into skills_page (

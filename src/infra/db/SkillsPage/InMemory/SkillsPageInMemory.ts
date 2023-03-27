@@ -4,6 +4,11 @@ import { randomInt } from "crypto";
 let skillsPage: SkillsPageOut[] = [];
 
 export default class SkillsPageInMemory implements ISkillsPage {
+
+  async clear(): Promise<void> {
+    skillsPage = []
+  }
+
   async createSkillsPage(page: SkillsPageIn): Promise<void> {
     skillsPage = [{ id: randomInt(1, 2000), ...page }];
   }

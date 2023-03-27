@@ -1,5 +1,5 @@
-import SkillsPageInMemory from "./InMemory/SkillsPageInMemory"
+import SkillsPagePgPromise from "./PgPromise/SkillsPagePgPromise"
 
 export {
-  SkillsPageInMemory as SkillsPageRepository
+  SkillsPagePgPromise as SkillsPageRepository
 }

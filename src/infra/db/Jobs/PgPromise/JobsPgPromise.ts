@@ -2,6 +2,11 @@ import IJobs, { JobIn, JobOut } from "@/domain/repository/IJobs";
 import db from "./db";
 
 export default class JobsPgPromise implements IJobs {
+
+  async clear(): Promise<void> {
+    await db.none('delete from jobs;')
+  }
+
   async createJob(job: JobIn): Promise<void> {
     const start = new Date(new Date(job.start).toDateString())
     const end = job.end && new Date(new Date(job.end).toDateString())

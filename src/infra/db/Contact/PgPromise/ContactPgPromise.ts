@@ -3,6 +3,10 @@ import db from "./db";
 
 export default class ContactPgPromise implements IContacts {
 
+  async clear(): Promise<void> {
+    await db.none('delete from contacts;')
+  }
+
   async createContact(contact: ContactIn): Promise<void> {
     const query = `INSERT INTO "contacts" ("email"
         ${contact.localization ? ', "localization"' : ''}

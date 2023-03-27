@@ -3,6 +3,10 @@ import db from "./db";
 
 export default class SkillsPgPromise implements ISkills {
 
+  async clear(): Promise<void> {
+    await db.none('delete from skills;')
+  }
+
   async createSkill(skill: SkillIn): Promise<void> {
     await db.none(
       `insert into skills (

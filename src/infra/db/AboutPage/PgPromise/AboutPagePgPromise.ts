@@ -3,6 +3,10 @@ import IAboutPage, { AboutPageIn } from "@/domain/repository/IAboutPage";
 import db from "./db";
 
 export default class AboutPagePgPromise implements IAboutPage {
+  async clear(): Promise<void> {
+    await db.none('delete from about_page;')
+  }
+
   async createAboutPage(page: Omit<AboutPage, "id">): Promise<void> {
     await db.none('delete from about_page;')
     await db.none(`insert into about_page (
