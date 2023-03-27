@@ -1,5 +1,5 @@
-import { AboutPageRepository } from "@/infra/db/AboutPage";
-import { SkillsRepository } from "@/infra/db/Skills";
+import { AboutPageRepository } from "@/infra/db";
+import { SkillsRepository } from "@/infra/db";
 import aboutPageMock from "@/mock/aboutPageMock";
 import { describe, expect, test } from "vitest";
 import { getAboutPageHandler } from "./aboutPageController";

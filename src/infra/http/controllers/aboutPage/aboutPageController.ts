@@ -1,5 +1,5 @@
-import { AboutPageRepository } from "@/infra/db/AboutPage";
-import { SkillsRepository } from "@/infra/db/Skills";
+import { AboutPageRepository } from "@/infra/db";
+import { SkillsRepository } from "@/infra/db";
 
 const aboutPageRepository = new AboutPageRepository();
 const skillsRepository = new SkillsRepository()

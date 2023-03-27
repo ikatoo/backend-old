@@ -1,6 +1,6 @@
 import AboutPage from "@/domain/entities/AboutPage";
-import { AboutPageRepository } from "@/infra/db/AboutPage";
-import { SkillsRepository } from "@/infra/db/Skills";
+import { AboutPageRepository } from "@/infra/db";
+import { SkillsRepository } from "@/infra/db";
 import aboutPageMock from "@/mock/aboutPageMock";
 import { Server, ServerApplicationState } from "@hapi/hapi";
 import { init } from "hapi/server";
