@@ -3,9 +3,11 @@ import contactPageMock from "@/mock/contactPageMock";
 import { afterEach, describe, expect, test } from "vitest";
 import ContactPgPromise from "./ContactPgPromise";
 import db from "..";
+import ContactPagePgPromise from "../ContactPage/ContactPagePgPromise";
 
 describe("Basic operations in Contact Postgres Database", () => {
   const repository = new ContactPgPromise();
+  const contactPageRepository = new ContactPagePgPromise()
 
   afterEach(async () => {
     await db.none("delete from contacts;");
@@ -17,8 +19,7 @@ describe("Basic operations in Contact Postgres Database", () => {
       localization: {
         latitude: contactPageMock.localization.lat,
         longitude: contactPageMock.localization.lng
-      },
-      contactPageId: 3
+      }
     };
     await expect(repository.createContact(contactMock))
       .resolves.not.toThrow()
@@ -101,25 +102,27 @@ describe("Basic operations in Contact Postgres Database", () => {
 
 
   test("Get contacts by contact_page_id", async () => {
-    let expected: ContactIn[] = []
-    for (let index = 0; index < 4; index++) {
-      const contact = {
-        email: `newemail${index}@email.com`,
-        localization: {
-          latitude: contactPageMock.localization.lat + ((index + 1) / 10),
-          longitude: contactPageMock.localization.lng + ((index + 1) / 10)
-        },
-        contactPageId: index < 3 ? 1 : index
-      }
-      expected = index < 3 ? [...expected, contact] : expected
-      await repository.createContact(contact);
-    }
+    await contactPageRepository.createContactPage({
+      title: 'test',
+      description: 'desc'
+    })
 
-    const actual = (await repository.getContactsByContactPageId(1)).map(contact => {
+    const page = await contactPageRepository.getContactPage()
+    const contactMock: ContactIn = {
+      email: "this@email.com",
+      localization: {
+        latitude: contactPageMock.localization.lat,
+        longitude: contactPageMock.localization.lng
+      },
+      contactPageId: page.id
+    };
+    await repository.createContact(contactMock)
+
+    const actual = (await repository.getContactsByContactPageId(page.id)).map(contact => {
       const { id, ...rest } = contact
       return rest
     })
 
-    expect(expected).toEqual(actual);
+    expect([contactMock]).toEqual(actual);
   });
 });

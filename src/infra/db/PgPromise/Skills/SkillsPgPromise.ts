@@ -2,6 +2,20 @@ import ISkills, { SkillIn, SkillOut } from "@/domain/repository/ISkills";
 import db from "..";
 
 export default class SkillsPgPromise implements ISkills {
+  async getSkillByTitle(title: string): Promise<SkillOut | undefined> {
+    const skill = await db.oneOrNone(
+      "select * from skills where title = $1;",
+      title
+    );
+    const mappedSkill: SkillOut = {
+      id: skill.id,
+      title: skill.title,
+      description: skill.description,
+      aboutPageId: skill.about_page_id
+    }
+
+    return mappedSkill;
+  }
 
   async clear(): Promise<void> {
     await db.none('delete from skills;')

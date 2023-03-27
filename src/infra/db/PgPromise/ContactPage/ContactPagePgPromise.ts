@@ -7,8 +7,9 @@ export default class ContactPagePgPromise implements IContactPage {
   async clear(): Promise<void> {
     await db.none('delete from contacts_page;')
   }
-  
+
   async createContactPage(page: ContactPageIn): Promise<void> {
+    await db.none('delete from contacts_page;')
     await db.none(
       `insert into contacts_page (
         title, description

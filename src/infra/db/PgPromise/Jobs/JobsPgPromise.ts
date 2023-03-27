@@ -2,6 +2,18 @@ import IJobs, { JobIn, JobOut } from "@/domain/repository/IJobs";
 import db from "..";
 
 export default class JobsPgPromise implements IJobs {
+  async getJobByTitle(title: string): Promise<JobOut | undefined> {
+    const job = await db.oneOrNone('select * from jobs where title = $1;', [
+      title
+    ])
+    const mappedJob: JobOut = {
+      ...job,
+      start: new Date(new Date(job.start).toDateString()).getTime(),
+      end: new Date(new Date(job.end).toDateString()).getTime(),
+    }
+
+    return mappedJob
+  }
 
   async clear(): Promise<void> {
     await db.none('delete from jobs;')

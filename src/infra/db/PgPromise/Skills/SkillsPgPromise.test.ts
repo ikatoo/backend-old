@@ -108,4 +108,25 @@ describe("Basic operations in Skills Postgres Database", () => {
 
     expect(expected).toEqual(actual);
   });
+
+  test("Get skills by title", async () => {
+    let expected: SkillIn[] = []
+    for (let index = 0; index < 4; index++) {
+      const skill: SkillIn = {
+        title: `title ${index}`,
+        description: `description ${index}`,
+        aboutPageId: index < 3 ? 1 : index
+      }
+      expected = index < 3 ? [...expected, skill] : expected
+      await skillsRepository.createSkill(skill);
+    }
+
+    const actual = await skillsRepository.getSkillByTitle('title 2')
+
+    expect(expected[2]).toEqual({
+      title: actual?.title,
+      description: actual?.description,
+      aboutPageId: actual?.aboutPageId
+    });
+  });
 });
