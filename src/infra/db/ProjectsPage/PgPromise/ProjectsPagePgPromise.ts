@@ -3,6 +3,11 @@ import { IProjectsPage, ProjectsPageIn } from "@/domain/repository/IProjectsPage
 import db from "./db";
 
 export default class ProjectsPagePgPromise implements IProjectsPage {
+
+  async clear(): Promise<void> {
+    await db.none('delete from projects_page;')
+  }
+
   async createProjectsPage(page: ProjectsPageIn): Promise<void> {
     await db.none(
       `insert into projects_page (

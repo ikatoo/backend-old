@@ -3,6 +3,11 @@ import IContactPage, { ContactPageIn } from "@/domain/repository/IContactPage";
 import db from "./db";
 
 export default class ContactPagePgPromise implements IContactPage {
+
+  async clear(): Promise<void> {
+    await db.none('delete from contacts_page;')
+  }
+  
   async createContactPage(page: ContactPageIn): Promise<void> {
     await db.none(
       `insert into contacts_page (

@@ -3,6 +3,11 @@ import IProjects, { ProjectIn } from "@/domain/repository/IProject";
 import db from "./db";
 
 export default class ProjectsPgPromise implements IProjects {
+
+  async clear(): Promise<void> {
+    await db.none('delete from projects;')
+  }
+
   async createProject(project: ProjectIn): Promise<void> {
     await db.none(
       `insert into projects (

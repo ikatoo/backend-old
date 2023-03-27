@@ -3,6 +3,10 @@ import db from "./db"
 
 export default class SkillOnJobPgPromise implements ISkillOnJob {
 
+  async clear(): Promise<void> {
+    await db.none('delete from skills_jobs;')
+  }
+
   async getSkillsByJobId(jobId: number): Promise<SkillOnJob[]> {
     const skillsJobs = await db.manyOrNone(
       'select * from skills_jobs where job_id = $1',

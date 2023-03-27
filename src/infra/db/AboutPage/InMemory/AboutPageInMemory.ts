@@ -5,6 +5,10 @@ import { randomInt } from "crypto";
 let aboutPage: AboutPage[] = [];
 
 export default class AboutPageInMemory implements IAboutPage {
+  async clear(): Promise<void> {
+    aboutPage = []
+  }
+
   async createAboutPage(page: Omit<AboutPage, "id">): Promise<void> {
     aboutPage = [{ id: randomInt(1, 2000), ...page }];
   }
