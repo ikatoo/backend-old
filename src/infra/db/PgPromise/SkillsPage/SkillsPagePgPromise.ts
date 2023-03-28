@@ -1,4 +1,4 @@
-import ISkillsPage, { SkillsPageIn, SkillsPageOut } from "@/domain/repository/ISkillsPage";
+import ISkillsPage, { SkillsPage } from "@/repository/ISkillsPage";
 import db from "..";
 
 export default class SkillsPagePgPromise implements ISkillsPage {
@@ -7,24 +7,34 @@ export default class SkillsPagePgPromise implements ISkillsPage {
     await db.none('delete from skills_page;')
   }
 
-  async createSkillsPage(page: SkillsPageIn): Promise<void> {
+  async createSkillsPage(page: SkillsPage): Promise<void> {
+    await db.none('delete from skills_page;')
     await db.none(
       `insert into skills_page (
-      title, description
-    ) values ($1,$2);`,
+      title, description, skills, last_jobs
+    ) values ($1,$2,$3,$4);`,
       [
         page.title,
-        page.description
+        page.description,
+        { skills: page.skills },
+        { lastJobs: page.lastJobs }
       ],
     );
   }
 
-  async getSkillsPage(): Promise<SkillsPageOut> {
-    const page = await db.manyOrNone('select * from skills_page;')
-    return page ? page[0] : {}
+  async getSkillsPage(): Promise<SkillsPage | undefined> {
+    const page = await db.oneOrNone('select * from skills_page;')
+    if (!page) return
+    const mappedPage = {
+      title: page.title,
+      description: page.description,
+      skills: page.skills.skills,
+      lastJobs: page.last_jobs.lastJobs
+    }
+    return mappedPage
   }
 
-  async updateSkillsPage(page: Partial<SkillsPageIn>): Promise<void> {
+  async updateSkillsPage(page: Partial<SkillsPage>): Promise<void> {
     const query = `update skills_page set ${Object.keys(page).map((key, index) =>
       `${key} = '${Object.values(page)[index]}'`)
       };`

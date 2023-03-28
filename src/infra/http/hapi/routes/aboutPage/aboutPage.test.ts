@@ -1,14 +1,12 @@
-import AboutPage from "@/domain/entities/AboutPage";
 import { AboutPageRepository } from "@/infra/db";
-import { SkillsRepository } from "@/infra/db";
 import aboutPageMock from "@/mock/aboutPageMock";
+import { AboutPage } from "@/repository/IAboutPage";
 import { Server, ServerApplicationState } from "@hapi/hapi";
 import { init } from "hapi/server";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 
 describe("/about routes", () => {
   const aboutPageRepository = new AboutPageRepository();
-  const skillsRepository = new SkillsRepository()
   let server: Server<ServerApplicationState>;
 
   beforeEach(async () => {
@@ -21,16 +19,12 @@ describe("/about routes", () => {
 
   test("result is equal the mock", async () => {
     await aboutPageRepository.createAboutPage(aboutPageMock);
-    const { id } = await aboutPageRepository.getAboutPage()
-    for (const skill of aboutPageMock.skills) {
-      await skillsRepository.createSkill({ ...skill, aboutPageId: id })
-    }
     const { result } = await server.inject<AboutPage>({
       method: "get",
       url: "/about",
     });
 
-    expect(result).toEqual({ id: result?.id, ...aboutPageMock });
+    expect(result).toEqual(aboutPageMock);
   });
 
   test("responds with 200", async () => {

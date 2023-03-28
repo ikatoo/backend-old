@@ -1,45 +1,66 @@
-import Project from "@/domain/entities/Project";
-import IProjects, { ProjectIn } from "@/domain/repository/IProject";
+import IProjects, { PartialProject, Project, ProjectInput } from "@/repository/IProject";
+import { dateToString, stringToDate } from "@/utils/transformers/dateTransform";
 import db from "..";
 
 export default class ProjectsPgPromise implements IProjects {
+  async getProjectById(id: number): Promise<Project> {
+    throw new Error("Method not implemented.");
+  }
+
+  async getProjectByTitle(title: string): Promise<Project> {
+    throw new Error("Method not implemented.");
+  }
 
   async clear(): Promise<void> {
     await db.none('delete from projects;')
   }
 
-  async createProject(project: ProjectIn): Promise<void> {
+  async createProject(project: ProjectInput): Promise<void> {
     await db.none(
       `insert into projects (
         title, description, snapshot, github_link, last_update
       ) values ($1,$2,$3,$4,$5);`,
       [
-        project.title,
-        project.description,
+        project.description.title,
+        project.description.content,
         project.snapshot,
         project.githubLink,
-        project.lastUpdate
+        stringToDate(project.description.subTitle)
       ],
     );
   }
 
   async getProjects(): Promise<Project[]> {
     const projects = await db.manyOrNone('select * from projects;')
-    return projects.map(project => {
-      const { github_link, last_update, ...rest } = project
-      return {
-        ...rest,
-        githubLink: github_link,
-        lastUpdate: last_update
-      }
-    }) ?? [];
+    return projects.map(project => ({
+      id: project.id,
+      description: {
+        title: project.title,
+        content: project.description,
+        subTitle: `Last update: ${dateToString(project.last_update)}`
+      },
+      githubLink: project.github_link,
+      snapshot: project.snapshot
+    }))
   }
 
-  async updateProject(id: number, project: Partial<ProjectIn>): Promise<void> {
-    const query = `update projects set ${Object.keys(project).map((key, index) =>
-      `${key} = '${Object.values(project)[index]}'`)
-      } where id = ${id}`
-    await db.none(query);
+  async updateProject(id: number, project: PartialProject): Promise<void> {
+    await db.none(
+      `update projects set 
+      ${project.description?.title ? 'title=$2' : ''} 
+      ${project.description?.content ? ',description=$3' : ''} 
+      ${project.snapshot ? ',snapshot=$4' : ''} 
+      ${project.githubLink ? ',github_link=$5' : ''} 
+      ${project.description?.subTitle ? ',last_update =$6' : ''} 
+       where id = $1`,
+      [
+        id,
+        project.description?.title,
+        project.description?.content,
+        project.snapshot,
+        project.githubLink,
+        project.description?.subTitle ? stringToDate(project.description.subTitle) : undefined
+      ]);
   }
 
   async deleteProject(id: number): Promise<void> {
