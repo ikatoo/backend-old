@@ -27,11 +27,7 @@ async function getSkillsPageHandler(): Promise<SkillsPageOutput | undefined> {
   const skillsPage = await skillsPageRepository.getSkillsPage()
   if (!skillsPage) return undefined
 
-  return {
-    ...skillsPage,
-    lastJobs: [],
-    skills: []
-  }
+  return skillsPage
 }
 
 export { getSkillsPageHandler };
