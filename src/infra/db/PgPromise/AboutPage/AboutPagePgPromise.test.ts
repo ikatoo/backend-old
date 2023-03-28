@@ -1,7 +1,7 @@
 import aboutPageMock from "@/mock/aboutPageMock";
-import { afterEach, beforeAll, describe, expect, test } from "vitest";
-import AboutPagePgPromise from "./AboutPagePgPromise";
+import { afterEach, describe, expect, test } from "vitest";
 import db from "..";
+import AboutPagePgPromise from "./AboutPagePgPromise";
 
 describe("Basic operations in AboutPage Postgres Database", () => {
   const repository = new AboutPagePgPromise();
