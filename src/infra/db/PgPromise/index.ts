@@ -14,7 +14,6 @@ if (!global.PG_PROMISE_DB) {
   })
   const db = global.PG_PROMISE_DB;
   function initDb() {
-    console.log('INIT DATABASE...')
     db.none(`create table if not exists about_page (
       title varchar(150) unique not null,
       description text not null,
