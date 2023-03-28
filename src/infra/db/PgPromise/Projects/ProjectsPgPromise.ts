@@ -4,11 +4,41 @@ import db from "..";
 
 export default class ProjectsPgPromise implements IProjects {
   async getProjectById(id: number): Promise<Project> {
-    throw new Error("Method not implemented.");
+    const project = await db.oneOrNone(
+      'select * from projects where id=$1',
+      id
+    )
+    const mappedProject: Project = {
+      id: project.id,
+      description: {
+        title: project.title,
+        content: project.description,
+        subTitle: `Last update: ${dateToString(project.last_update)}`
+      },
+      githubLink: project.github_link,
+      snapshot: project.snapshot
+    }
+
+    return mappedProject
   }
 
   async getProjectByTitle(title: string): Promise<Project> {
-    throw new Error("Method not implemented.");
+    const project = await db.oneOrNone(
+      'select * from projects where title=$1',
+      title
+    )
+    const mappedProject: Project = {
+      id: project.id,
+      description: {
+        title: project.title,
+        content: project.description,
+        subTitle: `Last update: ${dateToString(project.last_update)}`
+      },
+      githubLink: project.github_link,
+      snapshot: project.snapshot
+    }
+
+    return mappedProject
   }
 
   async clear(): Promise<void> {
