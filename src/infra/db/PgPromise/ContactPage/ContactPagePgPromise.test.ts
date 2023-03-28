@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, test } from "vitest";
 import ContactPagePgPromise from "./ContactPagePgPromise";
 import db from "..";
+import contactPageMock from "@/mock/contactPageMock";
+import { ContactPage } from "@/repository/IContactPage";
 
 describe("Basic operations in ContactPage Postgres Database", () => {
   const repository = new ContactPagePgPromise();
@@ -10,58 +12,40 @@ describe("Basic operations in ContactPage Postgres Database", () => {
   });
 
   test("CREATE Method", async () => {
-    const pageMock = {
-      title: 'contact title',
-      description: 'description',
-    };
-    await expect(repository.createContactPage(pageMock))
+    await expect(repository.createContactPage(contactPageMock))
       .resolves.not.toThrow()
   });
 
   test("READ Method", async () => {
-    const pageMock = {
-      title: 'contact title',
-      description: 'description',
-    };
-    await repository.createContactPage(pageMock);
+    await repository.createContactPage(contactPageMock);
     const pageInDb = await db.one(
       "select * from contacts_page where title = $1",
-      pageMock.title,
+      contactPageMock.title,
     );
-    const expected = { id: pageInDb.id, ...pageMock };
     const actual = await repository.getContactPage();
 
-    expect(expected).toEqual(actual);
+    expect(contactPageMock).toEqual(actual);
   });
 
   test("UPDATE Method", async () => {
-    const pageMock = {
-      title: 'contact title',
-      description: 'description',
-    };
-    await repository.createContactPage(pageMock);
-    const pageInDb = await db.one(
-      "select * from contacts_page where title = $1",
-      pageMock.title,
-    );
-    const newValue = {
+    await repository.createContactPage(contactPageMock);
+    const newValue: Partial<ContactPage> = {
       description: "new description",
+      localization: {
+        lat: 2,
+        lng: 3
+      }
     };
     await repository.updateContactPage(newValue);
-    const expected = { id: pageInDb.id, ...pageMock, ...newValue };
     const actual = await repository.getContactPage();
 
-    expect(expected).toEqual(actual);
+    expect({ ...contactPageMock, ...newValue }).toEqual(actual);
   });
 
   test("DELETE Method", async () => {
-    const pageMock = {
-      title: 'contact title',
-      description: 'description',
-    };
-    await repository.createContactPage(pageMock);
+    await repository.createContactPage(contactPageMock);
     await repository.deleteContactPage();
-    const expected = {};
+    const expected = undefined;
     const actual = await repository.getContactPage();
 
     expect(expected).toEqual(actual);

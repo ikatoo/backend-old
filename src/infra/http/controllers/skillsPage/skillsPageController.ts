@@ -1,6 +1,3 @@
-import Skill from "@/domain/entities/Skill";
-import { JobsRepository, SkillOnJobRepository } from "@/infra/db";
-import { SkillsRepository } from "@/infra/db";
 import { SkillsPageRepository } from "@/infra/db";
 import { dateNumberToString, dateToString } from "@/utils/transformers/dateTransform";
 
@@ -15,7 +12,6 @@ type JobsOutput = {
   yearMonthStart: string
   yearMonthEnd?: string
   link: string
-  skills: { skillTitle: string }[]
 }
 
 type SkillsPageOutput = {
@@ -25,14 +21,11 @@ type SkillsPageOutput = {
   lastJobs: JobsOutput[]
 }
 
-async function getSkillsPageHandler(): Promise<SkillsPageOutput> {
+async function getSkillsPageHandler(): Promise<SkillsPageOutput | undefined> {
   const skillsPageRepository = new SkillsPageRepository();
-  const skillsRepository = new SkillsRepository()
-  const jobsRepository = new JobsRepository()
-  const skillsOnJobsRepository = new SkillOnJobRepository()
 
   const skillsPage = await skillsPageRepository.getSkillsPage()
-  
+  if (!skillsPage) return undefined
 
   return {
     ...skillsPage,

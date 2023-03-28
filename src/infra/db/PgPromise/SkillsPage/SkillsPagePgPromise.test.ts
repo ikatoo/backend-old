@@ -17,11 +17,9 @@ describe("Basic operations in SkillsPage PgPromise Database", () => {
 
   test("READ Method", async () => {
     await repository.createSkillsPage(skillPageMock);
-    const { lastJobs, skills, ...rest } = skillPageMock
     const actual = await repository.getSkillsPage();
-    const expected = { id: actual.id, ...rest };
 
-    expect(expected).toEqual(actual);
+    expect(skillPageMock).toEqual(actual);
   });
 
   test("UPDATE Method", async () => {
@@ -30,11 +28,9 @@ describe("Basic operations in SkillsPage PgPromise Database", () => {
       description: "new description",
     };
     await repository.updateSkillsPage(newValue);
-    const { lastJobs, skills, ...rest } = skillPageMock
     const actual = await repository.getSkillsPage();
-    const expected = { id: actual.id, ...rest, ...newValue };
 
-    expect(expected).toEqual(actual);
+    expect({ ...skillPageMock, ...newValue }).toEqual(actual);
   });
 
   test("DELETE Method", async () => {

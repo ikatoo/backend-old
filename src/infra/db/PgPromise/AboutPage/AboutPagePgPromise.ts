@@ -1,5 +1,4 @@
-import AboutPage from "@/domain/entities/AboutPage";
-import IAboutPage, { AboutPageIn } from "@/domain/repository/IAboutPage";
+import IAboutPage, { AboutPage } from "@/repository/IAboutPage";
 import db from "..";
 
 export default class AboutPagePgPromise implements IAboutPage {
@@ -7,30 +6,35 @@ export default class AboutPagePgPromise implements IAboutPage {
     await db.none('delete from about_page;')
   }
 
-  async createAboutPage(page: Omit<AboutPage, "id">): Promise<void> {
+  async createAboutPage(page: AboutPage): Promise<void> {
     await db.none(`insert into about_page (
-      title, description, illustration_url, illustration_alt
-    ) values ($1,$2,$3,$4);`, [
-      page.title, page.description, page.illustrationURL, page.illustrationALT
+      title, description, illustration_url, illustration_alt, skills
+    ) values ($1,$2,$3,$4,$5);`, [
+      page.title,
+      page.description,
+      page.illustrationURL,
+      page.illustrationALT,
+      { skills: page.skills }
     ])
   }
 
-  async getAboutPage(): Promise<AboutPage> {
-    const page = await db.oneOrNone('select * from about_page;') ?? {}
+  async getAboutPage(): Promise<AboutPage | undefined> {
+    const page = await db.oneOrNone('select * from about_page;')
+    if (!page) return
     return {
-      id: page.id,
       title: page.title,
       description: page.description,
-      skills: page.skills,
+      skills: page.skills.skills,
       illustrationURL: page.illustration_url,
       illustrationALT: page.illustration_alt
     }
   }
 
-  async updateAboutPage(page: Partial<AboutPageIn>): Promise<void> {
-    const query = `update about_page set ${Object.keys(page).map((key, index) =>
-      `${key} = '${Object.values(page)[index]}';`)
-      }`
+  async updateAboutPage(page: Partial<AboutPage>): Promise<void> {
+    const fieldsWithValues = Object.keys(page).map((key, index) =>
+      `${key} = '${Object.values(page)[index]}'`)
+
+    const query = `update about_page set ${fieldsWithValues};`
     await db.none(query);
   }
 

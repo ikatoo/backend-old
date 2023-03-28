@@ -1,6 +1,9 @@
 const stringToDate = (stringDate: string): Date => {
-  const arrayDate = stringDate.split(' - ')
-  const year = parseInt(arrayDate[0])
+  const arrayDate = stringDate.split('-')
+  const stringYear = arrayDate[0].split("")
+    .map(_char => !Number.isNaN(parseInt(_char)) ? _char : undefined)
+    .join('')
+  const year = parseInt(stringYear)
   const monthIndex = parseInt(arrayDate[1]) - 1
 
   return new Date(year, monthIndex)
@@ -34,7 +37,7 @@ const dateNumberToString = (numberDate: number): string => {
   const date = new Date(numberDate)
   const year = date.getFullYear()
   const month = date.getMonth() + 1
-  
+
   return `${year} - ${month.toString().padStart(2, '0')}`
 }
 
