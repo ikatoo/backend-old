@@ -1,4 +1,5 @@
 import { AboutPageRepository } from "@/infra/db";
+import db from "@/infra/db/PgPromise";
 import aboutPageMock from "@/mock/aboutPageMock";
 import { AboutPage } from "@/repository/IAboutPage";
 import { Server, ServerApplicationState } from "@hapi/hapi";
@@ -14,6 +15,7 @@ describe("/about routes", () => {
   });
 
   afterEach(async () => {
+    await db.none('delete from about_page;')
     await server.stop();
   });
 
@@ -28,6 +30,7 @@ describe("/about routes", () => {
   });
 
   test("responds with 200", async () => {
+    await aboutPageRepository.createAboutPage(aboutPageMock);
     const res = await server.inject({
       method: "get",
       url: "/about",
