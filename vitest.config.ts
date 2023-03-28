@@ -8,4 +8,9 @@ export default defineConfig({
       "hapi": fileURLToPath(new URL("./src/infra/http/hapi", import.meta.url)),
     },
   },
+  test: {
+    globalSetup: [
+      './vitestGlobalSetup.ts'
+    ]
+  }
 });
