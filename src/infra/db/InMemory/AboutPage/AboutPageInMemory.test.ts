@@ -13,7 +13,7 @@ describe("Basic operations in AboutPage InMemory Database", () => {
   test("READ Method", async () => {
     await repository.createAboutPage(aboutPageMock);
     const expected = aboutPageMock;
-    const { id, ...actual } = await repository.getAboutPage();
+    const actual = await repository.getAboutPage();
 
     expect(expected).toEqual(actual);
   });
@@ -24,7 +24,7 @@ describe("Basic operations in AboutPage InMemory Database", () => {
     };
     await repository.updateAboutPage(newValue);
     const actual = await repository.getAboutPage();
-    const expected = { id: actual.id, ...aboutPageMock, ...newValue };
+    const expected = { ...aboutPageMock, ...newValue };
 
     expect(expected).toEqual(actual);
   });

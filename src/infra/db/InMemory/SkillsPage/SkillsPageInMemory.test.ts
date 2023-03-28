@@ -8,9 +8,8 @@ describe("Basic operations in SkillsPage InMemory Database", () => {
   test("CREATE and READ Method", async () => {
     await repository.createSkillsPage(skillPageMock);
     const actual = await repository.getSkillsPage();
-    const expected = { id: actual.id, ...skillPageMock };
 
-    expect(expected).toEqual(actual);
+    expect(skillPageMock).toEqual(actual);
   });
 
   test("UPDATE Method", async () => {
@@ -19,7 +18,7 @@ describe("Basic operations in SkillsPage InMemory Database", () => {
     };
     await repository.updateSkillsPage(newValue);
     const actual = await repository.getSkillsPage();
-    const expected = { id: actual.id, ...skillPageMock, ...newValue };
+    const expected = { ...skillPageMock, ...newValue };
 
     expect(expected).toEqual(actual);
   });

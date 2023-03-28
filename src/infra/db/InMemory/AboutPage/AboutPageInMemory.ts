@@ -1,5 +1,4 @@
-import AboutPage from "@/domain/entities/AboutPage";
-import IAboutPage from "@/domain/repository/IAboutPage";
+import IAboutPage, { AboutPage } from "@/repository/IAboutPage";
 import { randomInt } from "crypto";
 
 let aboutPage: AboutPage[] = [];
@@ -9,15 +8,15 @@ export default class AboutPageInMemory implements IAboutPage {
     aboutPage = []
   }
 
-  async createAboutPage(page: Omit<AboutPage, "id">): Promise<void> {
-    aboutPage = [{ id: randomInt(1, 2000), ...page }];
+  async createAboutPage(page: AboutPage): Promise<void> {
+    aboutPage = [page];
   }
 
   async getAboutPage(): Promise<AboutPage> {
     return aboutPage[0];
   }
 
-  async updateAboutPage(page: Partial<Omit<AboutPage, "id">>): Promise<void> {
+  async updateAboutPage(page: Partial<AboutPage>): Promise<void> {
     aboutPage = [{ ...aboutPage[0], ...page }];
   }
 
