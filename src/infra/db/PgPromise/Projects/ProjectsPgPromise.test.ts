@@ -1,4 +1,5 @@
 import projectsPageMock from "@/mock/projectsPageMock";
+import { dateToString } from "@/utils/transformers/dateTransform";
 import { afterEach, describe, expect, test } from "vitest";
 import db from "..";
 import ProjectsPgPromise from "./ProjectsPgPromise";
@@ -30,51 +31,83 @@ describe("Basic operations in Projects Postgres Database", () => {
     expect(projectsPageMock).toEqual(actual)
   });
 
-  // test("UPDATE Method", async () => {
-  //   await repository.createProject(projectsPageMock[0])
-  //   const newValue = {
-  //     description: {
-  //       title: "new description"
-  //     }
-  //   };
-  //   const projects = await repository.getProjects()
-  //   await repository.updateProject(projects[0].id, newValue);
-  //   const newProjects = await repository.getProjects()
-  //   const expected = {
-  //     snapshot: '/images/snap-calm.png',
-  //     description: {
-  //       title: 'Calm Organizador de Criptomoedas',
-  //       subTitle: 'Last update: 2022 - 03',
-  //       content: newValue.description.title
-  //     },
-  //     githubLink: 'https://github.com/mckatoo/calm'
-  //   }
-  //   const actual = newProjects[0]
+  test("get project by id", async () => {
+    const selectedProject = projectsPageMock[1]
+    await repository.createProject(projectsPageMock[0])
+    await repository.createProject(selectedProject)
+    const project = await db.one(
+      'select * from projects where title = $1',
+      selectedProject.description.title
+    )
+    const { id, ...actual } = await repository.getProjectById(project.id)
 
-  //   console.log('expected =====\n', expected)
-  //   console.log('actual =====\n', actual)
+    expect(selectedProject).toEqual(actual)
+  })
 
-  //   expect(expected).toEqual(actual);
-  // });
+  test("get project by title", async () => {
+    const selectedProject = projectsPageMock[0]
+    await repository.createProject(projectsPageMock[1])
+    await repository.createProject(selectedProject)
+    const project = await db.one(
+      'select * from projects where title = $1',
+      selectedProject.description.title
+    )
+    const { id, ...actual } = await repository.getProjectByTitle(project.title)
 
-  // test("DELETE Method", async () => {
-  //   const now = new Date(new Date().toDateString())
-  //   const projectMock = {
-  //     title: 'project title',
-  //     description: 'description',
-  //     snapshot: 'projc snap',
-  //     githubLink: 'http://link_to_github',
-  //     lastUpdate: now
-  //   };
-  //   await repository.createProject(projectMock);
-  //   const projectInDb = await db.one(
-  //     "select * from projects where title = $1",
-  //     projectMock.title,
-  //   );
-  //   await repository.deleteProject(projectInDb.id);
-  //   const expected: [] = [];
-  //   const actual = await repository.getProjects();
+    expect(selectedProject).toEqual(actual)
+  })
 
-  //   expect(expected).toEqual(actual);
-  // });
+  test("UPDATE Method", async () => {
+    const selectedMock = projectsPageMock[0]
+    await repository.createProject(selectedMock)
+    const newValue = {
+      description: {
+        title: "new description"
+      }
+    };
+    const project = await db.one(
+      'select * from projects where title=$1',
+      selectedMock.description.title
+    )
+    await repository.updateProject(project.id, newValue);
+    const updatedProject = await db.one(
+      'select * from projects where id=$1',
+      project.id
+    )
+    const expected = {
+      snapshot: '/images/snap-calm.png',
+      description: {
+        title: newValue.description.title,
+        subTitle: 'Last update: 2022 - 03',
+        content: 'Personal project for learn nextjs.'
+      },
+      githubLink: 'https://github.com/mckatoo/calm'
+    }
+    const actual = {
+      snapshot: updatedProject.snapshot,
+      description: {
+        title: updatedProject.title,
+        subTitle: `Last update: ${dateToString(updatedProject.last_update)}`,
+        content: updatedProject.description
+      },
+      githubLink: updatedProject.github_link
+
+    }
+
+    expect(expected).toEqual(actual);
+  });
+
+  test("DELETE Method", async () => {
+    const projectMock = projectsPageMock[0]
+    await repository.createProject(projectMock);
+    const projectInDb = await db.one(
+      "select * from projects where title = $1",
+      projectMock.description.title,
+    );
+    await repository.deleteProject(projectInDb.id);
+    const expected: [] = [];
+    const actual = await repository.getProjects();
+
+    expect(expected).toEqual(actual);
+  });
 });
