@@ -1,4 +1,5 @@
 import { AboutPageRepository } from "@/infra/db";
+import { AboutPage } from "@/repository/IAboutPage";
 
 const aboutPageRepository = new AboutPageRepository();
 
@@ -8,4 +9,8 @@ async function getAboutPageHandler() {
   return aboutPage
 }
 
-export { getAboutPageHandler };
+async function createAboutPageHandler(page: AboutPage) {
+  await aboutPageRepository.createAboutPage(page)
+}
+
+export { getAboutPageHandler, createAboutPageHandler };
