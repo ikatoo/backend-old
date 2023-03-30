@@ -28,7 +28,7 @@ const aboutPageRoutes: ServerRoute<
       handler: async (request, h) => {
         if (!request.payload) return h.response().code(400)
         console.log(typeof request.payload)
-        if (isValidPayloadKeys<AboutPage>(request.payload as object))
+        if (!isValidPayloadKeys<AboutPage>(request.payload as object))
           return h.response({
             error: 'Invalid type.'
           }).code(409)
