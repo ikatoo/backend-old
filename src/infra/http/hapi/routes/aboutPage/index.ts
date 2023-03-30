@@ -1,7 +1,7 @@
 import { getAboutPageHandler } from "@/infra/http/controllers";
 import { createAboutPageHandler, updateAboutPageHandler } from "@/infra/http/controllers/aboutPage/aboutPageController";
 import { AboutPage } from "@/repository/IAboutPage";
-import typeHasProperty from "@/utils/typeHasProperty";
+import isValidPayloadKeys from "@/utils/typeUtils/isValidPayloadKeys";
 import { ReqRefDefaults, ServerRoute } from "@hapi/hapi";
 const aboutPageRoutes: ServerRoute<
   ReqRefDefaults
@@ -27,12 +27,17 @@ const aboutPageRoutes: ServerRoute<
       path: "/about",
       handler: async (request, h) => {
         if (!request.payload) return h.response().code(400)
-        for (const key of Object.keys(request.payload)) {
-          if (!typeHasProperty<AboutPage>(request.payload, key))
-            return h.response({
-              error: 'Invalid type.'
-            }).code(409)
-        }
+        console.log(typeof request.payload)
+        if (isValidPayloadKeys<AboutPage>(request.payload as object))
+          return h.response({
+            error: 'Invalid type.'
+          }).code(409)
+        // for (const key of Object.keys(request.payload)) {
+        //   if (!typeHasProperty<AboutPage>(request.payload, key))
+        //     return h.response({
+        //       error: 'Invalid type.'
+        //     }).code(409)
+        // }
         const page = request.payload as AboutPage
         try {
           request.method === 'post'
