@@ -32,12 +32,6 @@ const aboutPageRoutes: ServerRoute<
           return h.response({
             error: 'Invalid type.'
           }).code(409)
-        // for (const key of Object.keys(request.payload)) {
-        //   if (!typeHasProperty<AboutPage>(request.payload, key))
-        //     return h.response({
-        //       error: 'Invalid type.'
-        //     }).code(409)
-        // }
         const page = request.payload as AboutPage
         try {
           request.method === 'post'
