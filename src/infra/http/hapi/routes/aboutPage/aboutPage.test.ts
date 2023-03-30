@@ -19,6 +19,15 @@ describe("/about routes", () => {
     await server.stop();
   });
 
+  test("responds with 405 code when try use put method", async () => {
+    const { statusCode } = await server.inject<AboutPage>({
+      method: "put",
+      url: "/about",
+    });
+
+    expect(statusCode).toEqual(405);
+  })
+
   test("result is equal the mock", async () => {
     await aboutPageRepository.createAboutPage(aboutPageMock);
     const { result } = await server.inject<AboutPage>({
@@ -37,5 +46,84 @@ describe("/about routes", () => {
     });
 
     expect(res.statusCode).toBe(200);
+  });
+
+  test("responds with data", async () => {
+    await aboutPageRepository.createAboutPage(aboutPageMock);
+    const res = await server.inject({
+      method: "get",
+      url: "/about",
+    });
+
+    expect(res.result).toEqual(aboutPageMock);
+  });
+
+  test("responds with 404", async () => {
+    const res = await server.inject({
+      method: "get",
+      url: "/about",
+    });
+
+    expect(res.statusCode).toBe(404);
+  });
+
+  test("responds with 204", async () => {
+    const res = await server.inject({
+      method: "post",
+      url: "/about",
+      payload: aboutPageMock
+    });
+
+    expect(res.statusCode).toBe(204);
+  });
+
+  test("responds with 409", async () => {
+    await aboutPageRepository.createAboutPage(aboutPageMock);
+    const res = await server.inject({
+      method: "post",
+      url: "/about",
+      payload: aboutPageMock
+    });
+
+    expect(res.statusCode).toBe(409);
+  });
+
+  test("responds with 400", async () => {
+    const res = await server.inject({
+      method: "post",
+      url: "/about",
+    });
+
+    expect(res.statusCode).toBe(400);
+  });
+
+  test("responds with 204 when update", async () => {
+    const res = await server.inject({
+      method: "patch",
+      url: "/about",
+      payload: { title: 'new title' }
+    });
+
+    expect(res.statusCode).toBe(204);
+  });
+
+  test.only("responds with 409 when try update with invalid payload", async () => {
+    await aboutPageRepository.createAboutPage(aboutPageMock);
+    const res = await server.inject({
+      method: "patch",
+      url: "/about",
+      payload: { invalid: 'payload' }
+    });
+
+    expect(res.statusCode).toBe(409);
+  });
+
+  test("responds with 400 when try update without payload", async () => {
+    const res = await server.inject({
+      method: "patch",
+      url: "/about",
+    });
+
+    expect(res.statusCode).toBe(400);
   });
 });
