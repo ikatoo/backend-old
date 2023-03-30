@@ -13,4 +13,8 @@ async function createAboutPageHandler(page: AboutPage) {
   await aboutPageRepository.createAboutPage(page)
 }
 
-export { getAboutPageHandler, createAboutPageHandler };
+async function updateAboutPageHandler(page: Partial<AboutPage>) {
+  await aboutPageRepository.updateAboutPage(page)
+}
+
+export { getAboutPageHandler, createAboutPageHandler, updateAboutPageHandler };
