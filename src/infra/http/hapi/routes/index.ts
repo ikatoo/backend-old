@@ -6,8 +6,10 @@ const routes: ServerRoute<ReqRefDefaults>[] = [
   {
     method: "GET",
     path: "/",
-    handler: function () {
-      return { version: `${process.env.npm_package_version}` };
+    handler: (_request, h) => {
+      return h.response({
+        version: process.env.npm_package_version
+      })
     },
   },
   ...aboutPageRoutes,
