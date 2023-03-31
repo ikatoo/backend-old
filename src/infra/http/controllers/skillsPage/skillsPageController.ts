@@ -14,7 +14,12 @@ async function createSkillsPageHandler(page: SkillsPage): Promise<void> {
   await skillsPageRepository.createSkillsPage(page)
 }
 
+async function upadteSkillsPageHandler(page: Partial<SkillsPage>): Promise<void> {
+  await skillsPageRepository.updateSkillsPage(page)
+}
+
 export {
   getSkillsPageHandler,
-  createSkillsPageHandler
+  createSkillsPageHandler,
+  upadteSkillsPageHandler
 };
