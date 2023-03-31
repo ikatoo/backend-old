@@ -30,7 +30,7 @@ const aboutPageRoutes: ServerRoute<
         const validPage = AboutPageSchema.safeParse(request.payload)
         if (!validPage.success)
           return h.response({
-            error: validPage.error
+            error: 'Invalid type.'
           }).code(409)
         try {
           request.method === 'post'
