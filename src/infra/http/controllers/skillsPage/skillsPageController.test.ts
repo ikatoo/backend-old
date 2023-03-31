@@ -1,7 +1,7 @@
 import { SkillsPageRepository } from "@/infra/db";
 import skillPageMock from "@/mock/skillPageMock";
 import { afterEach, describe, expect, test } from "vitest";
-import { createSkillsPageHandler, getSkillsPageHandler, upadteSkillsPageHandler } from "./skillsPageController";
+import { createSkillsPageHandler, getSkillsPageHandler, updateSkillsPageHandler } from "./skillsPageController";
 
 describe("SkillsPage Controller test", () => {
   const skillsPageRepository = new SkillsPageRepository()
@@ -31,7 +31,7 @@ describe("SkillsPage Controller test", () => {
       title: 'new title',
       description: 'new Description'
     }
-    await expect(upadteSkillsPageHandler(newData))
+    await expect(updateSkillsPageHandler(newData))
       .resolves.not.toThrow()
     const page = await skillsPageRepository.getSkillsPage()
 
