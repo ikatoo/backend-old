@@ -8,7 +8,6 @@ export default class SkillsPagePgPromise implements ISkillsPage {
   }
 
   async createSkillsPage(page: SkillsPage): Promise<void> {
-    await db.none('delete from skills_page;')
     await db.none(
       `insert into skills_page (
       title, description, skills, last_jobs
