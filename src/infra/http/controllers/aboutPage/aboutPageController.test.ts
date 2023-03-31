@@ -2,7 +2,7 @@ import { AboutPageRepository } from "@/infra/db";
 import db from "@/infra/db/PgPromise";
 import aboutPageMock from "@/mock/aboutPageMock";
 import { afterEach, describe, expect, test } from "vitest";
-import { createAboutPageHandler, getAboutPageHandler, updateAboutPageHandler } from "./aboutPageController";
+import { createAboutPageHandler, deleteAboutPageHandler, getAboutPageHandler, updateAboutPageHandler } from "./aboutPageController";
 
 describe("AboutPage Controller test", () => {
   const aboutPageRepository = new AboutPageRepository();
@@ -27,5 +27,13 @@ describe("AboutPage Controller test", () => {
     await aboutPageRepository.createAboutPage(aboutPageMock);
     await expect(updateAboutPageHandler({ title: 'new title' }))
       .resolves.not.toThrow()
+  });
+
+  test("Delete about page", async () => {
+    await aboutPageRepository.createAboutPage(aboutPageMock);
+    await deleteAboutPageHandler()
+    const actual = await aboutPageRepository.getAboutPage()
+
+    expect(actual).toBeUndefined()
   });
 });
