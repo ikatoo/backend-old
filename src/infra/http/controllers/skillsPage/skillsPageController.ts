@@ -5,7 +5,7 @@ const skillsPageRepository = new SkillsPageRepository();
 
 async function getSkillsPageHandler(): Promise<SkillsPage | undefined> {
   const skillsPage = await skillsPageRepository.getSkillsPage()
-  if (!skillsPage) return undefined
+  if (!skillsPage) return
 
   return skillsPage
 }
