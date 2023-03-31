@@ -21,6 +21,9 @@ describe("AboutPage Controller test", () => {
   test("Create about page without error", async () => {
     await expect(createAboutPageHandler(aboutPageMock))
       .resolves.not.toThrow()
+    const page = await aboutPageRepository.getAboutPage()
+
+    expect(page).toEqual(aboutPageMock)
   });
 
   test("Update about page without error", async () => {
