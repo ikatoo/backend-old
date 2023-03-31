@@ -17,23 +17,14 @@ describe("/skills routes", () => {
     repository.clear()
   });
 
-  test("GET Method: result is equal the mock", async () => {
+  test("GET Method: result is equal the mock with 200 statusCode", async () => {
     await repository.createSkillsPage(skillPageMock);
-    const { result } = await server.inject({
+    const { result, statusCode } = await server.inject({
       method: "get",
       url: "/skills",
     });
 
     expect(result).toEqual(skillPageMock);
-  });
-
-  test("responds with 200", async () => {
-    await repository.createSkillsPage(skillPageMock);
-    const res = await server.inject({
-      method: "get",
-      url: "/skills",
-    });
-
-    expect(res.statusCode).toBe(200);
+    expect(statusCode).toBe(200);
   });
 });
