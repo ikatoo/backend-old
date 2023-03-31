@@ -10,4 +10,11 @@ async function getSkillsPageHandler(): Promise<SkillsPage | undefined> {
   return skillsPage
 }
 
-export { getSkillsPageHandler };
+async function createSkillsPageHandler(page: SkillsPage): Promise<void> {
+  await skillsPageRepository.createSkillsPage(page)
+}
+
+export {
+  getSkillsPageHandler,
+  createSkillsPageHandler
+};

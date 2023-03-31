@@ -1,7 +1,7 @@
 import { SkillsPageRepository } from "@/infra/db";
 import skillPageMock from "@/mock/skillPageMock";
 import { afterEach, describe, expect, test } from "vitest";
-import { getSkillsPageHandler } from "./skillsPageController";
+import { createSkillsPageHandler, getSkillsPageHandler } from "./skillsPageController";
 
 describe("SkillsPage Controller test", () => {
   const skillsPageRepository = new SkillsPageRepository()
@@ -15,5 +15,13 @@ describe("SkillsPage Controller test", () => {
     const result = await getSkillsPageHandler();
 
     expect(skillPageMock).toEqual(result);
+  });
+
+  test("Create skills page data without error", async () => {
+    await expect(createSkillsPageHandler(skillPageMock))
+      .resolves.not.toThrow()
+    const page = await skillsPageRepository.getSkillsPage()
+
+    expect(page).toEqual(skillPageMock)
   });
 });
