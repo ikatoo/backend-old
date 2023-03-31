@@ -1,22 +1,24 @@
-type Skill = {
-  skillTitle: string
-  rankPercent: number
-}
+import { z } from "zod"
 
-type Job = {
-  jobTitle: string
-  jobDescription: string
-  yearMonthStart: string
-  yearMonthEnd?: string
-  link: string
-}
+export const SkillsPageSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  skills: z.array(z.object({
+    skillTitle: z.string(),
+    rankPercent: z.number()
+  })),
+  lastJobs: z.array(z.object({
+    jobTitle: z.string(),
+    jobDescription: z.string(),
+    yearMonthStart: z.string(),
+    yearMonthEnd: z.string().optional(),
+    link: z.string()
+  }))
+})
 
-export type SkillsPage = {
-  title: string
-  description: string
-  skills: Skill[]
-  lastJobs: Job[]
-}
+export const PartialSkillsPageSchema = SkillsPageSchema.partial()
+
+export type SkillsPage = z.infer<typeof SkillsPageSchema>
 
 export default interface ISkillsPage {
   createSkillsPage(page: SkillsPage): Promise<void>;
