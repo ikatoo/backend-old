@@ -107,7 +107,7 @@ describe("/about routes", () => {
     expect(res.statusCode).toBe(204);
   });
 
-  test.only("responds with 409 when try update with invalid payload", async () => {
+  test("responds with 409 when try update with invalid payload", async () => {
     await aboutPageRepository.createAboutPage(aboutPageMock);
     const res = await server.inject({
       method: "patch",
