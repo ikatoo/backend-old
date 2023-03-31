@@ -1,14 +1,28 @@
-type Skill = {
-  title: string
-}
+import { z } from "zod"
 
-export type AboutPage = {
-  title: string
-  description: string
-  skills: Skill[]
-  illustrationURL: string
-  illustrationALT: string
-}
+export const AboutPageSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  skills: z.array(z.object({
+    title: z.string()
+  })),
+  illustrationURL: z.string(),
+  illustrationALT: z.string(),
+})
+
+// type Skill = {
+//   title: string
+// }
+
+// export type AboutPage = {
+//   title: string
+//   description: string
+//   skills: Skill[]
+//   illustrationURL: string
+//   illustrationALT: string
+// }
+
+export type AboutPage = z.infer<typeof AboutPageSchema>
 
 export default interface IAboutPage {
   createAboutPage(page: AboutPage): Promise<void>;
