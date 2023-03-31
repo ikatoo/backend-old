@@ -19,7 +19,7 @@ describe("/about routes", () => {
     await server.stop();
   });
 
-  test("responds with 405 code when try use put method", async () => {
+  test("PUT Method: responds with 405 code when try use put method", async () => {
     const { statusCode } = await server.inject<AboutPage>({
       method: "put",
       url: "/about",
@@ -28,7 +28,7 @@ describe("/about routes", () => {
     expect(statusCode).toEqual(405);
   })
 
-  test("result is equal the mock", async () => {
+  test("GET Method: result is equal the mock", async () => {
     await aboutPageRepository.createAboutPage(aboutPageMock);
     const { result } = await server.inject<AboutPage>({
       method: "get",
@@ -38,7 +38,7 @@ describe("/about routes", () => {
     expect(result).toEqual(aboutPageMock);
   });
 
-  test("responds with 200", async () => {
+  test("GET Method: responds with 200", async () => {
     await aboutPageRepository.createAboutPage(aboutPageMock);
     const res = await server.inject({
       method: "get",
@@ -48,7 +48,7 @@ describe("/about routes", () => {
     expect(res.statusCode).toBe(200);
   });
 
-  test("responds with data", async () => {
+  test("GET Method: responds with data", async () => {
     await aboutPageRepository.createAboutPage(aboutPageMock);
     const res = await server.inject({
       method: "get",
@@ -58,7 +58,7 @@ describe("/about routes", () => {
     expect(res.result).toEqual(aboutPageMock);
   });
 
-  test("responds with 404", async () => {
+  test("GET Method: responds with 404", async () => {
     const res = await server.inject({
       method: "get",
       url: "/about",
@@ -67,7 +67,7 @@ describe("/about routes", () => {
     expect(res.statusCode).toBe(404);
   });
 
-  test("responds with 204", async () => {
+  test("POST Method: responds with 204", async () => {
     const res = await server.inject({
       method: "post",
       url: "/about",
@@ -77,7 +77,7 @@ describe("/about routes", () => {
     expect(res.statusCode).toBe(204);
   });
 
-  test("responds with 409", async () => {
+  test("POST Method: responds with 409", async () => {
     await aboutPageRepository.createAboutPage(aboutPageMock);
     const res = await server.inject({
       method: "post",
@@ -88,7 +88,7 @@ describe("/about routes", () => {
     expect(res.statusCode).toBe(409);
   });
 
-  test("responds with 400", async () => {
+  test("POST Method: responds with 400 when request without payload", async () => {
     const res = await server.inject({
       method: "post",
       url: "/about",
@@ -97,7 +97,7 @@ describe("/about routes", () => {
     expect(res.statusCode).toBe(400);
   });
 
-  test("responds with 204 when update", async () => {
+  test("PATCH Method: responds with 204 when update", async () => {
     const res = await server.inject({
       method: "patch",
       url: "/about",
@@ -107,7 +107,7 @@ describe("/about routes", () => {
     expect(res.statusCode).toBe(204);
   });
 
-  test("responds with 409 when try update with invalid payload", async () => {
+  test("PATCH Method: responds with 409 when try update with invalid payload", async () => {
     await aboutPageRepository.createAboutPage(aboutPageMock);
     const res = await server.inject({
       method: "patch",
@@ -118,7 +118,7 @@ describe("/about routes", () => {
     expect(res.statusCode).toBe(409);
   });
 
-  test("responds with 400 when try update without payload", async () => {
+  test("PATCH Method: responds with 400 when try update without payload", async () => {
     const res = await server.inject({
       method: "patch",
       url: "/about",
