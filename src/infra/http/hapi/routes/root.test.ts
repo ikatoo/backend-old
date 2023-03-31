@@ -24,13 +24,12 @@ describe("GET /", () => {
   });
 
   test("version is 0.0.1", async () => {
-    const res = await server.inject({
+    const { result } = await server.inject({
       method: "get",
       url: "/",
     });
 
     const expected = { version: "0.0.1" };
-    const result = res.result;
 
     expect(expected).toEqual(result);
   });
