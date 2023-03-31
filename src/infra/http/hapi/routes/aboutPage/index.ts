@@ -1,6 +1,6 @@
 import { getAboutPageHandler } from "@/infra/http/controllers";
 import { createAboutPageHandler, updateAboutPageHandler } from "@/infra/http/controllers/aboutPage/aboutPageController";
-import { AboutPage, AboutPageSchema } from "@/repository/IAboutPage";
+import { AboutPage, AboutPageSchema, PartialAboutPageSchema } from "@/repository/IAboutPage";
 import { ReqRefDefaults, ServerRoute } from "@hapi/hapi";
 const aboutPageRoutes: ServerRoute<
   ReqRefDefaults
@@ -22,7 +22,7 @@ const aboutPageRoutes: ServerRoute<
       }
     },
     {
-      method: ["POST", "PATCH"],
+      method: "POST",
       path: "/about",
       handler: async (request, h) => {
         if (!request.payload) return h.response().code(400)
@@ -33,9 +33,29 @@ const aboutPageRoutes: ServerRoute<
             error: 'Invalid type.'
           }).code(409)
         try {
-          request.method === 'post'
-            ? await createAboutPageHandler(validPage.data)
-            : await updateAboutPageHandler(validPage.data)
+          await createAboutPageHandler(validPage.data)
+          return h.response().code(204)
+        } catch (error) {
+          if (error instanceof Error && error.message.includes('duplicate'))
+            return h.response({
+              error: error.message
+            }).code(409)
+        }
+      }
+    },
+    {
+      method: "PATCH",
+      path: "/about",
+      handler: async (request, h) => {
+        if (!request.payload) return h.response().code(400)
+
+        const validPage = PartialAboutPageSchema.safeParse(request.payload)
+        if (!validPage.success || Object.keys(validPage.data).length === 0)
+          return h.response({
+            error: 'Invalid type.'
+          }).code(409)
+        try {
+          await updateAboutPageHandler(validPage.data)
           return h.response().code(204)
         } catch (error) {
           if (error instanceof Error && error.message.includes('duplicate'))
