@@ -1,7 +1,7 @@
 import { SkillsPageRepository } from "@/infra/db";
 import skillPageMock from "@/mock/skillPageMock";
 import { afterEach, describe, expect, test } from "vitest";
-import { createSkillsPageHandler, getSkillsPageHandler, updateSkillsPageHandler } from "./skillsPageController";
+import { createSkillsPageHandler, deleteSkillsPageHandler, getSkillsPageHandler, updateSkillsPageHandler } from "./skillsPageController";
 
 describe("SkillsPage Controller test", () => {
   const skillsPageRepository = new SkillsPageRepository()
@@ -36,5 +36,14 @@ describe("SkillsPage Controller test", () => {
     const page = await skillsPageRepository.getSkillsPage()
 
     expect(page).toEqual({ ...skillPageMock, ...newData })
+  });
+
+  test("Delete skills page data", async () => {
+    await skillsPageRepository.createSkillsPage(skillPageMock);
+    await expect(deleteSkillsPageHandler())
+      .resolves.not.toThrow()
+    const page = await skillsPageRepository.getSkillsPage()
+
+    expect(page).toBeUndefined()
   });
 });

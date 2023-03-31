@@ -18,8 +18,13 @@ async function updateSkillsPageHandler(page: Partial<SkillsPage>): Promise<void>
   await skillsPageRepository.updateSkillsPage(page)
 }
 
+async function deleteSkillsPageHandler(): Promise<void> {
+  await skillsPageRepository.deleteSkillsPage()
+}
+
 export {
   getSkillsPageHandler,
   createSkillsPageHandler,
-  updateSkillsPageHandler
+  updateSkillsPageHandler,
+  deleteSkillsPageHandler
 };
