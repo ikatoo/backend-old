@@ -10,6 +10,8 @@ export const AboutPageSchema = z.object({
   illustrationALT: z.string(),
 })
 
+export const PartialAboutPageSchema = AboutPageSchema.partial()
+
 export type AboutPage = z.infer<typeof AboutPageSchema>
 
 export default interface IAboutPage {
