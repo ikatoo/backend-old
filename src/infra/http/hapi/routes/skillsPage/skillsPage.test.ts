@@ -4,7 +4,7 @@ import { Server, ServerApplicationState } from "@hapi/hapi";
 import { init } from "hapi/server";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 
-describe.skip("/skills routes", () => {
+describe("/skills routes", () => {
   const repository = new SkillsPageRepository();
   let server: Server<ServerApplicationState>;
 
@@ -14,21 +14,21 @@ describe.skip("/skills routes", () => {
 
   afterEach(async () => {
     await server.stop();
+    repository.clear()
   });
 
-  test("result is equal the mock", async () => {
-    const { skills, lastJobs, ...rest } = skillPageMock
-
+  test("GET Method: result is equal the mock", async () => {
     await repository.createSkillsPage(skillPageMock);
     const { result } = await server.inject({
       method: "get",
       url: "/skills",
     });
 
-    expect(result).toEqual(rest);
+    expect(result).toEqual(skillPageMock);
   });
 
   test("responds with 200", async () => {
+    await repository.createSkillsPage(skillPageMock);
     const res = await server.inject({
       method: "get",
       url: "/skills",
