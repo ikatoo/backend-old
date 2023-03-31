@@ -1,7 +1,6 @@
 import { getAboutPageHandler } from "@/infra/http/controllers";
 import { createAboutPageHandler, updateAboutPageHandler } from "@/infra/http/controllers/aboutPage/aboutPageController";
-import { AboutPage } from "@/repository/IAboutPage";
-import isValidPayloadKeys from "@/utils/typeUtils/isValidPayloadKeys";
+import { AboutPage, AboutPageSchema } from "@/repository/IAboutPage";
 import { ReqRefDefaults, ServerRoute } from "@hapi/hapi";
 const aboutPageRoutes: ServerRoute<
   ReqRefDefaults
@@ -27,16 +26,16 @@ const aboutPageRoutes: ServerRoute<
       path: "/about",
       handler: async (request, h) => {
         if (!request.payload) return h.response().code(400)
-        console.log(typeof request.payload)
-        if (!isValidPayloadKeys<AboutPage>(request.payload as object))
+
+        const validPage = AboutPageSchema.safeParse(request.payload)
+        if (!validPage.success)
           return h.response({
-            error: 'Invalid type.'
+            error: validPage.error
           }).code(409)
-        const page = request.payload as AboutPage
         try {
           request.method === 'post'
-            ? await createAboutPageHandler(page)
-            : await updateAboutPageHandler(page)
+            ? await createAboutPageHandler(validPage.data)
+            : await updateAboutPageHandler(validPage.data)
           return h.response().code(204)
         } catch (error) {
           if (error instanceof Error && error.message.includes('duplicate'))
