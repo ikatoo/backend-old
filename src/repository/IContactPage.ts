@@ -1,13 +1,20 @@
-export type Localization = {
-  lat: number
-  lng: number
-}
+import { z } from "zod"
 
-export type ContactPage = {
-  title: string
-  description: string
-  localization: Localization
-}
+export const LocalizationSchema = z.object({
+  lat: z.number(),
+  lng: z.number()
+})
+
+export const ContactPageSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  localization: LocalizationSchema
+})
+
+export const PartialContactPageSchema = ContactPageSchema.partial()
+
+export type ContactPage = z.infer<typeof ContactPageSchema>
+export type Localization = z.infer<typeof LocalizationSchema>
 
 export default interface IContactPage {
   createContactPage(page: ContactPage): Promise<void>;
