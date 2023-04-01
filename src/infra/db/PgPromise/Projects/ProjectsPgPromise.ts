@@ -3,11 +3,13 @@ import { dateToString, stringToDate } from "@/utils/transformers/dateTransform";
 import db from "..";
 
 export default class ProjectsPgPromise implements IProjects {
-  async getProjectById(id: number): Promise<Project> {
+  async getProjectById(id: number): Promise<Project | undefined> {
     const project = await db.oneOrNone(
       'select * from projects where id=$1',
       id
     )
+    if (!project) return
+
     const mappedProject: Project = {
       id: project.id,
       description: {
@@ -22,11 +24,13 @@ export default class ProjectsPgPromise implements IProjects {
     return mappedProject
   }
 
-  async getProjectByTitle(title: string): Promise<Project> {
+  async getProjectByTitle(title: string): Promise<Project | undefined> {
     const project = await db.oneOrNone(
       'select * from projects where title=$1',
       title
     )
+    if (!project) return
+
     const mappedProject: Project = {
       id: project.id,
       description: {
