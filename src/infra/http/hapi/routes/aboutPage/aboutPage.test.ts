@@ -126,4 +126,16 @@ describe("/about routes", () => {
 
     expect(res.statusCode).toBe(400);
   });
+
+  test("DELETE Method: responde with status 204", async () => {
+    await aboutPageRepository.createAboutPage(aboutPageMock);
+    const { statusCode } = await server.inject({
+      method: "delete",
+      url: "/about",
+    });
+    const actual = await aboutPageRepository.getAboutPage()
+
+    expect(statusCode).toBe(204)
+    expect(actual).toBeUndefined()
+  })
 });

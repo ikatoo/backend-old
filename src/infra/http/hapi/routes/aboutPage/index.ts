@@ -1,5 +1,5 @@
 import { getAboutPageHandler } from "@/infra/http/controllers";
-import { createAboutPageHandler, updateAboutPageHandler } from "@/infra/http/controllers/aboutPage/aboutPageController";
+import { createAboutPageHandler, deleteAboutPageHandler, updateAboutPageHandler } from "@/infra/http/controllers/aboutPage/aboutPageController";
 import { AboutPage, AboutPageSchema, PartialAboutPageSchema } from "@/repository/IAboutPage";
 import { ReqRefDefaults, ServerRoute } from "@hapi/hapi";
 const aboutPageRoutes: ServerRoute<
@@ -63,6 +63,14 @@ const aboutPageRoutes: ServerRoute<
               error: error.message
             }).code(409)
         }
+      }
+    },
+    {
+      method: "DELETE",
+      path: '/about',
+      handler: async (_request, h) => {
+        await deleteAboutPageHandler()
+        return h.response().code(204)
       }
     }
   ];
