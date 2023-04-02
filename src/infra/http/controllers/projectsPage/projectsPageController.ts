@@ -4,8 +4,18 @@ import { PartialProject, Project, ProjectWithId } from "@/repository/IProject";
 const projectsRepository = new ProjectsRepository();
 
 async function getProjectsHandler(): Promise<ProjectWithId[]> {
-  const contacts = await projectsRepository.getProjects()
-  return [...contacts]
+  const projects = await projectsRepository.getProjects()
+  return projects
+}
+
+async function getProjectsByTitleHandler(title: string): Promise<ProjectWithId[]> {
+  const projects = await projectsRepository.getProjectsByTitle(title)
+  return projects ?? []
+}
+
+async function getProjectByIDHandler(id: number): Promise<ProjectWithId | undefined> {
+  const project = await projectsRepository.getProjectById(id)
+  return project
 }
 
 async function createProjectHandler(project: Project): Promise<void> {
@@ -22,6 +32,8 @@ async function deleteProjectHandler(id: number): Promise<void> {
 
 export {
   getProjectsHandler,
+  getProjectsByTitleHandler,
+  getProjectByIDHandler,
   createProjectHandler,
   updateProjectHandler,
   deleteProjectHandler
