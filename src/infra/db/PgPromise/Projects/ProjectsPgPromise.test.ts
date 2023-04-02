@@ -45,15 +45,12 @@ describe("Basic operations in Projects Postgres Database", () => {
     expect(selectedProject).toEqual(actual)
   })
 
-  test("get project by title", async () => {
+  test("get projects by title", async () => {
     const selectedProject = projectsPageMock[0]
     await repository.createProject(projectsPageMock[1])
     await repository.createProject(selectedProject)
-    const project = await db.one(
-      'select * from projects where title = $1',
-      selectedProject.description.title
-    )
-    const { id, ...actual } = await repository.getProjectByTitle(project.title) as ProjectWithId
+    const projects = await repository.getProjectsByTitle(selectedProject.description.title) as ProjectWithId[]
+    const { id, ...actual } = projects[0]
 
     expect(selectedProject).toEqual(actual)
   })

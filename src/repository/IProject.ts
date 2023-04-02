@@ -22,7 +22,7 @@ export default interface IProjects {
   createProject(project: Project): Promise<void>;
   getProjects(): Promise<ProjectWithId[]>;
   getProjectById(id: number): Promise<ProjectWithId | undefined>;
-  getProjectByTitle(title: string): Promise<ProjectWithId | undefined>;
+  getProjectsByTitle(title: string): Promise<ProjectWithId[] | undefined>;
   updateProject(id: number, project: PartialProject): Promise<void>;
   deleteProject(id: number): Promise<void>;
   clear(): Promise<void>
