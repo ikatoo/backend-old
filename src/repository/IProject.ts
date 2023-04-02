@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const ProjectSchema = z.object({
-  id: z.number(),
   snapshot: z.string(),
   description: z.object({
     title: z.string(),
@@ -15,14 +14,15 @@ export const PartialProjectSchema = ProjectSchema.deepPartial()
 
 export type Project = z.infer<typeof ProjectSchema>
 
-export type ProjectInput = Omit<Project, "id">
-export type PartialProject = Omit<z.infer<typeof PartialProjectSchema>, 'id'>
+export type PartialProject = z.infer<typeof PartialProjectSchema>
+
+export type ProjectWithId = Project & { id: number }
 
 export default interface IProjects {
-  createProject(project: ProjectInput): Promise<void>;
-  getProjects(): Promise<Project[]>;
-  getProjectById(id: number): Promise<Project | undefined>;
-  getProjectByTitle(title: string): Promise<Project | undefined>;
+  createProject(project: Project): Promise<void>;
+  getProjects(): Promise<ProjectWithId[]>;
+  getProjectById(id: number): Promise<ProjectWithId | undefined>;
+  getProjectByTitle(title: string): Promise<ProjectWithId | undefined>;
   updateProject(id: number, project: PartialProject): Promise<void>;
   deleteProject(id: number): Promise<void>;
   clear(): Promise<void>

@@ -1,8 +1,13 @@
 import { ProjectsRepository } from "@/infra/db";
 import projectsPageMock from "@/mock/projectsPageMock";
+import { ProjectWithId } from "@/repository/IProject";
 import { afterEach, describe, expect, test } from "vitest";
-import { createProjectsPageHandler, deleteProjectsPageHandler, getProjectsPageHandler, updateProjectsPageHandler } from "./projectsPageController";
-import { Project } from "@/repository/IProject";
+import {
+  createProjectHandler,
+  deleteProjectHandler,
+  getProjectsHandler,
+  updateProjectHandler
+} from "./projectsPageController";
 
 describe("ProjectsPage Controller test", () => {
   const projectsRepository = new ProjectsRepository()
@@ -13,13 +18,13 @@ describe("ProjectsPage Controller test", () => {
 
   test("Get projects", async () => {
     await projectsRepository.createProject(projectsPageMock[1])
-    const result = await getProjectsPageHandler()
+    const result = await getProjectsHandler()
 
     expect([{ id: result[0].id, ...projectsPageMock[1] }]).toEqual(result);
   });
 
   test("Create projects page data without error", async () => {
-    await createProjectsPageHandler(projectsPageMock[0])
+    await createProjectHandler(projectsPageMock[0])
     const project = await projectsRepository.getProjectByTitle(projectsPageMock[0].description.title)
 
     expect({ id: project?.id, ...projectsPageMock[0] }).toEqual(project);
@@ -33,9 +38,9 @@ describe("ProjectsPage Controller test", () => {
         content: 'new Description'
       }
     }
-    const { id } = await projectsRepository.getProjectByTitle(projectsPageMock[0].description.title) as Project
-    await updateProjectsPageHandler(id, newData)
-    const { id: updateId, ...actual } = await projectsRepository.getProjectById(id) as Project
+    const { id } = await projectsRepository.getProjectByTitle(projectsPageMock[0].description.title) as ProjectWithId
+    await updateProjectHandler(id, newData)
+    const { id: updateId, ...actual } = await projectsRepository.getProjectById(id) as ProjectWithId
 
     expect(actual).toEqual({
       ...projectsPageMock[0],
@@ -49,8 +54,8 @@ describe("ProjectsPage Controller test", () => {
 
   test("Delete projects page data", async () => {
     await projectsRepository.createProject(projectsPageMock[1]);
-    const { id } = await projectsRepository.getProjectByTitle(projectsPageMock[1].description.title) as Project
-    await expect(deleteProjectsPageHandler(id))
+    const { id } = await projectsRepository.getProjectByTitle(projectsPageMock[1].description.title) as ProjectWithId
+    await expect(deleteProjectHandler(id))
       .resolves.not.toThrow()
     const actual = await projectsRepository.getProjectById(id)
 

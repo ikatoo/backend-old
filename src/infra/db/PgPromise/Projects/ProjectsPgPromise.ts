@@ -1,16 +1,16 @@
-import IProjects, { PartialProject, Project, ProjectInput } from "@/repository/IProject";
+import IProjects, { PartialProject, Project, ProjectWithId } from "@/repository/IProject";
 import { dateToString, stringToDate } from "@/utils/transformers/dateTransform";
 import db from "..";
 
 export default class ProjectsPgPromise implements IProjects {
-  async getProjectById(id: number): Promise<Project | undefined> {
+  async getProjectById(id: number): Promise<ProjectWithId | undefined> {
     const project = await db.oneOrNone(
       'select * from projects where id=$1',
       id
     )
     if (!project) return
 
-    const mappedProject: Project = {
+    const mappedProject: ProjectWithId = {
       id: project.id,
       description: {
         title: project.title,
@@ -24,14 +24,14 @@ export default class ProjectsPgPromise implements IProjects {
     return mappedProject
   }
 
-  async getProjectByTitle(title: string): Promise<Project | undefined> {
+  async getProjectByTitle(title: string): Promise<ProjectWithId | undefined> {
     const project = await db.oneOrNone(
       'select * from projects where title=$1',
       title
     )
     if (!project) return
 
-    const mappedProject: Project = {
+    const mappedProject: ProjectWithId = {
       id: project.id,
       description: {
         title: project.title,
@@ -49,7 +49,7 @@ export default class ProjectsPgPromise implements IProjects {
     await db.none('delete from projects;')
   }
 
-  async createProject(project: ProjectInput): Promise<void> {
+  async createProject(project: Project): Promise<void> {
     await db.none(
       `insert into projects (
         title, description, snapshot, github_link, last_update
@@ -64,7 +64,7 @@ export default class ProjectsPgPromise implements IProjects {
     );
   }
 
-  async getProjects(): Promise<Project[]> {
+  async getProjects(): Promise<ProjectWithId[]> {
     const projects = await db.manyOrNone('select * from projects;')
     return projects.map(project => ({
       id: project.id,
