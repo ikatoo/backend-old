@@ -24,14 +24,14 @@ export default class ProjectsPgPromise implements IProjects {
     return mappedProject
   }
 
-  async getProjectByTitle(title: string): Promise<ProjectWithId | undefined> {
-    const project = await db.oneOrNone(
-      'select * from projects where title=$1',
+  async getProjectsByTitle(title: string): Promise<ProjectWithId[] | undefined> {
+    const projects = await db.manyOrNone(
+      `select * from projects where title ilike '%$1:value%'`,
       title
     )
-    if (!project) return
+    if (!projects.length) return
 
-    const mappedProject: ProjectWithId = {
+    const mappedProject: ProjectWithId[] = projects.map(project => ({
       id: project.id,
       description: {
         title: project.title,
@@ -40,7 +40,8 @@ export default class ProjectsPgPromise implements IProjects {
       },
       githubLink: project.github_link,
       snapshot: project.snapshot
-    }
+    })
+    )
 
     return mappedProject
   }
