@@ -1,5 +1,5 @@
 import projectsPageMock from "@/mock/projectsPageMock";
-import { Project } from "@/repository/IProject";
+import { ProjectWithId } from "@/repository/IProject";
 import { dateToString } from "@/utils/transformers/dateTransform";
 import { afterEach, describe, expect, test } from "vitest";
 import db from "..";
@@ -40,7 +40,7 @@ describe("Basic operations in Projects Postgres Database", () => {
       'select * from projects where title = $1',
       selectedProject.description.title
     )
-    const { id, ...actual } = await repository.getProjectById(project.id) as Project
+    const { id, ...actual } = await repository.getProjectById(project.id) as ProjectWithId
 
     expect(selectedProject).toEqual(actual)
   })
@@ -53,7 +53,7 @@ describe("Basic operations in Projects Postgres Database", () => {
       'select * from projects where title = $1',
       selectedProject.description.title
     )
-    const { id, ...actual } = await repository.getProjectByTitle(project.title) as Project
+    const { id, ...actual } = await repository.getProjectByTitle(project.title) as ProjectWithId
 
     expect(selectedProject).toEqual(actual)
   })

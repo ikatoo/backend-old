@@ -1,28 +1,28 @@
 import { ProjectsRepository } from "@/infra/db";
-import { PartialProject, Project, ProjectInput } from "@/repository/IProject";
+import { PartialProject, Project, ProjectWithId } from "@/repository/IProject";
 
 const projectsRepository = new ProjectsRepository();
 
-async function getProjectsPageHandler(): Promise<Project[]> {
+async function getProjectsHandler(): Promise<ProjectWithId[]> {
   const contacts = await projectsRepository.getProjects()
   return [...contacts]
 }
 
-async function createProjectsPageHandler(project: ProjectInput): Promise<void> {
+async function createProjectHandler(project: Project): Promise<void> {
   await projectsRepository.createProject(project)
 }
 
-async function updateProjectsPageHandler(id: number, project: PartialProject): Promise<void> {
+async function updateProjectHandler(id: number, project: PartialProject): Promise<void> {
   await projectsRepository.updateProject(id, project)
 }
 
-async function deleteProjectsPageHandler(id: number): Promise<void> {
+async function deleteProjectHandler(id: number): Promise<void> {
   await projectsRepository.deleteProject(id)
 }
 
 export {
-  getProjectsPageHandler,
-  createProjectsPageHandler,
-  updateProjectsPageHandler,
-  deleteProjectsPageHandler
+  getProjectsHandler,
+  createProjectHandler,
+  updateProjectHandler,
+  deleteProjectHandler
 };

@@ -1,6 +1,7 @@
 import { ReqRefDefaults, ServerRoute } from "@hapi/hapi";
 import aboutPageRoutes from "./aboutPage";
 import contactPageRoutes from "./contactPage";
+import projectsPageRoutes from "./projectsPage";
 import skillsPageRoutes from "./skillsPage";
 
 const routes: ServerRoute<ReqRefDefaults>[] = [
@@ -15,7 +16,8 @@ const routes: ServerRoute<ReqRefDefaults>[] = [
   },
   ...aboutPageRoutes,
   ...skillsPageRoutes,
-  ...contactPageRoutes
+  ...contactPageRoutes,
+  ...projectsPageRoutes
 ];
 
 export default routes;
