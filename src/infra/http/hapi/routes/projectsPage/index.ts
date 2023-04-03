@@ -1,4 +1,4 @@
-import { createProjectHandler, getProjectsHandler, updateProjectHandler } from "@/infra/http/controllers/projectsPage/projectsPageController";
+import { createProjectHandler, deleteProjectHandler, getProjectByIDHandler, getProjectsByTitleHandler, getProjectsHandler, updateProjectHandler } from "@/infra/http/controllers/projectsPage/projectsPageController";
 import { PartialProjectSchema, ProjectSchema } from "@/repository/IProject";
 import { ReqRefDefaults, ServerRoute } from "@hapi/hapi";
 const projectsPageRoutes: ServerRoute<
@@ -8,11 +8,35 @@ const projectsPageRoutes: ServerRoute<
       method: "GET",
       path: "/projects",
       handler: async (_request, h) => {
-        const page = await getProjectsHandler()
-        if (!page.length) {
+        const projects = await getProjectsHandler()
+        if (!projects.length) {
           return h.response().code(404)
         }
-        return h.response(page)
+        return h.response(projects)
+      },
+    },
+    {
+      method: "GET",
+      path: "/project/title/{title}",
+      handler: async (request, h) => {
+        const title = request.params.title
+        const projects = await getProjectsByTitleHandler(title)
+        if (!projects.length) {
+          return h.response().code(404)
+        }
+        return h.response(projects)
+      },
+    },
+    {
+      method: "GET",
+      path: "/project/id/{id}",
+      handler: async (request, h) => {
+        const id = request.params.id
+        const project = await getProjectByIDHandler(id)
+        if (!project) {
+          return h.response().code(404)
+        }
+        return h.response(project)
       },
     },
     {
@@ -64,6 +88,18 @@ const projectsPageRoutes: ServerRoute<
               error: error.message
             }).code(409)
         }
+      }
+    },
+    {
+      method: "DELETE",
+      path: "/project/id/{id}",
+      handler: async (request, h) => {
+        const id = request.params.id
+        if (!id) {
+          return h.response().code(400)
+        }
+        await deleteProjectHandler(id)
+        return h.response().code(204)
       }
     }
   ];
