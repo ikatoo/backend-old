@@ -1,5 +1,5 @@
 import { getSkillsPageHandler } from "@/infra/http/controllers";
-import { createSkillsPageHandler, updateSkillsPageHandler } from "@/infra/http/controllers/skillsPage/skillsPageController";
+import { createSkillsPageHandler, deleteSkillsPageHandler, updateSkillsPageHandler } from "@/infra/http/controllers/skillsPage/skillsPageController";
 import { PartialSkillsPageSchema, SkillsPageSchema } from "@/repository/ISkillsPage";
 import { ReqRefDefaults, ServerRoute } from "@hapi/hapi";
 const skillsPageRoutes: ServerRoute<
@@ -65,6 +65,14 @@ const skillsPageRoutes: ServerRoute<
               error: error.message
             }).code(409)
         }
+      }
+    },
+    {
+      method: "DELETE",
+      path: '/skills',
+      handler: async (_request, h) => {
+        await deleteSkillsPageHandler()
+        return h.response().code(204)
       }
     }
   ];

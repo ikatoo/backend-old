@@ -1,4 +1,4 @@
-import { createContactsPageHandler, getContactsPageHandler, updateContactsPageHandler } from "@/infra/http/controllers/contactsPage/contactsPageController";
+import { createContactsPageHandler, deleteContactsPageHandler, getContactsPageHandler, updateContactsPageHandler } from "@/infra/http/controllers/contactsPage/contactsPageController";
 import { ContactPageSchema, PartialContactPageSchema } from "@/repository/IContactPage";
 import { ReqRefDefaults, ServerRoute } from "@hapi/hapi";
 const contactPageRoutes: ServerRoute<
@@ -64,6 +64,14 @@ const contactPageRoutes: ServerRoute<
               error: error.message
             }).code(409)
         }
+      }
+    },
+    {
+      method: "DELETE",
+      path: '/contact',
+      handler: async (_request, h) => {
+        await deleteContactsPageHandler()
+        return h.response().code(204)
       }
     }
   ];

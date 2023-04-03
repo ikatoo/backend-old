@@ -126,6 +126,18 @@ describe("/skills routes", () => {
     });
 
     expect(res.statusCode).toBe(400);
-  });
+  });;
+
+  test("DELETE Method: responde with status 204", async () => {
+    await repository.createSkillsPage(skillPageMock);
+    const { statusCode } = await server.inject({
+      method: "delete",
+      url: "/skills",
+    });
+    const actual = await repository.getSkillsPage()
+
+    expect(statusCode).toBe(204)
+    expect(actual).toBeUndefined()
+  })
 
 });
