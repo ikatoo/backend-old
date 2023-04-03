@@ -1,6 +1,6 @@
 import { ProjectsRepository } from "@/infra/db";
 import projectsPageMock from "@/mock/projectsPageMock";
-import { Project, ProjectWithId } from "@/repository/IProject";
+import { ProjectWithId } from "@/repository/IProject";
 import { Server, ServerApplicationState } from "@hapi/hapi";
 import { init } from "hapi/server";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
@@ -29,22 +29,14 @@ describe("/project routes", () => {
 
   test("GET Method: responds with data", async () => {
     await repository.createProject(projectsPageMock[0])
-    const { result } = await server.inject<ProjectWithId[]>({
+    const { result, statusCode } = await server.inject<ProjectWithId[]>({
       method: "get",
       url: "/projects",
     });
     const { id, ...actual } = !!result ? result[0] : {} as ProjectWithId
 
     expect(actual).toEqual(projectsPageMock[0]);
-  });
-
-  test("GET Method: responds with 404", async () => {
-    const { statusCode } = await server.inject({
-      method: "get",
-      url: "/projects",
-    });
-
-    expect(statusCode).toBe(404);
+    expect(statusCode).toEqual(200);
   });
 
   test("GET Method: result is equal the mock with 200 statusCode", async () => {
@@ -53,21 +45,12 @@ describe("/project routes", () => {
       method: "get",
       url: "/projects",
     });
+    const projects = result as ProjectWithId[]
+    const { id, ...actual } = projects[0]
 
     expect(statusCode).toBe(200);
-    // expect([result]).toEqual(projectsPageMock);
-  });
-
-  test("POST Method: create project page with 204 statusCode", async () => {
-    const { statusCode } = await server.inject({
-      method: "post",
-      url: "/project",
-      payload: projectsPageMock[0]
-    });
-    const page = await repository.getProjectByTitle(projectsPageMock[0].description.title)
-
-    expect(statusCode).toBe(204);
-    // expect(page).toEqual(projectsPageMock)
+    expect(actual).toEqual(projectsPageMock[1]);
+    expect(projects).toHaveLength(1)
   });
 
   test("GET Method: responds with 404 when not found data", async () => {
@@ -79,12 +62,25 @@ describe("/project routes", () => {
     expect(statusCode).toBe(404);
   })
 
+  test("POST Method: create project with 204 statusCode", async () => {
+    const { statusCode } = await server.inject({
+      method: "post",
+      url: "/project",
+      payload: projectsPageMock[0]
+    });
+    const title = projectsPageMock[0].description.title
+    const projects = await repository.getProjectsByTitle(title) as ProjectWithId[]
+    const { id, ...actual } = projects[0]
+    expect(statusCode).toBe(204);
+    expect(actual).toEqual(projectsPageMock[0])
+  });
+  
   test("POST Method: responds with 409 when try create page with existent data", async () => {
     await repository.createProject(projectsPageMock[1]);
     const { statusCode } = await server.inject({
       method: "post",
       url: "/project",
-      payload: projectsPageMock
+      payload: projectsPageMock[1]
     });
 
     expect(statusCode).toBe(409);
@@ -101,7 +97,8 @@ describe("/project routes", () => {
 
   test("PATCH Method: responds with 204 when update", async () => {
     await repository.createProject(projectsPageMock[0]);
-    const { id } = await repository.getProjectByTitle(projectsPageMock[0].description.title) as ProjectWithId
+    const projects = await repository.getProjectsByTitle(projectsPageMock[0].description.title) as ProjectWithId[]
+    const { id } = projects[0]
     const res = await server.inject({
       method: "patch",
       url: `/project/id/${id}`,
@@ -113,7 +110,8 @@ describe("/project routes", () => {
 
   test("PATCH Method: responds with 409 when try update with invalid payload", async () => {
     await repository.createProject(projectsPageMock[0]);
-    const { id } = await repository.getProjectByTitle(projectsPageMock[0].description.title) as ProjectWithId
+    const projects = await repository.getProjectsByTitle(projectsPageMock[0].description.title) as ProjectWithId[]
+    const { id } = projects[0]
     const res = await server.inject({
       method: "patch",
       url: `/project/id/${id}`,
@@ -125,13 +123,52 @@ describe("/project routes", () => {
 
   test("PATCH Method: responds with 400 when try update without payload", async () => {
     await repository.createProject(projectsPageMock[0]);
-    const { id } = await repository.getProjectByTitle(projectsPageMock[0].description.title) as ProjectWithId
+    const projects = await repository.getProjectsByTitle(projectsPageMock[0].description.title) as ProjectWithId[]
+    const { id } = projects[0]
     const res = await server.inject({
       method: "patch",
       url: `/project/id/${id}`,
     });
 
     expect(res.statusCode).toBe(400);
+  });
+
+  test("DELETE Method: responds with 204", async () => {
+    await repository.createProject(projectsPageMock[0]);
+    const projects = await repository.getProjectsByTitle(projectsPageMock[0].description.title) as ProjectWithId[]
+    const { id } = projects[0]
+    const res = await server.inject({
+      method: "delete",
+      url: `/project/id/${id}`,
+    });
+
+    expect(res.statusCode).toBe(204);
+  });
+
+  test("GET Method: get project with id", async () => {
+    await repository.createProject(projectsPageMock[0]);
+    const projects = await repository.getProjectsByTitle(projectsPageMock[0].description.title) as ProjectWithId[]
+    const { id } = projects[0]
+    const { result, statusCode } = await server.inject({
+      method: "get",
+      url: `/project/id/${id}`,
+    });
+
+    expect(statusCode).toBe(200);
+    expect(result).toEqual({ id, ...projectsPageMock[0] });
+  });
+
+  test("GET Method: get project with like title", async () => {
+    await repository.createProject(projectsPageMock[0]);
+    const { title } = projectsPageMock[0].description
+    const { result, statusCode } = await server.inject({
+      method: "get",
+      url: `/project/title/${title}`,
+    });
+    const { id, ...actual } = (result as ProjectWithId[])[0]
+
+    expect(statusCode).toBe(200);
+    expect(actual).toEqual(projectsPageMock[0]);
   });
 
 });
