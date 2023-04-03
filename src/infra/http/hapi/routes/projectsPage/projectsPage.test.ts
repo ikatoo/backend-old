@@ -53,13 +53,13 @@ describe("/project routes", () => {
     expect(projects).toHaveLength(1)
   });
 
-  test("GET Method: responds with 404 when not found data", async () => {
+  test("GET Method: responds with 204 when not found data", async () => {
     const { statusCode } = await server.inject({
       method: "get",
-      url: "/project",
+      url: "/projects",
     });
 
-    expect(statusCode).toBe(404);
+    expect(statusCode).toBe(204);
   })
 
   test("POST Method: create project with 204 statusCode", async () => {
@@ -74,7 +74,7 @@ describe("/project routes", () => {
     expect(statusCode).toBe(201);
     expect(actual).toEqual(projectsPageMock[0])
   });
-  
+
   test("POST Method: responds with 409 when try create page with existent data", async () => {
     await repository.createProject(projectsPageMock[1]);
     const { statusCode } = await server.inject({
@@ -158,6 +158,15 @@ describe("/project routes", () => {
     expect(result).toEqual({ id, ...projectsPageMock[0] });
   });
 
+  test("GET Method: should return statusCode 404 when project with id not exist", async () => {
+    const { statusCode } = await server.inject({
+      method: "get",
+      url: '/project/id/1000000',
+    });
+
+    expect(statusCode).toBe(404);
+  });
+
   test("GET Method: get project with like title", async () => {
     await repository.createProject(projectsPageMock[0]);
     const { title } = projectsPageMock[0].description
@@ -169,6 +178,17 @@ describe("/project routes", () => {
 
     expect(statusCode).toBe(200);
     expect(actual).toEqual(projectsPageMock[0]);
+  });
+
+  test("GET Method: should return statusCode 202 when not found data with this title", async () => {
+    await repository.createProject(projectsPageMock[0]);
+    const { result, statusCode } = await server.inject({
+      method: "get",
+      url: '/project/title/sdfsdf',
+    });
+
+    expect(statusCode).toBe(204);
+    expect(result).toBeNull();
   });
 
 });

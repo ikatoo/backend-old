@@ -9,9 +9,9 @@ const aboutPageRoutes: ServerRoute<
       method: "GET",
       path: "/about",
       handler: async (_request, h) => {
-        const page = await getAboutPageHandler()
-        if (!page) return h.response().code(404)
-        return h.response(page)
+        const pageData = await getAboutPageHandler()
+        if (!pageData) return h.response().code(204)
+        return h.response(pageData)
       }
     },
     {

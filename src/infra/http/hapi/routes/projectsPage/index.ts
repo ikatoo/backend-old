@@ -10,7 +10,7 @@ const projectsPageRoutes: ServerRoute<
       handler: async (_request, h) => {
         const projects = await getProjectsHandler()
         if (!projects.length) {
-          return h.response().code(404)
+          return h.response().code(204)
         }
         return h.response(projects)
       },
@@ -22,7 +22,7 @@ const projectsPageRoutes: ServerRoute<
         const title = request.params.title
         const projects = await getProjectsByTitleHandler(title)
         if (!projects.length) {
-          return h.response().code(404)
+          return h.response().code(204)
         }
         return h.response(projects)
       },
