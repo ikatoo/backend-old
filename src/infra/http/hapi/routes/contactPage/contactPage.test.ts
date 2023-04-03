@@ -65,7 +65,7 @@ describe("/contact routes", () => {
     });
     const page = await repository.getContactPage()
 
-    expect(statusCode).toBe(204);
+    expect(statusCode).toBe(201);
     expect(page).toEqual(contactPageMock)
   });
 

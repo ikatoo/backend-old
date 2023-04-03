@@ -35,7 +35,7 @@ const contactPageRoutes: ServerRoute<
           }).code(409)
         try {
           await createContactsPageHandler(validPage.data)
-          return h.response().code(204)
+          return h.response().code(201)
         } catch (error) {
           if (error instanceof Error && error.message.includes('duplicate'))
             return h.response({

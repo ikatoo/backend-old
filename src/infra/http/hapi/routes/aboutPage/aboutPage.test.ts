@@ -74,7 +74,7 @@ describe("/about routes", () => {
       payload: aboutPageMock
     });
 
-    expect(res.statusCode).toBe(204);
+    expect(res.statusCode).toBe(201);
   });
 
   test("POST Method: responds with 409", async () => {
