@@ -128,4 +128,16 @@ describe("/contact routes", () => {
     expect(res.statusCode).toBe(400);
   });
 
+  test("DELETE Method: responde with status 204", async () => {
+    await repository.createContactPage(contactPageMock);
+    const { statusCode } = await server.inject({
+      method: "delete",
+      url: "/contact",
+    });
+    const actual = await repository.getContactPage()
+
+    expect(statusCode).toBe(204)
+    expect(actual).toBeUndefined()
+  })
+
 });
