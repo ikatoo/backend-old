@@ -37,13 +37,13 @@ describe("/contact routes", () => {
     expect(res.result).toEqual(contactPageMock);
   });
 
-  test("GET Method: responds with 404", async () => {
+  test("GET Method: responds with 204 when not found data", async () => {
     const { statusCode } = await server.inject({
       method: "get",
       url: "/contact",
     });
 
-    expect(statusCode).toBe(404);
+    expect(statusCode).toBe(204);
   });
 
   test("GET Method: result is equal the mock with 200 statusCode", async () => {
@@ -68,15 +68,6 @@ describe("/contact routes", () => {
     expect(statusCode).toBe(201);
     expect(page).toEqual(contactPageMock)
   });
-
-  test("GET Method: responds with 404 when not found data", async () => {
-    const { statusCode } = await server.inject({
-      method: "get",
-      url: "/contact",
-    });
-
-    expect(statusCode).toBe(404);
-  })
 
   test("POST Method: responds with 409 when try create page with existent data", async () => {
     await repository.createContactPage(contactPageMock);

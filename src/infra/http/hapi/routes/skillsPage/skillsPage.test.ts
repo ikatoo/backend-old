@@ -37,13 +37,13 @@ describe("/skills routes", () => {
     expect(res.result).toEqual(skillPageMock);
   });
 
-  test("GET Method: responds with 404", async () => {
+  test("GET Method: responds with 204 when there is no data to return", async () => {
     const { statusCode } = await server.inject({
       method: "get",
       url: "/skills",
     });
 
-    expect(statusCode).toBe(404);
+    expect(statusCode).toBe(204);
   });
 
   test("GET Method: result is equal the mock with 200 statusCode", async () => {
@@ -68,15 +68,6 @@ describe("/skills routes", () => {
     expect(statusCode).toBe(201);
     expect(page).toEqual(skillPageMock)
   });
-
-  test("GET Method: responds with 404 when not found data", async () => {
-    const { statusCode } = await server.inject({
-      method: "get",
-      url: "/skills",
-    });
-
-    expect(statusCode).toBe(404);
-  })
 
   test("GET Method: responds with 409 when try create page with existent data", async () => {
     await repository.createSkillsPage(skillPageMock);

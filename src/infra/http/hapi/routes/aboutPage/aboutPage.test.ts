@@ -58,13 +58,13 @@ describe("/about routes", () => {
     expect(res.result).toEqual(aboutPageMock);
   });
 
-  test("GET Method: responds with 404", async () => {
+  test("GET Method: responds with 204 statusCode when there is no data to return", async () => {
     const res = await server.inject({
       method: "get",
       url: "/about",
     });
 
-    expect(res.statusCode).toBe(404);
+    expect(res.statusCode).toBe(204);
   });
 
   test("POST Method: responds with 204", async () => {

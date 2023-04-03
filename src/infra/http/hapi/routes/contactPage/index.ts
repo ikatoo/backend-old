@@ -8,11 +8,11 @@ const contactPageRoutes: ServerRoute<
       method: "GET",
       path: "/contact",
       handler: async (_request, h) => {
-        const page = await getContactsPageHandler()
-        if (!page) {
-          return h.response().code(404)
+        const pageData = await getContactsPageHandler()
+        if (!pageData) {
+          return h.response().code(204)
         }
-        return h.response(page)
+        return h.response(pageData)
       },
     },
     {

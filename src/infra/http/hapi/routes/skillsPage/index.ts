@@ -9,11 +9,11 @@ const skillsPageRoutes: ServerRoute<
       method: "GET",
       path: "/skills",
       handler: async (_request, h) => {
-        const page = await getSkillsPageHandler()
-        if (!page) {
-          return h.response().code(404)
+        const pageData = await getSkillsPageHandler()
+        if (!pageData) {
+          return h.response().code(204)
         }
-        return h.response(page)
+        return h.response(pageData)
       },
     },
     {
