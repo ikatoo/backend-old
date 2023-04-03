@@ -71,7 +71,7 @@ describe("/project routes", () => {
     const title = projectsPageMock[0].description.title
     const projects = await repository.getProjectsByTitle(title) as ProjectWithId[]
     const { id, ...actual } = projects[0]
-    expect(statusCode).toBe(204);
+    expect(statusCode).toBe(201);
     expect(actual).toEqual(projectsPageMock[0])
   });
   

@@ -65,7 +65,7 @@ describe("/skills routes", () => {
     });
     const page = await repository.getSkillsPage()
 
-    expect(statusCode).toBe(204);
+    expect(statusCode).toBe(201);
     expect(page).toEqual(skillPageMock)
   });
 
