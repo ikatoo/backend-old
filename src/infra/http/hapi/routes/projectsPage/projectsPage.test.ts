@@ -172,7 +172,7 @@ describe("/project routes", () => {
     const { title } = projectsPageMock[0].description
     const { result, statusCode } = await server.inject({
       method: "get",
-      url: `/project/title/${title}`,
+      url: `/projects/title/${title}`,
     });
     const { id, ...actual } = (result as ProjectWithId[])[0]
 
@@ -184,7 +184,7 @@ describe("/project routes", () => {
     await repository.createProject(projectsPageMock[0]);
     const { result, statusCode } = await server.inject({
       method: "get",
-      url: '/project/title/sdfsdf',
+      url: '/projects/title/sdfsdf',
     });
 
     expect(statusCode).toBe(204);
