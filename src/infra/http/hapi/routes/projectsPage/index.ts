@@ -17,7 +17,7 @@ const projectsPageRoutes: ServerRoute<
     },
     {
       method: "GET",
-      path: "/project/title/{title}",
+      path: "/projects/title/{title}",
       handler: async (request, h) => {
         const title = request.params.title
         const projects = await getProjectsByTitleHandler(title)
