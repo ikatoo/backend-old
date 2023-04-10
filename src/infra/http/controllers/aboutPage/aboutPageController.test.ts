@@ -8,14 +8,14 @@ describe("AboutPage Controller test", () => {
   const aboutPageRepository = new AboutPageRepository();
 
   afterEach(async () => {
-    await db.none('delete from about_page;')
+    await aboutPageRepository.clear()
   })
 
   test("Get about page data", async () => {
     await aboutPageRepository.createAboutPage(aboutPageMock);
-    const result = await getAboutPageHandler();
+    const { body } = await getAboutPageHandler();
 
-    expect(aboutPageMock).toEqual(result);
+    expect(aboutPageMock).toEqual(body);
   });
 
   test("Create about page without error", async () => {

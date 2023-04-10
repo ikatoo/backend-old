@@ -1,18 +1,20 @@
 import { AboutPageRepository } from "@/infra/db";
 import { AboutPage, AboutPageSchema } from "@/repository/IAboutPage";
 
-export type StatusCode = { statusCode?: number }
-export type AboutPageController = (page: AboutPage) => Promise<StatusCode>
+export type AboutPageController = (page?: AboutPage) => Promise<ControllerResponse>
 
 const aboutPageRepository = new AboutPageRepository();
 
 async function getAboutPageHandler() {
-  const aboutPage = await aboutPageRepository.getAboutPage()
+  const body = await aboutPageRepository.getAboutPage()
+  if (!body) {
+    return { statusCode: 204 }
+  }
 
-  return aboutPage
+  return { body, statusCode: 200 }
 }
 
-async function createAboutPageHandler(page: AboutPage): Promise<ControllerResponse> {
+async function createAboutPageHandler(page?: AboutPage): Promise<ControllerResponse> {
   const validPage = AboutPageSchema.safeParse(page)
   if (!validPage.success)
     return {
@@ -21,7 +23,7 @@ async function createAboutPageHandler(page: AboutPage): Promise<ControllerRespon
     }
 
   try {
-    await aboutPageRepository.createAboutPage(page)
+    await aboutPageRepository.createAboutPage(validPage.data)
     return { statusCode: 201 }
   } catch (error) {
     if (error instanceof Error && error.message.includes('duplicate'))
