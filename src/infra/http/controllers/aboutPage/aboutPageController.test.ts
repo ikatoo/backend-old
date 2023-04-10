@@ -1,5 +1,4 @@
 import { AboutPageRepository } from "@/infra/db";
-import db from "@/infra/db/PgPromise";
 import aboutPageMock from "@/mock/aboutPageMock";
 import { afterEach, describe, expect, test } from "vitest";
 import { createAboutPageHandler, deleteAboutPageHandler, getAboutPageHandler, updateAboutPageHandler } from "./aboutPageController";
@@ -19,7 +18,7 @@ describe("AboutPage Controller test", () => {
   });
 
   test("Create about page without error", async () => {
-    await expect(createAboutPageHandler(aboutPageMock))
+    await expect(createAboutPageHandler({ page: aboutPageMock }))
       .resolves.not.toThrow()
     const page = await aboutPageRepository.getAboutPage()
 

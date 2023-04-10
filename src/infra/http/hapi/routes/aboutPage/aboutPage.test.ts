@@ -1,5 +1,4 @@
 import { AboutPageRepository } from "@/infra/db";
-import db from "@/infra/db/PgPromise";
 import aboutPageMock from "@/mock/aboutPageMock";
 import { AboutPage } from "@/repository/IAboutPage";
 import { Server, ServerApplicationState } from "@hapi/hapi";
@@ -15,7 +14,7 @@ describe("/about routes", () => {
   });
 
   afterEach(async () => {
-    await db.none('delete from about_page;')
+    await aboutPageRepository.clear()
     await server.stop();
   });
 
@@ -30,12 +29,12 @@ describe("/about routes", () => {
 
   test("GET Method: result is equal the mock", async () => {
     await aboutPageRepository.createAboutPage(aboutPageMock);
-    const { result } = await server.inject<AboutPage>({
+    const { result } = await server.inject<HandlerResponse>({
       method: "get",
       url: "/about",
     });
 
-    expect(result).toEqual(aboutPageMock);
+    expect(result?.body).toEqual(aboutPageMock);
   });
 
   test("GET Method: responds with 200", async () => {
@@ -50,12 +49,12 @@ describe("/about routes", () => {
 
   test("GET Method: responds with data", async () => {
     await aboutPageRepository.createAboutPage(aboutPageMock);
-    const res = await server.inject({
+    const { result } = await server.inject<HandlerResponse>({
       method: "get",
       url: "/about",
     });
 
-    expect(res.result).toEqual(aboutPageMock);
+    expect(result?.body).toEqual(aboutPageMock);
   });
 
   test("GET Method: responds with 204 statusCode when there is no data to return", async () => {
