@@ -1,4 +1,4 @@
-import HapiAdapter from "@/infra/http/adapters/hapiAdapter";
+import hapiAdapter from "@/infra/http/adapters/hapiAdapter";
 import { getAboutPageHandler } from "@/infra/http/controllers";
 import { createAboutPageHandler, deleteAboutPageHandler, updateAboutPageHandler } from "@/infra/http/controllers/aboutPage/aboutPageController";
 import { ReqRefDefaults, ServerRoute } from "@hapi/hapi";
@@ -8,7 +8,7 @@ const aboutPageRoutes: ServerRoute<
     {
       method: "GET",
       path: "/about",
-      handler: HapiAdapter.get(getAboutPageHandler)
+      handler: hapiAdapter(getAboutPageHandler)
     },
     {
       method: "PUT",
@@ -20,17 +20,17 @@ const aboutPageRoutes: ServerRoute<
     {
       method: "POST",
       path: "/about",
-      handler: HapiAdapter.create(createAboutPageHandler)
+      handler: hapiAdapter(createAboutPageHandler)
     },
     {
       method: "PATCH",
       path: "/about",
-      handler: HapiAdapter.update(updateAboutPageHandler)
+      handler: hapiAdapter(updateAboutPageHandler)
     },
     {
       method: "DELETE",
       path: '/about',
-      handler: HapiAdapter.delete(deleteAboutPageHandler)
+      handler: hapiAdapter(deleteAboutPageHandler)
     }
   ];
 

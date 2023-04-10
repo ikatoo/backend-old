@@ -27,7 +27,7 @@ describe("AboutPage Controller test", () => {
 
   test("Update about page without error", async () => {
     await aboutPageRepository.createAboutPage(aboutPageMock);
-    await expect(updateAboutPageHandler({ title: 'new title' }))
+    await expect(updateAboutPageHandler({page: { title: 'new title' }}))
       .resolves.not.toThrow()
   });
 

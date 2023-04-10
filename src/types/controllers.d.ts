@@ -9,4 +9,4 @@ declare type HandlerProps = {
   page?: unknown
 }
 
-declare type AboutPageHandlerFunction = (handlerProps?: HandlerProps) => Promise<HandlerResponse>
+declare type HandlerFunction = (handlerProps?: HandlerProps) => Promise<HandlerResponse>
