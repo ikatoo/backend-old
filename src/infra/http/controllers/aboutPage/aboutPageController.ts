@@ -1,7 +1,5 @@
 import { AboutPageRepository } from "@/infra/db";
-import { AboutPage, AboutPageSchema } from "@/repository/IAboutPage";
-
-export type AboutPageController = (page?: AboutPage) => Promise<ControllerResponse>
+import { AboutPageSchema, PartialAboutPageSchema } from "@/repository/IAboutPage";
 
 const aboutPageRepository = new AboutPageRepository();
 
@@ -14,8 +12,8 @@ async function getAboutPageHandler() {
   return { body, statusCode: 200 }
 }
 
-async function createAboutPageHandler(page?: AboutPage): Promise<ControllerResponse> {
-  const validPage = AboutPageSchema.safeParse(page)
+async function createAboutPageHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
+  const validPage = AboutPageSchema.safeParse(handlerProps?.page)
   if (!validPage.success)
     return {
       error: 'Invalid type.',
@@ -35,12 +33,46 @@ async function createAboutPageHandler(page?: AboutPage): Promise<ControllerRespo
   }
 }
 
-async function updateAboutPageHandler(page: Partial<AboutPage>) {
-  await aboutPageRepository.updateAboutPage(page)
+async function updateAboutPageHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
+  if (!handlerProps?.page) return { statusCode: 400 }
+
+  const validPage = PartialAboutPageSchema.safeParse(handlerProps?.page)
+  if (!validPage.success || Object.keys(validPage.data).length === 0)
+    return ({
+      error: 'Invalid type.',
+      statusCode: 409
+    })
+
+  try {
+    await aboutPageRepository.updateAboutPage(validPage.data)
+    return {
+      statusCode: 204
+    }
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('duplicate'))
+      return {
+        error: error.message,
+        statusCode: 409
+      }
+  }
+
+  return {
+    statusCode: 500
+  }
 }
 
-async function deleteAboutPageHandler() {
-  await aboutPageRepository.deleteAboutPage()
+async function deleteAboutPageHandler(): Promise<HandlerResponse> {
+  try {
+    await aboutPageRepository.deleteAboutPage()
+    return { statusCode: 204 }
+  } catch (error) {
+    if (error instanceof Error)
+      return {
+        statusCode: 500,
+        error: error.message
+      }
+  }
+  return { statusCode: 500 }
 }
 
 export {
