@@ -13,6 +13,9 @@ async function getAboutPageHandler() {
 }
 
 async function createAboutPageHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
+  if(!handlerProps?.page) return {
+    statusCode: 400
+  }
   const validPage = AboutPageSchema.safeParse(handlerProps?.page)
   if (!validPage.success)
     return {
