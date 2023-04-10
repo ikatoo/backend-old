@@ -1,6 +1,7 @@
+import HapiAdapter from "@/infra/http/adapters/hapi";
 import { getAboutPageHandler } from "@/infra/http/controllers";
 import { createAboutPageHandler, deleteAboutPageHandler, updateAboutPageHandler } from "@/infra/http/controllers/aboutPage/aboutPageController";
-import { AboutPage, AboutPageSchema, PartialAboutPageSchema } from "@/repository/IAboutPage";
+import { PartialAboutPageSchema } from "@/repository/IAboutPage";
 import { ReqRefDefaults, ServerRoute } from "@hapi/hapi";
 const aboutPageRoutes: ServerRoute<
   ReqRefDefaults
@@ -24,24 +25,7 @@ const aboutPageRoutes: ServerRoute<
     {
       method: "POST",
       path: "/about",
-      handler: async (request, h) => {
-        if (!request.payload) return h.response().code(400)
-
-        const validPage = AboutPageSchema.safeParse(request.payload)
-        if (!validPage.success)
-          return h.response({
-            error: 'Invalid type.'
-          }).code(409)
-        try {
-          await createAboutPageHandler(validPage.data)
-          return h.response().code(201)
-        } catch (error) {
-          if (error instanceof Error && error.message.includes('duplicate'))
-            return h.response({
-              error: error.message
-            }).code(409)
-        }
-      }
+      handler: HapiAdapter.create(createAboutPageHandler)
     },
     {
       method: "PATCH",
