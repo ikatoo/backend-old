@@ -14,11 +14,11 @@ describe("ContactsPage Controller test", () => {
     await contactsPageRepository.createContactPage(contactPageMock);
     const result = await getContactsPageHandler()
 
-    expect(contactPageMock).toEqual(result);
+    expect(contactPageMock).toEqual(result.body);
   });
 
   test("Create contacts page data without error", async () => {
-    await expect(createContactsPageHandler(contactPageMock))
+    await expect(createContactsPageHandler({ page: contactPageMock }))
       .resolves.not.toThrow()
     const page = await contactsPageRepository.getContactPage()
 
@@ -31,7 +31,7 @@ describe("ContactsPage Controller test", () => {
       title: 'new title',
       description: 'new Description'
     }
-    await expect(updateContactsPageHandler(newData))
+    await expect(updateContactsPageHandler({ page: newData }))
       .resolves.not.toThrow()
     const page = await contactsPageRepository.getContactPage()
 

@@ -48,7 +48,7 @@ describe("/contact routes", () => {
 
   test("GET Method: result is equal the mock with 200 statusCode", async () => {
     await repository.createContactPage(contactPageMock);
-    const { result, statusCode } = await server.inject({
+    const { result, statusCode } = await server.inject<HandlerResponse>({
       method: "get",
       url: "/contact",
     });
