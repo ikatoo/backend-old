@@ -10,8 +10,8 @@ export default (handler: HandlerFunction) => {
     }
 
     return statusCode
-      ? h.response({ body }).code(statusCode)
-      : h.response({ body })
+      ? h.response(body).code(statusCode)
+      : h.response(body)
   }
 
   return hapiHandler

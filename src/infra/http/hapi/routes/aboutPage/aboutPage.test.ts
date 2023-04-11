@@ -34,7 +34,7 @@ describe("/about routes", () => {
       url: "/about",
     });
 
-    expect(result?.body).toEqual(aboutPageMock);
+    expect(result).toEqual(aboutPageMock);
   });
 
   test("GET Method: responds with 200", async () => {
@@ -54,7 +54,7 @@ describe("/about routes", () => {
       url: "/about",
     });
 
-    expect(result?.body).toEqual(aboutPageMock);
+    expect(result).toEqual(aboutPageMock);
   });
 
   test("GET Method: responds with 204 statusCode when there is no data to return", async () => {
