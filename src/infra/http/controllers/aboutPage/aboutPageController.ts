@@ -3,7 +3,7 @@ import { AboutPageSchema, PartialAboutPageSchema } from "@/repository/IAboutPage
 
 const aboutPageRepository = new AboutPageRepository();
 
-async function getAboutPageHandler() {
+async function getAboutPageHandler(): Promise<HandlerResponse> {
   const body = await aboutPageRepository.getAboutPage()
   if (!body) {
     return { statusCode: 204 }
