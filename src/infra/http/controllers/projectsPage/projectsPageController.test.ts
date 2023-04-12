@@ -26,7 +26,7 @@ describe("ProjectsPage Controller test", () => {
   });
 
   test("Create projects page data without error", async () => {
-    await createProjectHandler(projectsPageMock[0])
+    await createProjectHandler({ parameters: projectsPageMock[0] })
     const projects = await projectsRepository.getProjectsByTitle(projectsPageMock[0].description.title) as ProjectWithId[]
     const project = projects[0]
 
@@ -43,7 +43,7 @@ describe("ProjectsPage Controller test", () => {
     }
     const projects = await projectsRepository.getProjectsByTitle(projectsPageMock[0].description.title) as ProjectWithId[]
     const { id } = projects[0]
-    await updateProjectHandler(id, newData)
+    await updateProjectHandler({ parameters: { id, ...newData } })
     const { id: updateId, ...actual } = await projectsRepository.getProjectById(id) as ProjectWithId
 
     expect(actual).toEqual({
@@ -56,14 +56,14 @@ describe("ProjectsPage Controller test", () => {
     })
   });
 
-  test("Delete projects page data", async () => {
+  test("Delete projects page with 204 status code", async () => {
     await projectsRepository.createProject(projectsPageMock[1]);
     const projects = await projectsRepository.getProjectsByTitle(projectsPageMock[1].description.title) as ProjectWithId[]
     const { id } = projects[0]
-    await expect(deleteProjectHandler(id))
-      .resolves.not.toThrow()
+    const { statusCode } = await deleteProjectHandler({ parameters: { id } })
     const actual = await projectsRepository.getProjectById(id)
 
+    expect(statusCode).toEqual(204)
     expect(actual).toBeUndefined()
   });
 
