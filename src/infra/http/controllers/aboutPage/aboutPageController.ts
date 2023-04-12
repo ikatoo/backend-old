@@ -13,7 +13,7 @@ async function getAboutPageHandler(): Promise<HandlerResponse> {
 }
 
 async function createAboutPageHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
-  if(!handlerProps?.page) return {
+  if (!handlerProps?.page || !Object.keys(handlerProps.page).length) return {
     statusCode: 400
   }
   const validPage = AboutPageSchema.safeParse(handlerProps?.page)
@@ -37,7 +37,9 @@ async function createAboutPageHandler(handlerProps?: HandlerProps): Promise<Hand
 }
 
 async function updateAboutPageHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
-  if (!handlerProps?.page) return { statusCode: 400 }
+  if (!handlerProps?.page || !Object.keys(handlerProps.page).length) return {
+    statusCode: 400
+  }
 
   const validPage = PartialAboutPageSchema.safeParse(handlerProps?.page)
   if (!validPage.success || Object.keys(validPage.data).length === 0)

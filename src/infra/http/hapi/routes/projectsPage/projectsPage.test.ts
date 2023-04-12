@@ -27,18 +27,6 @@ describe("/project routes", () => {
     expect(statusCode).toEqual(405);
   })
 
-  test("GET Method: responds with data", async () => {
-    await repository.createProject(projectsPageMock[0])
-    const { result, statusCode } = await server.inject<ProjectWithId[]>({
-      method: "get",
-      url: "/projects",
-    });
-    const { id, ...actual } = !!result ? result[0] : {} as ProjectWithId
-
-    expect(actual).toEqual(projectsPageMock[0]);
-    expect(statusCode).toEqual(200);
-  });
-
   test("GET Method: result is equal the mock with 200 statusCode", async () => {
     await repository.createProject(projectsPageMock[1]);
     const { result, statusCode } = await server.inject({
@@ -180,7 +168,7 @@ describe("/project routes", () => {
     expect(actual).toEqual(projectsPageMock[0]);
   });
 
-  test("GET Method: should return statusCode 202 when not found data with this title", async () => {
+  test("GET Method: should return statusCode 204 when not found data with this title", async () => {
     await repository.createProject(projectsPageMock[0]);
     const { result, statusCode } = await server.inject({
       method: "get",

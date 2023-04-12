@@ -1,16 +1,55 @@
 import { ProjectsRepository } from "@/infra/db";
-import { PartialProject, Project, ProjectWithId } from "@/repository/IProject";
+import { PartialProject, PartialProjectSchema, Project, ProjectWithId } from "@/repository/IProject";
 
 const projectsRepository = new ProjectsRepository();
 
-async function getProjectsHandler(): Promise<ProjectWithId[]> {
-  const projects = await projectsRepository.getProjects()
-  return projects
+async function getProjectsHandler(): Promise<HandlerResponse> {
+  try {
+    const projects = await projectsRepository.getProjects()
+    if (!projects.length) {
+      return {
+        statusCode: 204
+      }
+    }
+    return {
+      body: projects,
+      statusCode: 200
+    }
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : undefined,
+      statusCode: 500
+    }
+  }
 }
 
-async function getProjectsByTitleHandler(title: string): Promise<ProjectWithId[]> {
-  const projects = await projectsRepository.getProjectsByTitle(title)
-  return projects ?? []
+async function getProjectsByTitleHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
+  if (!handlerProps?.page) return {
+    statusCode: 400
+  }
+  const title = (handlerProps.page as { title: string }).title
+  if (!title)
+    return {
+      error: 'Invalid type',
+      statusCode: 409
+    }
+
+  try {
+    const projects = await projectsRepository.getProjectsByTitle(title)
+    if (!projects || !projects.length) {
+      return { statusCode: 204 }
+    }
+    return {
+      body: projects,
+      statusCode: 200
+    }
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : undefined,
+      statusCode: 500
+    }
+  }
+
 }
 
 async function getProjectByIDHandler(id: number): Promise<ProjectWithId | undefined> {
@@ -31,10 +70,6 @@ async function deleteProjectHandler(id: number): Promise<void> {
 }
 
 export {
-  getProjectsHandler,
-  getProjectsByTitleHandler,
-  getProjectByIDHandler,
-  createProjectHandler,
-  updateProjectHandler,
-  deleteProjectHandler
+  createProjectHandler, deleteProjectHandler, getProjectByIDHandler, getProjectsByTitleHandler, getProjectsHandler, updateProjectHandler
 };
+

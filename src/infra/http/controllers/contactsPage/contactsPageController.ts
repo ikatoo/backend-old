@@ -11,7 +11,7 @@ async function getContactsPageHandler(): Promise<HandlerResponse> {
 }
 
 async function createContactsPageHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
-  if (!handlerProps?.page) return {
+  if (!handlerProps?.page || !Object.keys(handlerProps.page).length) return {
     statusCode: 400
   }
 
@@ -38,7 +38,7 @@ async function createContactsPageHandler(handlerProps?: HandlerProps): Promise<H
 }
 
 async function updateContactsPageHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
-  if (!handlerProps?.page) return {
+  if (!handlerProps?.page || !Object.keys(handlerProps.page).length) return {
     statusCode: 400
   }
 

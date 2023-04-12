@@ -2,7 +2,8 @@ import { Request, ResponseToolkit } from "@hapi/hapi"
 
 export default (handler: HandlerFunction) => {
   const hapiHandler = async (request: Request, h: ResponseToolkit) => {
-    const { statusCode, error, body } = await handler({ page: request.payload })
+    const page = request.payload ?? request.params
+    const { statusCode, error, body } = await handler({ page })
     if (error) {
       return statusCode
         ? h.response({ error }).code(statusCode)
