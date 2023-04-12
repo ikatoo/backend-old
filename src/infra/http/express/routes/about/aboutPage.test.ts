@@ -1,4 +1,5 @@
 import { AboutPageRepository } from "@/infra/db";
+import aboutPageMock from "@/mock/aboutPageMock";
 import request from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { app } from "../../server";
@@ -10,7 +11,7 @@ describe("/about routes", () => {
   });
 
   afterEach(async () => {
-    aboutPageRepository.clear()
+    await aboutPageRepository.clear()
   });
 
   test("PUT Method: responds with 405 code when try use put method", async () => {
@@ -21,111 +22,81 @@ describe("/about routes", () => {
     expect(statusCode).toEqual(405);
   })
 
-  // test("GET Method: result is equal the mock", async () => {
-  //   await aboutPageRepository.createAboutPage(aboutPageMock);
-  //   const { body } = await request(app).get('/about').send()
+  test("GET Method: result is equal the mock and status code 200", async () => {
+    await aboutPageRepository.createAboutPage(aboutPageMock);
+    const { body, statusCode } = await request(app).get('/about').send()
 
-  //   expect(body).toEqual(aboutPageMock);
-  // });
+    expect(body).toEqual(aboutPageMock);
+    expect(statusCode).toEqual(200)
+  });
 
-  // test("GET Method: responds with 200", async () => {
-  //   await aboutPageRepository.createAboutPage(aboutPageMock);
-  //   const res = await server.inject({
-  //     method: "get",
-  //     url: "/about",
-  //   });
+  test("GET Method: responds with 204 statusCode when there is no data to return", async () => {
+    const { body, statusCode } = await request(app).get('/about').send()
 
-  //   expect(res.statusCode).toBe(200);
-  // });
+    expect(statusCode).toBe(204);
+    expect(body).toEqual({})
+  });
 
-  // test("GET Method: responds with data", async () => {
-  //   await aboutPageRepository.createAboutPage(aboutPageMock);
-  //   const res = await server.inject({
-  //     method: "get",
-  //     url: "/about",
-  //   });
+  test("POST Method: responds with 204", async () => {
+    const { body, statusCode } = await request(app)
+      .post('/about')
+      .send(aboutPageMock)
 
-  //   expect(res.result).toEqual(aboutPageMock);
-  // });
+    expect(statusCode).toBe(201);
+  });
 
-  // test("GET Method: responds with 204 statusCode when there is no data to return", async () => {
-  //   const res = await server.inject({
-  //     method: "get",
-  //     url: "/about",
-  //   });
+  test("POST Method: responds with 409 when try create with existent data", async () => {
+    await aboutPageRepository.createAboutPage(aboutPageMock);
+    const { body, statusCode } = await request(app)
+      .post('/about')
+      .send(aboutPageMock)
 
-  //   expect(res.statusCode).toBe(204);
-  // });
+    expect(statusCode).toBe(409);
+    expect(body).toHaveProperty('error')
+  });
 
-  // test("POST Method: responds with 204", async () => {
-  //   const res = await server.inject({
-  //     method: "post",
-  //     url: "/about",
-  //     payload: aboutPageMock
-  //   });
+  test("POST Method: responds with 400 when request without payload", async () => {
+    const { statusCode } = await request(app)
+      .post('/about')
+      .send()
 
-  //   expect(res.statusCode).toBe(201);
-  // });
+    expect(statusCode).toBe(400);
+  });
 
-  // test("POST Method: responds with 409", async () => {
-  //   await aboutPageRepository.createAboutPage(aboutPageMock);
-  //   const res = await server.inject({
-  //     method: "post",
-  //     url: "/about",
-  //     payload: aboutPageMock
-  //   });
+  test("PATCH Method: responds with 204 when update", async () => {
+    await aboutPageRepository.createAboutPage(aboutPageMock);
+    const { statusCode } = await request(app)
+      .patch('/about')
+      .send({ title: 'new title' })
 
-  //   expect(res.statusCode).toBe(409);
-  // });
+    expect(statusCode).toBe(204);
+  });
 
-  // test("POST Method: responds with 400 when request without payload", async () => {
-  //   const res = await server.inject({
-  //     method: "post",
-  //     url: "/about",
-  //   });
+  test("PATCH Method: responds with 409 when try update with invalid payload", async () => {
+    await aboutPageRepository.createAboutPage(aboutPageMock);
+    const { statusCode } = await request(app)
+      .patch('/about')
+      .send({ invalid: 'payload' })
 
-  //   expect(res.statusCode).toBe(400);
-  // });
+    expect(statusCode).toBe(409);
+  });
 
-  // test("PATCH Method: responds with 204 when update", async () => {
-  //   const res = await server.inject({
-  //     method: "patch",
-  //     url: "/about",
-  //     payload: { title: 'new title' }
-  //   });
+  test("PATCH Method: responds with 400 when try update without payload", async () => {
+    const { statusCode } = await request(app)
+      .patch('/about')
+      .send()
 
-  //   expect(res.statusCode).toBe(204);
-  // });
+    expect(statusCode).toBe(400);
+  });
 
-  // test("PATCH Method: responds with 409 when try update with invalid payload", async () => {
-  //   await aboutPageRepository.createAboutPage(aboutPageMock);
-  //   const res = await server.inject({
-  //     method: "patch",
-  //     url: "/about",
-  //     payload: { invalid: 'payload' }
-  //   });
+  test("DELETE Method: responde with status 204", async () => {
+    await aboutPageRepository.createAboutPage(aboutPageMock);
+    const { statusCode } = await request(app)
+      .delete('/about')
+      .send()
+    const actual = await aboutPageRepository.getAboutPage()
 
-  //   expect(res.statusCode).toBe(409);
-  // });
-
-  // test("PATCH Method: responds with 400 when try update without payload", async () => {
-  //   const res = await server.inject({
-  //     method: "patch",
-  //     url: "/about",
-  //   });
-
-  //   expect(res.statusCode).toBe(400);
-  // });
-
-  // test("DELETE Method: responde with status 204", async () => {
-  //   await aboutPageRepository.createAboutPage(aboutPageMock);
-  //   const { statusCode } = await server.inject({
-  //     method: "delete",
-  //     url: "/about",
-  //   });
-  //   const actual = await aboutPageRepository.getAboutPage()
-
-  //   expect(statusCode).toBe(204)
-  //   expect(actual).toBeUndefined()
-  // })
+    expect(statusCode).toBe(204)
+    expect(actual).toBeUndefined()
+  })
 });

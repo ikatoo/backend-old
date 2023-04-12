@@ -1,5 +1,5 @@
 import { expressAdapter } from '@/infra/http/adapters/expressAdapter'
-import { createAboutPageHandler, getAboutPageHandler } from '@/infra/http/controllers/aboutPage/aboutPageController'
+import { createAboutPageHandler, deleteAboutPageHandler, getAboutPageHandler, updateAboutPageHandler } from '@/infra/http/controllers/aboutPage/aboutPageController'
 import { Router } from 'express'
 
 const aboutRoutes = Router()
@@ -19,6 +19,16 @@ aboutRoutes.get(
 aboutRoutes.post(
   '/about',
   expressAdapter(createAboutPageHandler)
+)
+
+aboutRoutes.patch(
+  '/about',
+  expressAdapter(updateAboutPageHandler)
+)
+
+aboutRoutes.delete(
+  '/about',
+  expressAdapter(deleteAboutPageHandler)
 )
 
 export {
