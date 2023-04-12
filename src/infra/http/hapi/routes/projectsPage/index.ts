@@ -1,3 +1,4 @@
+import hapiAdapter from "@/infra/http/adapters/hapiAdapter";
 import { createProjectHandler, deleteProjectHandler, getProjectByIDHandler, getProjectsByTitleHandler, getProjectsHandler, updateProjectHandler } from "@/infra/http/controllers/projectsPage/projectsPageController";
 import { PartialProjectSchema, ProjectSchema } from "@/repository/IProject";
 import { ReqRefDefaults, ServerRoute } from "@hapi/hapi";
@@ -7,25 +8,12 @@ const projectsPageRoutes: ServerRoute<
     {
       method: "GET",
       path: "/projects",
-      handler: async (_request, h) => {
-        const projects = await getProjectsHandler()
-        if (!projects.length) {
-          return h.response().code(204)
-        }
-        return h.response(projects)
-      },
+      handler: hapiAdapter(getProjectsHandler)
     },
     {
       method: "GET",
       path: "/projects/title/{title}",
-      handler: async (request, h) => {
-        const title = request.params.title
-        const projects = await getProjectsByTitleHandler(title)
-        if (!projects.length) {
-          return h.response().code(204)
-        }
-        return h.response(projects)
-      },
+      handler: hapiAdapter(getProjectsByTitleHandler)
     },
     {
       method: "GET",
