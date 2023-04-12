@@ -18,14 +18,7 @@ const projectsPageRoutes: ServerRoute<
     {
       method: "GET",
       path: "/project/id/{id}",
-      handler: async (request, h) => {
-        const id = request.params.id
-        const project = await getProjectByIDHandler(id)
-        if (!project) {
-          return h.response().code(404)
-        }
-        return h.response(project)
-      },
+      handler: hapiAdapter(getProjectByIDHandler)
     },
     {
       method: "PUT",

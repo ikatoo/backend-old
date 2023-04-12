@@ -52,9 +52,19 @@ async function getProjectsByTitleHandler(handlerProps?: HandlerProps): Promise<H
 
 }
 
-async function getProjectByIDHandler(id: number): Promise<ProjectWithId | undefined> {
-  const project = await projectsRepository.getProjectById(id)
-  return project
+async function getProjectByIDHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
+  const { id } = (handlerProps?.parameters as { id: string })
+  if (!id) return {
+    statusCode: 400
+  }
+  const project = await projectsRepository.getProjectById(+id)
+  if (!project) {
+    return { statusCode: 404 }
+  }
+  return {
+    body: project,
+    statusCode: 200
+  }
 }
 
 async function createProjectHandler(project: Project): Promise<void> {

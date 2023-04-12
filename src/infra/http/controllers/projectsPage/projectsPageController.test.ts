@@ -79,8 +79,8 @@ describe("ProjectsPage Controller test", () => {
     await projectsRepository.createProject(projectsPageMock[1])
     const title = projectsPageMock[1].description.title
     const projects = await projectsRepository.getProjectsByTitle(title) as ProjectWithId[]
-    const { id } = projects[0]
-    const result = await getProjectByIDHandler(id)
+    const id = projects[0].id.toString()
+    const result = (await getProjectByIDHandler({ parameters: { id } })).body as ProjectWithId
 
     expect({ id: result?.id, ...projectsPageMock[1] }).toEqual(result);
   });
