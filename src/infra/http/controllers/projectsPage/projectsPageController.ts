@@ -95,7 +95,8 @@ async function createProjectHandler(handlerProps?: HandlerProps): Promise<Handle
 }
 
 async function updateProjectHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
-  if (typeof handlerProps?.parameters !== "object" || Object.keys(handlerProps?.parameters!).length < 2) return {
+  const { id } = (handlerProps?.parameters as { id: string })
+  if (Object.keys(handlerProps?.parameters!).length < 2 || !+id) return {
     statusCode: 400
   }
 
@@ -106,7 +107,6 @@ async function updateProjectHandler(handlerProps?: HandlerProps): Promise<Handle
       statusCode: 409
     }
   try {
-    const { id } = (handlerProps?.parameters as { id: string })
     await projectsRepository.updateProject(+id, validPage.data)
     return { statusCode: 204 }
   } catch (error) {
@@ -124,7 +124,7 @@ async function updateProjectHandler(handlerProps?: HandlerProps): Promise<Handle
 
 async function deleteProjectHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
   const id = Object.values(handlerProps?.parameters!)[0]
-  if (!id) return {
+  if (!+id) return {
     statusCode: 400
   }
 
