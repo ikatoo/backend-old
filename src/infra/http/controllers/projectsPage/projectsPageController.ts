@@ -24,10 +24,10 @@ async function getProjectsHandler(): Promise<HandlerResponse> {
 }
 
 async function getProjectsByTitleHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
-  if (!handlerProps?.parameters || !Object.keys(handlerProps.parameters).length) return {
+  if (!Object.keys(handlerProps?.parameters!).length) return {
     statusCode: 400
   }
-  const title = (handlerProps.parameters as { title: string }).title
+  const title = (handlerProps?.parameters as { title: string }).title
   if (!title)
     return {
       error: 'Invalid type',
