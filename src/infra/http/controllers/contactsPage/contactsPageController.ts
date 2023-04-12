@@ -11,11 +11,11 @@ async function getContactsPageHandler(): Promise<HandlerResponse> {
 }
 
 async function createContactsPageHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
-  if (!handlerProps?.parameters || !Object.keys(handlerProps.parameters).length) return {
+  if (!Object.keys(handlerProps?.parameters!).length) return {
     statusCode: 400
   }
 
-  const validPage = ContactPageSchema.safeParse(handlerProps.parameters)
+  const validPage = ContactPageSchema.safeParse(handlerProps?.parameters)
   if (!validPage.success)
     return {
       error: 'Invalid type.',
