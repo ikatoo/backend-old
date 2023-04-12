@@ -13,10 +13,10 @@ async function getAboutPageHandler(): Promise<HandlerResponse> {
 }
 
 async function createAboutPageHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
-  if (!handlerProps?.page || !Object.keys(handlerProps.page).length) return {
+  if (!handlerProps?.parameters || !Object.keys(handlerProps.parameters).length) return {
     statusCode: 400
   }
-  const validPage = AboutPageSchema.safeParse(handlerProps?.page)
+  const validPage = AboutPageSchema.safeParse(handlerProps?.parameters)
   if (!validPage.success)
     return {
       error: 'Invalid type.',
@@ -37,11 +37,11 @@ async function createAboutPageHandler(handlerProps?: HandlerProps): Promise<Hand
 }
 
 async function updateAboutPageHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
-  if (!handlerProps?.page || !Object.keys(handlerProps.page).length) return {
+  if (!handlerProps?.parameters || !Object.keys(handlerProps.parameters).length) return {
     statusCode: 400
   }
 
-  const validPage = PartialAboutPageSchema.safeParse(handlerProps?.page)
+  const validPage = PartialAboutPageSchema.safeParse(handlerProps?.parameters)
   if (!validPage.success || Object.keys(validPage.data).length === 0)
     return ({
       error: 'Invalid type.',
