@@ -1,5 +1,5 @@
 import { ProjectsRepository } from "@/infra/db";
-import { PartialProject, PartialProjectSchema, Project, ProjectWithId } from "@/repository/IProject";
+import { PartialProjectSchema, ProjectSchema } from "@/repository/IProject";
 
 const projectsRepository = new ProjectsRepository();
 
@@ -67,16 +67,76 @@ async function getProjectByIDHandler(handlerProps?: HandlerProps): Promise<Handl
   }
 }
 
-async function createProjectHandler(project: Project): Promise<void> {
-  await projectsRepository.createProject(project)
+async function createProjectHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
+  if (!Object.keys(handlerProps?.parameters!).length) return {
+    statusCode: 400
+  }
+
+  const validPage = ProjectSchema.safeParse(handlerProps?.parameters)
+  if (!validPage.success)
+    return {
+      error: 'Invalid type.',
+      statusCode: 409
+    }
+  try {
+    await projectsRepository.createProject(validPage.data)
+    return { statusCode: 201 }
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('duplicate')) {
+      return {
+        error: error.message,
+        statusCode: 409
+      }
+    }
+    return {
+      statusCode: 500
+    }
+  }
 }
 
-async function updateProjectHandler(id: number, project: PartialProject): Promise<void> {
-  await projectsRepository.updateProject(id, project)
+async function updateProjectHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
+  if (typeof handlerProps?.parameters !== "object" || Object.keys(handlerProps?.parameters!).length < 2) return {
+    statusCode: 400
+  }
+
+  const validPage = PartialProjectSchema.safeParse(handlerProps?.parameters)
+  if (!validPage.success || !Object.keys(validPage.data).length)
+    return {
+      error: 'Invalid type.',
+      statusCode: 409
+    }
+  try {
+    const { id } = (handlerProps?.parameters as { id: string })
+    await projectsRepository.updateProject(+id, validPage.data)
+    return { statusCode: 204 }
+  } catch (error) {
+    if (error instanceof Error) {
+      return {
+        error: error.message,
+        statusCode: 409
+      }
+    }
+    return {
+      statusCode: 500
+    }
+  }
 }
 
-async function deleteProjectHandler(id: number): Promise<void> {
-  await projectsRepository.deleteProject(id)
+async function deleteProjectHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
+  const id = Object.values(handlerProps?.parameters!)[0]
+  if (!id) return {
+    statusCode: 400
+  }
+
+  try {
+    await projectsRepository.deleteProject(id)
+    return { statusCode: 204 }
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : undefined,
+      statusCode: 204
+    }
+  }
 }
 
 export {
