@@ -18,7 +18,7 @@ describe("ContactsPage Controller test", () => {
   });
 
   test("Create contacts page data without error", async () => {
-    await expect(createContactsPageHandler({ page: contactPageMock }))
+    await expect(createContactsPageHandler({ parameters: contactPageMock }))
       .resolves.not.toThrow()
     const page = await contactsPageRepository.getContactPage()
 
@@ -31,7 +31,7 @@ describe("ContactsPage Controller test", () => {
       title: 'new title',
       description: 'new Description'
     }
-    await expect(updateContactsPageHandler({ page: newData }))
+    await expect(updateContactsPageHandler({ parameters: newData }))
       .resolves.not.toThrow()
     const page = await contactsPageRepository.getContactPage()
 

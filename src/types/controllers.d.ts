@@ -5,8 +5,7 @@ declare type HandlerResponse = {
 }
 
 declare type HandlerProps = {
-  id?: number
-  page?: unknown
+  parameters?: unknown
 }
 
 declare type HandlerFunction = (handlerProps?: HandlerProps) => Promise<HandlerResponse>

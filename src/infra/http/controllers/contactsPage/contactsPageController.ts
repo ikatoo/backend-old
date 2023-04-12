@@ -11,11 +11,11 @@ async function getContactsPageHandler(): Promise<HandlerResponse> {
 }
 
 async function createContactsPageHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
-  if (!handlerProps?.page || !Object.keys(handlerProps.page).length) return {
+  if (!handlerProps?.parameters || !Object.keys(handlerProps.parameters).length) return {
     statusCode: 400
   }
 
-  const validPage = ContactPageSchema.safeParse(handlerProps.page)
+  const validPage = ContactPageSchema.safeParse(handlerProps.parameters)
   if (!validPage.success)
     return {
       error: 'Invalid type.',
@@ -38,11 +38,11 @@ async function createContactsPageHandler(handlerProps?: HandlerProps): Promise<H
 }
 
 async function updateContactsPageHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
-  if (!handlerProps?.page || !Object.keys(handlerProps.page).length) return {
+  if (!handlerProps?.parameters || !Object.keys(handlerProps.parameters).length) return {
     statusCode: 400
   }
 
-  const validPage = PartialContactPageSchema.safeParse(handlerProps?.page)
+  const validPage = PartialContactPageSchema.safeParse(handlerProps?.parameters)
   if (!validPage.success || Object.keys(validPage.data).length === 0)
     return {
       error: 'Invalid type.',

@@ -70,7 +70,7 @@ describe("ProjectsPage Controller test", () => {
   test("Get projects with similar title", async () => {
     await projectsRepository.createProject(projectsPageMock[1])
     const title = projectsPageMock[1].description.title
-    const result = (await getProjectsByTitleHandler({ page: { title } })).body as ProjectWithId[]
+    const result = (await getProjectsByTitleHandler({ parameters: { title } })).body as ProjectWithId[]
 
     expect([{ id: result[0].id, ...projectsPageMock[1] }]).toEqual(result);
   });
