@@ -4,7 +4,7 @@ import request from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { app } from "../../server";
 
-describe("/about routes", () => {
+describe("EXPRESS: /about routes", () => {
   const aboutPageRepository = new AboutPageRepository();
 
   beforeEach(async () => {
