@@ -1,4 +1,4 @@
-import ExpressAdapter from '@/infra/http/adapters/expressAdapter'
+import { expressAdapter } from '@/infra/http/adapters/expressAdapter'
 import { createAboutPageHandler, getAboutPageHandler } from '@/infra/http/controllers/aboutPage/aboutPageController'
 import { Router } from 'express'
 
@@ -13,12 +13,12 @@ aboutRoutes.put(
 
 aboutRoutes.get(
   '/about',
-  ExpressAdapter.get(getAboutPageHandler)
+  expressAdapter(getAboutPageHandler)
 )
 
 aboutRoutes.post(
   '/about',
-  ExpressAdapter.create(createAboutPageHandler)
+  expressAdapter(createAboutPageHandler)
 )
 
 export {
