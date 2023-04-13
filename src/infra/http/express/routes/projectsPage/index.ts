@@ -2,42 +2,42 @@ import { expressAdapter } from "@/infra/http/adapters/expressAdapter";
 import { createProjectHandler, deleteProjectHandler, getProjectByIDHandler, getProjectsByTitleHandler, getProjectsHandler, updateProjectHandler } from "@/infra/http/controllers/projectsPage/projectsPageController";
 import { Router } from "express";
 
-const projectsRoute = Router()
+const projectsRoutes = Router()
 
-projectsRoute.put(
+projectsRoutes.put(
   '/projects',
   (_request, response) => response.status(405).send()
 )
 
-projectsRoute.get(
+projectsRoutes.get(
   '/projects',
   expressAdapter(getProjectsHandler)
 )
 
-projectsRoute.get(
+projectsRoutes.get(
   '/project/id/:id',
   expressAdapter(getProjectByIDHandler)
 )
 
-projectsRoute.get(
+projectsRoutes.get(
   '/projects/title/:title',
   expressAdapter(getProjectsByTitleHandler)
 )
 
-projectsRoute.post(
+projectsRoutes.post(
   '/project',
   expressAdapter(createProjectHandler)
 )
 
-projectsRoute.patch(
+projectsRoutes.patch(
   '/project/id/:id',
   expressAdapter(updateProjectHandler)
 )
 
-projectsRoute.delete(
+projectsRoutes.delete(
   '/project/id/:id',
   expressAdapter(deleteProjectHandler)
 )
 
-export { projectsRoute };
+export { projectsRoutes };
 
