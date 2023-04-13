@@ -12,7 +12,8 @@
     "test:infra:watch": "vitest --no-threads src/infra",
     "test:utils": "vitest run --no-threads src/utils",
     "test:utils:watch": "vitest --no-threads src/utils",
-    "dev": "cross-env NODE_ENV=dev tsx --watch src/infra/http/hapi/main.ts",
+    "dev:hapi": "cross-env NODE_ENV=dev tsx --watch src/infra/http/hapi/main.ts",
+    "dev:express": "cross-env NODE_ENV=dev tsx --watch src/infra/http/express/main.ts",
     "build": "rimraf dist && tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "repository": {
