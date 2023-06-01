@@ -1,23 +1,45 @@
-FROM node:18-bullseye
+# syntax = docker/dockerfile:1
 
-ENV PORT=${PORT}
-ENV HOST=${HOST}
-ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-ENV POSTGRES_USER=${POSTGRES_USER}
-ENV POSTGRES_DBNAME=${POSTGRES_DBNAME}
-ENV POSTGRES_PORT=${POSTGRES_PORT}
-ENV POSTGRES_HOSTNAME=${POSTGRES_HOSTNAME}
+# Adjust NODE_VERSION as desired
+ARG NODE_VERSION=19.9.0
+FROM node:${NODE_VERSION}-slim as base
 
-WORKDIR /backend
+LABEL fly_launch_runtime="Node.js"
 
-RUN \
-  apt-get update && \
-  apt-get install -y git && \
-  git clone https://github.com/ikatoo/backend . && \
-  git checkout express && \
-  npm install && \
-  npm run build
+# Node.js app lives here
+WORKDIR /app
 
-EXPOSE ${PORT}
+# Set production environment
+ENV NODE_ENV=production
 
-CMD [ "node", "dist/src/infra/http/express/main.js" ]
+
+# Throw-away build stage to reduce size of final image
+FROM base as build
+
+# Install packages needed to build node modules
+RUN apt-get update -qq && \
+    apt-get install -y python-is-python3 pkg-config build-essential 
+
+# Install node modules
+COPY --link package-lock.json package.json ./
+RUN npm ci --include=dev
+
+# Copy application code
+COPY --link . .
+
+# Build application
+RUN npm run build
+
+# Remove development dependencies
+RUN npm prune --omit=dev
+
+
+# Final stage for app image
+FROM base
+
+# Copy built application
+COPY --from=build /app /app
+
+# Start the server by default, this can be overwritten at runtime
+EXPOSE 3000
+CMD [ "npm", "run", "start" ]
