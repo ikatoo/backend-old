@@ -4,7 +4,7 @@
   "description": "Backend API from ikatoo.com.br",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/src/infra/http/express/main.js",
+    "start": "node dist/src/infra/http/index.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --no-threads",
     "test:watch": "vitest",
@@ -14,6 +14,7 @@
     "test:utils:watch": "vitest --no-threads src/utils",
     "dev:hapi": "cross-env NODE_ENV=dev tsx --watch src/infra/http/hapi/main.ts",
     "dev:express": "cross-env NODE_ENV=dev tsx --watch src/infra/http/express/main.ts",
+    "dev": "cross-env NODE_ENV=dev tsx --watch src/infra/http/index.ts",
     "build": "rimraf dist && tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "repository": {
