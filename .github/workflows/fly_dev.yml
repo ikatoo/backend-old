@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - dev
+      - ci/*
   
 jobs:
   tests:
@@ -15,7 +16,7 @@ jobs:
       PORT: 8000
       HOST: localhost
       POSTGRES_PASSWORD: passteste
-      POSTGRES_USER: userteste
+      POSTGRES_USER: postgres
       POSTGRES_DBNAME: dbteste
       POSTGRES_PORT: 5432
       POSTGRES_HOSTNAME: postgres
@@ -29,65 +30,62 @@ jobs:
           POSTGRES_DB: ${POSTGRES_DBNAME}
     
     steps:
-      - name: Connect in the postgres
-        run: psql --version
+      - uses: actions/checkout@v3
+        with:
+          ref: dev
       
-  #     - uses: actions/checkout@v3
-  #       with:
-  #         ref: dev
-      
-  #     - name: Setup Node
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 18.x
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
 
-  #     - name: Install Dependencies
-  #       run: npm ci
+      - name: Install Dependencies
+        run: npm ci
 
-  #     - name: Typecheck
-  #       run: npm run typecheck
+      - name: Typecheck
+        run: npm run typecheck
 
-  #     - name: Test
-  #       run: npm run test
+      - name: Test
+        run: npm run test
 
-  #     - name: Send email when fail tests
-  #       if: ${{ failure() }}
-  #       uses: dawidd6/action-send-mail@v3
-  #       with:
-  #         server_address: smtp.office365.com
-  #         server_port: 587
-  #         username: mckatoo@outlook.com
-  #         password: ${{ secrets.SMTP_PASSWORD }}
-  #         subject: Failed tests
-  #         to: mckatoo@gmail.com
-  #         from: iKatoo Repository
-  #         body: Tests of the repository ${{github.repository}} if failed. Please, verify and fix de code.
+      - name: Send email when fail tests
+        if: ${{ failure() }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.office365.com
+          server_port: 587
+          username: mckatoo@outlook.com
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: Failed tests
+          to: mckatoo@gmail.com
+          from: iKatoo Repository
+          body: Tests of the repository ${{github.repository}} if failed. Please, verify and fix de code.
         
 
-  # deploy:
-  #   name: Deploy
-  #   needs: tests
-  #   timeout-minutes: 60
-  #   runs-on: ubuntu-latest
+  deploy:
+    name: Deploy
+    needs: tests
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
   
-  #   steps:
-  #     - uses: superfly/flyctl-actions/setup-flyctl@master
+    steps:
+      - uses: superfly/flyctl-actions/setup-flyctl@master
 
-  #     - name: Deploy
-  #       if: ${{ success() }}
-  #       run: flyctl deploy --remote-only
-  #       env:
-  #         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      - name: Deploy
+        if: ${{ success() }}
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
-  #     - name: Send email when fail deploy
-  #       if: ${{ failure() }}
-  #       uses: dawidd6/action-send-mail@v3
-  #       with:
-  #         server_address: smtp.office365.com
-  #         server_port: 587
-  #         username: mckatoo@outlook.com
-  #         password: ${{ secrets.SMTP_PASSWORD }}
-  #         subject: Failed deploy
-  #         to: mckatoo@gmail.com
-  #         from: iKatoo Repository
-  #         body: The deploy of the repository ${{github.repository}} if failed. Please, verify and fix de code.
+      - name: Send email when fail deploy
+        if: ${{ failure() }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.office365.com
+          server_port: 587
+          username: mckatoo@outlook.com
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: Failed deploy
+          to: mckatoo@gmail.com
+          from: iKatoo Repository
+          body: The deploy of the repository ${{github.repository}} if failed. Please, verify and fix de code.
