@@ -1,4 +1,4 @@
-name: Fly Deploy from Dev
+name: Test and Deploy from Dev
 on:
   push:
     branches:
@@ -8,6 +8,7 @@ jobs:
   tests:
     name: Tests
     runs-on: ubuntu-latest
+    container: node:18.15
     env:
       VITE_PORT: 3000
       PORT: 8000
