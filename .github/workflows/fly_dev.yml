@@ -10,7 +10,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only
+        with:
+          ref: dev
+      
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Linting
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npx vitest run
+
+      - name: Deploy
+        if: ${{ success() }}
+        uses: superfly/flyctl-actions/setup-flyctl@master
+        run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Send email when fail deploy
+        if: ${{ failure() }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.office365.com
+          server_port: 587
+          username: mckatoo@outlook.com
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: Github Actions job result
+          to: mckatoo@gmail.com
+          from: iKatoo Repository
+          body: The deploy of the repository ${{github.repository}} if failed. Please, verify and fix de code.
