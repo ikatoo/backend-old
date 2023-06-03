@@ -1,26 +1,28 @@
 import { ContactPageRepository } from "@/infra/db";
 import { ContactPageSchema, PartialContactPageSchema } from "@/repository/IContactPage";
+import { ConflictError, HttpError, InternalError } from "@/utils/httpErrors";
 
 const contactsPageRepository = new ContactPageRepository();
 
-async function getContactsPageHandler(): Promise<HandlerResponse> {
+async function getContactsPageHandler(): ControllerResponse {
   const contactPage = await contactsPageRepository.getContactPage()
   if (!contactPage) return { statusCode: 204 }
 
   return { body: contactPage, statusCode: 200 }
 }
 
-async function createContactsPageHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
+async function createContactsPageHandler(handlerProps?: HandlerProps): ControllerResponse {
   if (!Object.keys(handlerProps?.parameters!).length) return {
     statusCode: 400
   }
 
   const validPage = ContactPageSchema.safeParse(handlerProps?.parameters)
   if (!validPage.success)
-    return {
-      error: 'Invalid type.',
-      statusCode: 409
-    }
+    throw new ConflictError('Invalid type.')
+  // return {
+  //   error: 'Invalid type.',
+  //   statusCode: 409
+  // }
   try {
     await contactsPageRepository.createContactPage(validPage.data)
     return {
@@ -28,26 +30,19 @@ async function createContactsPageHandler(handlerProps?: HandlerProps): Promise<H
     }
   } catch (error) {
     if (error instanceof Error && error.message.includes('duplicate'))
-      return {
-        error: error.message,
-        statusCode: 409
-      }
-    return { statusCode: 500 }
+      throw new ConflictError('Duplicated data.')
   }
 
 }
 
-async function updateContactsPageHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
+async function updateContactsPageHandler(handlerProps?: HandlerProps): ControllerResponse {
   if (!handlerProps?.parameters || !Object.keys(handlerProps.parameters).length) return {
     statusCode: 400
   }
 
   const validPage = PartialContactPageSchema.safeParse(handlerProps?.parameters)
   if (!validPage.success || Object.keys(validPage.data).length === 0)
-    return {
-      error: 'Invalid type.',
-      statusCode: 409
-    }
+    throw new ConflictError('Invalid type.')
   try {
     await contactsPageRepository.updateContactPage(validPage.data)
     return {
@@ -55,33 +50,22 @@ async function updateContactsPageHandler(handlerProps?: HandlerProps): Promise<H
     }
   } catch (error) {
     if (error instanceof Error && error.message.includes('duplicate'))
-      return {
-        error: error.message,
-        statusCode: 409
-      }
+      throw new ConflictError('Duplicated data.')
   }
   return {
     statusCode: 500
   }
 }
 
-async function deleteContactsPageHandler(): Promise<HandlerResponse> {
+async function deleteContactsPageHandler(): ControllerResponse {
   try {
     await contactsPageRepository.deleteContactPage()
     return {
       statusCode: 204
     }
   } catch (error) {
-    if (error instanceof Error) {
-      return {
-        statusCode: 500,
-        error: error.message
-      }
-    }
-    return {
-      statusCode: 500,
-    }
-
+    if (error instanceof Error)
+      throw new InternalError()
   }
 }
 

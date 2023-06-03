@@ -1,5 +1,5 @@
 declare type HandlerResponse = {
-  error?: string
+  // error?: string
   statusCode?: number
   body?: object
 }
@@ -8,4 +8,6 @@ declare type HandlerProps = {
   parameters?: unknown
 }
 
-declare type HandlerFunction = (handlerProps?: HandlerProps) => Promise<HandlerResponse>
+declare type ControllerResponse = Promise<HandlerResponse | void>
+
+declare type HandlerFunction = (handlerProps?: HandlerProps) => ControllerResponse

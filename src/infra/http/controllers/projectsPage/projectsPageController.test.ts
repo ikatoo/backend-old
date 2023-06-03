@@ -20,9 +20,10 @@ describe("ProjectsPage Controller test", () => {
 
   test("Get projects", async () => {
     await projectsRepository.createProject(projectsPageMock[1])
-    const result = (await getProjectsHandler()).body as ProjectWithId[]
+    const result = await getProjectsHandler()
+    const projects = result?.body as ProjectWithId[]
 
-    expect([{ id: result[0].id, ...projectsPageMock[1] }]).toEqual(result);
+    expect([{ id: projects[0].id, ...projectsPageMock[1] }]).toEqual(projects);
   });
 
   test("Create projects page data without error", async () => {
@@ -60,19 +61,20 @@ describe("ProjectsPage Controller test", () => {
     await projectsRepository.createProject(projectsPageMock[1]);
     const projects = await projectsRepository.getProjectsByTitle(projectsPageMock[1].description.title) as ProjectWithId[]
     const { id } = projects[0]
-    const { statusCode } = await deleteProjectHandler({ parameters: { id } })
+    const result = await deleteProjectHandler({ parameters: { id } })
     const actual = await projectsRepository.getProjectById(id)
 
-    expect(statusCode).toEqual(204)
+    expect(result?.statusCode).toEqual(204)
     expect(actual).toBeUndefined()
   });
 
   test("Get projects with similar title", async () => {
     await projectsRepository.createProject(projectsPageMock[1])
     const title = projectsPageMock[1].description.title
-    const result = (await getProjectsByTitleHandler({ parameters: { title } })).body as ProjectWithId[]
+    const result = (await getProjectsByTitleHandler({ parameters: { title } }))
+    const projects = result?.body as ProjectWithId[]
 
-    expect([{ id: result[0].id, ...projectsPageMock[1] }]).toEqual(result);
+    expect([{ id: projects[0].id, ...projectsPageMock[1] }]).toEqual(projects);
   });
 
   test("Get projects by id", async () => {
@@ -80,8 +82,9 @@ describe("ProjectsPage Controller test", () => {
     const title = projectsPageMock[1].description.title
     const projects = await projectsRepository.getProjectsByTitle(title) as ProjectWithId[]
     const id = projects[0].id.toString()
-    const result = (await getProjectByIDHandler({ parameters: { id } })).body as ProjectWithId
+    const result = (await getProjectByIDHandler({ parameters: { id } }))
+    const project = result?.body as ProjectWithId
 
-    expect({ id: result?.id, ...projectsPageMock[1] }).toEqual(result);
+    expect({ id: project.id, ...projectsPageMock[1] }).toEqual(project);
   });
 });

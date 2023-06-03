@@ -14,7 +14,7 @@ describe("ContactsPage Controller test", () => {
     await contactsPageRepository.createContactPage(contactPageMock);
     const result = await getContactsPageHandler()
 
-    expect(contactPageMock).toEqual(result.body);
+    expect(contactPageMock).toEqual(result?.body);
   });
 
   test("Create contacts page data without error", async () => {

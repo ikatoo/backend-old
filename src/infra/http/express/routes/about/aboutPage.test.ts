@@ -1,14 +1,11 @@
 import { AboutPageRepository } from "@/infra/db";
 import aboutPageMock from "@/mock/aboutPageMock";
 import request from "supertest";
-import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test } from "vitest";
 import { app } from "../../server";
 
 describe("EXPRESS: /about routes", () => {
   const aboutPageRepository = new AboutPageRepository();
-
-  beforeEach(async () => {
-  });
 
   afterEach(async () => {
     await aboutPageRepository.clear()
@@ -52,7 +49,8 @@ describe("EXPRESS: /about routes", () => {
       .send(aboutPageMock)
 
     expect(statusCode).toBe(409);
-    expect(body).toHaveProperty('error')
+    expect(body).toHaveProperty('message')
+    expect(body.message).toEqual('Duplicated data.')
   });
 
   test("POST Method: responds with 400 when request without payload", async () => {
