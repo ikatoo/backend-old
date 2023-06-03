@@ -8,6 +8,27 @@ jobs:
   deploy:
     name: Deploy app
     runs-on: ubuntu-latest
+
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    env:
+      VITE_PORT: 3000
+      PORT: 8000
+      HOST: localhost
+      POSTGRES_PASSWORD: passteste
+      POSTGRES_USER: userteste
+      POSTGRES_DBNAME: dbteste
+      POSTGRES_PORT: 5432
+      POSTGRES_HOSTNAME: postgres
+
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+          POSTGRES_USER: ${POSTGRES_USER}
+          POSTGRES_DB: ${POSTGRES_DBNAME}
+    
     steps:
       - uses: actions/checkout@v3
         with:
