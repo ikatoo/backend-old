@@ -12,10 +12,10 @@ describe("SkillsPage Controller test", () => {
 
   test("Get skills page data", async () => {
     await skillsPageRepository.createSkillsPage(skillPageMock);
-    const { body, statusCode } = await getSkillsPageHandler();
+    const result = await getSkillsPageHandler();
 
-    expect(body).toEqual(skillPageMock);
-    expect(statusCode).toEqual(200);
+    expect(result?.body).toEqual(skillPageMock);
+    expect(result?.statusCode).toEqual(200);
   });
 
   test("Create skills page data without error", async () => {
@@ -32,19 +32,19 @@ describe("SkillsPage Controller test", () => {
       title: 'new title',
       description: 'new Description'
     }
-    const { statusCode } = await updateSkillsPageHandler({ parameters: newData })
+    const result = await updateSkillsPageHandler({ parameters: newData })
     const page = await skillsPageRepository.getSkillsPage()
 
-    expect(statusCode).toEqual(204)
+    expect(result?.statusCode).toEqual(204)
     expect(page).toEqual({ ...skillPageMock, ...newData })
   });
 
   test("Delete skills page data with 204 status code", async () => {
     await skillsPageRepository.createSkillsPage(skillPageMock);
-    const { statusCode } = await deleteSkillsPageHandler()
+    const result = await deleteSkillsPageHandler()
     const page = await skillsPageRepository.getSkillsPage()
 
-    expect(statusCode).toEqual(204)
+    expect(result?.statusCode).toEqual(204)
     expect(page).toBeUndefined()
   });
 });

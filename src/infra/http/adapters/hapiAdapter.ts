@@ -1,3 +1,4 @@
+import { ConflictError, HttpError, InternalError } from "@/utils/httpErrors"
 import { Request, ResponseToolkit } from "@hapi/hapi"
 
 export default (handler: HandlerFunction) => {
@@ -5,16 +6,21 @@ export default (handler: HandlerFunction) => {
     const parameters = typeof request.payload === "object"
       ? { ...request.payload, ...request.params }
       : request.params
-    const { statusCode, error, body } = await handler({ parameters })
-    if (error) {
-      return statusCode
-        ? h.response({ error }).code(statusCode)
-        : h.response({ error })
-    }
 
-    return statusCode
-      ? h.response(body).code(statusCode)
-      : h.response(body)
+    try {
+      const result = await handler({ parameters })
+      if (!result) throw new InternalError()
+      const { statusCode, body } = result
+
+      return statusCode
+        ? h.response(body).code(statusCode)
+        : h.response(body)
+    } catch (error) {
+      if (error instanceof HttpError) {
+        const { message, statusCode } = error
+        return h.response({ message }).code(statusCode)
+      }
+    }
   }
 
   return hapiHandler

@@ -1,9 +1,10 @@
 import { ProjectsRepository } from "@/infra/db";
 import { PartialProjectSchema, ProjectSchema } from "@/repository/IProject";
+import { ConflictError, InternalError } from "@/utils/httpErrors";
 
 const projectsRepository = new ProjectsRepository();
 
-async function getProjectsHandler(): Promise<HandlerResponse> {
+async function getProjectsHandler(): ControllerResponse {
   try {
     const projects = await projectsRepository.getProjects()
     if (!projects.length) {
@@ -15,44 +16,31 @@ async function getProjectsHandler(): Promise<HandlerResponse> {
       body: projects,
       statusCode: 200
     }
-  } catch (error) {
-    return {
-      error: error instanceof Error ? error.message : undefined,
-      statusCode: 500
-    }
+  } catch {
+    throw new InternalError()
   }
 }
 
-async function getProjectsByTitleHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
+async function getProjectsByTitleHandler(handlerProps?: HandlerProps): ControllerResponse {
   if (!Object.keys(handlerProps?.parameters!).length) return {
     statusCode: 400
   }
   const title = (handlerProps?.parameters as { title: string }).title
   if (!title)
-    return {
-      error: 'Invalid type',
-      statusCode: 409
-    }
+    throw new ConflictError('Invalid type')
 
-  try {
-    const projects = await projectsRepository.getProjectsByTitle(title)
-    if (!projects || !projects.length) {
-      return { statusCode: 204 }
-    }
-    return {
-      body: projects,
-      statusCode: 200
-    }
-  } catch (error) {
-    return {
-      error: error instanceof Error ? error.message : undefined,
-      statusCode: 500
-    }
+  const projects = await projectsRepository.getProjectsByTitle(title)
+  if (!projects || !projects.length) {
+    return { statusCode: 204 }
   }
 
+  return {
+    body: projects,
+    statusCode: 200
+  }
 }
 
-async function getProjectByIDHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
+async function getProjectByIDHandler(handlerProps?: HandlerProps): ControllerResponse {
   const { id } = (handlerProps?.parameters as { id: string })
   if (!id) return {
     statusCode: 400
@@ -67,34 +55,24 @@ async function getProjectByIDHandler(handlerProps?: HandlerProps): Promise<Handl
   }
 }
 
-async function createProjectHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
+async function createProjectHandler(handlerProps?: HandlerProps): ControllerResponse {
   if (!Object.keys(handlerProps?.parameters!).length) return {
     statusCode: 400
   }
 
   const validPage = ProjectSchema.safeParse(handlerProps?.parameters)
   if (!validPage.success)
-    return {
-      error: 'Invalid type.',
-      statusCode: 409
-    }
+    throw new ConflictError('Invalid type')
   try {
     await projectsRepository.createProject(validPage.data)
     return { statusCode: 201 }
   } catch (error) {
-    if (error instanceof Error && error.message.includes('duplicate')) {
-      return {
-        error: error.message,
-        statusCode: 409
-      }
-    }
-    return {
-      statusCode: 500
-    }
+    if (error instanceof Error && error.message.includes('duplicate'))
+      throw new ConflictError('Duplicated data.')
   }
 }
 
-async function updateProjectHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
+async function updateProjectHandler(handlerProps?: HandlerProps): ControllerResponse {
   const { id } = (handlerProps?.parameters as { id: string })
   if (Object.keys(handlerProps?.parameters!).length < 2 || !+id) return {
     statusCode: 400
@@ -102,41 +80,21 @@ async function updateProjectHandler(handlerProps?: HandlerProps): Promise<Handle
 
   const validPage = PartialProjectSchema.safeParse(handlerProps?.parameters)
   if (!validPage.success || !Object.keys(validPage.data).length)
-    return {
-      error: 'Invalid type.',
-      statusCode: 409
-    }
-  try {
-    await projectsRepository.updateProject(+id, validPage.data)
-    return { statusCode: 204 }
-  } catch (error) {
-    if (error instanceof Error) {
-      return {
-        error: error.message,
-        statusCode: 409
-      }
-    }
-    return {
-      statusCode: 500
-    }
-  }
+    throw new ConflictError('Invalid type')
+  await projectsRepository.updateProject(+id, validPage.data)
+
+  return { statusCode: 204 }
 }
 
-async function deleteProjectHandler(handlerProps?: HandlerProps): Promise<HandlerResponse> {
+async function deleteProjectHandler(handlerProps?: HandlerProps): ControllerResponse {
   const id = Object.values(handlerProps?.parameters!)[0]
   if (!+id) return {
     statusCode: 400
   }
 
-  try {
-    await projectsRepository.deleteProject(id)
-    return { statusCode: 204 }
-  } catch (error) {
-    return {
-      error: error instanceof Error ? error.message : undefined,
-      statusCode: 204
-    }
-  }
+  await projectsRepository.deleteProject(id)
+
+  return { statusCode: 204 }
 }
 
 export {

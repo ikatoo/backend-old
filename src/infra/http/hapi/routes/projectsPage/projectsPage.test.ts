@@ -29,16 +29,16 @@ describe("/project routes", () => {
 
   test("GET Method: result is equal the mock with 200 statusCode", async () => {
     await repository.createProject(projectsPageMock[1]);
-    const { result, statusCode } = await server.inject({
+    const { result, statusCode } = await server.inject<ProjectWithId[]>({
       method: "get",
       url: "/projects",
     });
-    const projects = result as ProjectWithId[]
-    const { id, ...actual } = projects[0]
+    // const projects = result as ProjectWithId[]
+    const { id, ...actual } = (result as ProjectWithId[])[0]
 
     expect(statusCode).toBe(200);
     expect(actual).toEqual(projectsPageMock[1]);
-    expect(projects).toHaveLength(1)
+    expect(result).toHaveLength(1)
   });
 
   test("GET Method: responds with 204 when not found data", async () => {

@@ -3,15 +3,14 @@ import aboutPageRoutes from "./aboutPage";
 import contactPageRoutes from "./contactPage";
 import projectsPageRoutes from "./projectsPage";
 import skillsPageRoutes from "./skillsPage";
+import { version } from 'package.json';
 
 const routes: ServerRoute<ReqRefDefaults>[] = [
   {
     method: "GET",
     path: "/",
     handler: (_request, h) => {
-      return h.response({
-        version: process.env.npm_package_version
-      })
+      return h.response({ version })
     },
   },
   ...aboutPageRoutes,

@@ -3,9 +3,9 @@ import { dateNumberToString, dateStringToNumber, dateToNumber, dateToString, num
 
 describe('dateTransform utils', () => {
   // mocked dates is equivalent at 2023 - 06
-  const dateNumber = 1685588400000
-  const dateString = '2023 - 06'
   const date = new Date(2023, 5)
+  const dateNumber = date.getTime()
+  const dateString = '2023 - 06'
 
   test('String => Date', () => {
     const actual = stringToDate(dateString)
