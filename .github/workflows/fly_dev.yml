@@ -43,7 +43,7 @@ jobs:
         run: npm run typecheck
 
       - name: Test
-        run: npx vitest run
+        run: npm run test
 
       - name: Send email when fail tests
         if: ${{ failure() }}
