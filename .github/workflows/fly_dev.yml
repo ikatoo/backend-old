@@ -38,13 +38,15 @@ jobs:
           ref: ci/postgres
       
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
       - name: Typecheck
         run: npm run typecheck
 
       - name: Test
-        run: npx vitest run src/infra/db/InMemory/AboutPage/AboutPageInMemory.test.ts
+        run: |
+          npm ci
+          npm run test
 
       - name: Send email when fail tests
         if: ${{ failure() }}
