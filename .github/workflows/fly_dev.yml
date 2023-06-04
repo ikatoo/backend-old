@@ -9,7 +9,7 @@ jobs:
   tests:
     name: Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 2
     container: node:18.15
     env:
       VITE_PORT: 3000
@@ -45,7 +45,7 @@ jobs:
 
       - name: Test
         run: |
-          ls -la
+          ls -la src
           npx vitest run
 
       - name: Send email when fail tests
