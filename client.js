@@ -3,9 +3,9 @@ const { Client } = require('pg');
 const envs = {
   host: process.env.POSTGRES_HOSTNAME,
   port: process.env.POSTGRES_PORT,
-  user: 'postgres',
-  password: 'postgres',
-  database: 'postgres'
+  user: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  database: process.env.POSTGRES_DBNAME
 }
 
 console.log(envs)
