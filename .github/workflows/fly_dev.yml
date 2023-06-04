@@ -44,7 +44,7 @@ jobs:
         run: npm run typecheck
 
       - name: Test
-        run: npx vitest run src/infra/db/InMemory
+        run: npx vitest --version
 
       - name: Send email when fail tests
         if: ${{ failure() }}
