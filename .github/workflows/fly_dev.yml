@@ -38,7 +38,7 @@ jobs:
           ref: ci/postgres
       
       - name: Install Dependencies
-        run: npm ci
+        run: npm install
 
       - name: Typecheck
         run: npm run typecheck
