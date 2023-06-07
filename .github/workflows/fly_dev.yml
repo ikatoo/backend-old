@@ -10,7 +10,10 @@ jobs:
     name: Tests
     runs-on: ubuntu-latest
     timeout-minutes: 2
-    container: node:18.15
+    strategy:
+      matrix:
+        node: [18]
+    container: node:${{ matrix.node }}
     env:
       VITE_PORT: 3000
       PORT: 8000
@@ -44,9 +47,7 @@ jobs:
         run: npm run typecheck
 
       - name: Test
-        run: |
-          ls -la src
-          npx vitest run
+        run: npx vitest run
 
       - name: Send email when fail tests
         if: ${{ failure() }}
