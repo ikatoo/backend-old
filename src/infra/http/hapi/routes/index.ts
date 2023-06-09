@@ -3,14 +3,16 @@ import aboutPageRoutes from "./aboutPage";
 import contactPageRoutes from "./contactPage";
 import projectsPageRoutes from "./projectsPage";
 import skillsPageRoutes from "./skillsPage";
-import { version } from 'package.json';
+import { readFile } from "fs/promises";
 
 const routes: ServerRoute<ReqRefDefaults>[] = [
   {
     method: "GET",
     path: "/",
-    handler: (_request, h) => {
-      return h.response({ version })
+    handler: async (_request, h) => {
+      const packageString = await readFile('./package.json')
+      const packageJson = JSON.parse(packageString.toString('utf-8'))
+      return h.response({ version: packageJson.version })
     },
   },
   ...aboutPageRoutes,
