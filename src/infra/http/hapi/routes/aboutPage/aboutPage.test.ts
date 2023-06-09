@@ -2,8 +2,8 @@ import { AboutPageRepository } from "@/infra/db";
 import aboutPageMock from "@/mock/aboutPageMock";
 import { AboutPage } from "@/repository/IAboutPage";
 import { Server, ServerApplicationState } from "@hapi/hapi";
-import { init } from "hapi/server";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { init } from "../../server";
 
 describe("/about routes", () => {
   const aboutPageRepository = new AboutPageRepository();

@@ -2,8 +2,8 @@ import { ContactPageRepository } from "@/infra/db";
 import contactPageMock from "@/mock/contactPageMock";
 import { ContactPage } from "@/repository/IContactPage";
 import { Server, ServerApplicationState } from "@hapi/hapi";
-import { init } from "hapi/server";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { init } from "../../server";
 
 describe("/contact routes", () => {
   const repository = new ContactPageRepository();
