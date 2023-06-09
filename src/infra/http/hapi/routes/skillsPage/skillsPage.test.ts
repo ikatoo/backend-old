@@ -2,8 +2,8 @@ import { SkillsPageRepository } from "@/infra/db";
 import skillPageMock from "@/mock/skillPageMock";
 import { SkillsPage } from "@/repository/ISkillsPage";
 import { Server, ServerApplicationState } from "@hapi/hapi";
-import { init } from "hapi/server";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { init } from "../../server";
 
 describe("/skills routes", () => {
   const repository = new SkillsPageRepository();

@@ -1,7 +1,7 @@
 import { Server, ServerApplicationState } from "@hapi/hapi";
-import { init } from "hapi/server";
 
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { init } from "../server";
 
 describe("GET /", () => {
   let server: Server<ServerApplicationState>;

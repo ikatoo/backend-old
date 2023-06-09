@@ -2,8 +2,8 @@ import { ProjectsRepository } from "@/infra/db";
 import projectsPageMock from "@/mock/projectsPageMock";
 import { ProjectWithId } from "@/repository/IProject";
 import { Server, ServerApplicationState } from "@hapi/hapi";
-import { init } from "hapi/server";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { init } from "../../server";
 
 describe("/project routes", () => {
   const repository = new ProjectsRepository()
