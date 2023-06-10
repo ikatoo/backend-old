@@ -59,14 +59,7 @@ jobs:
 
       - name: Test Database Infra
         env:
-          VITE_PORT: 3000
-          PORT: 8000
-          HOST: localhost
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DBNAME: postgres
-          POSTGRES_PORT: 5432
-          POSTGRES_HOSTNAME: postgres
+          NODE_ENV: ci
         run: npx vitest run src/infra/db/PgPromise
 
       # - name: Test
