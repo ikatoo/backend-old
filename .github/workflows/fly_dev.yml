@@ -46,6 +46,11 @@ jobs:
           PGPASSWORD: postgres
         run: psql -v ON_ERROR_STOP=1 --host postgres --username postgres --dbname postgres -a -f db/scripts/init.sql
     
+      - name: Setup Node ${{ matrix.node }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+    
       - name: Install Dependencies
         run: npm ci
 
