@@ -4,6 +4,7 @@ on:
     branches:
       - dev
       - ci/*
+  workflow_dispatch:
   
 jobs:
   tests:
