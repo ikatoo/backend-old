@@ -43,7 +43,7 @@ jobs:
           ref: ci/postgres
 
       - name: Create Tables
-        run: ./db/docker-entrypoint-initdb.d/init-user-db.sh
+        run: bash ./db/docker-entrypoint-initdb.d/init-user-db.sh
         # run: docker run -it --rm -v ./db:/db postgres psql -v ON_ERROR_STOP=1 --host postgres --username postgres --dbname postgres -a -f /db/scripts/init.sql
 
       
