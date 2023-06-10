@@ -44,7 +44,7 @@ jobs:
         run: |
           apt-get update
           apt-get install -y postgresql-client
-          psql -v ON_ERROR_STOP=1 --username postgres --dbname postgres -a -f ./db/scripts/init.sql
+          psql -v ON_ERROR_STOP=1 --username postgres --dbname postgres
       
       - name: Install Dependencies
         run: npm ci
