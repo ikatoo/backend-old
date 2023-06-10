@@ -34,6 +34,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
     container:
       image: postgres:14
     steps:
@@ -42,7 +43,10 @@ jobs:
           ref: ci/postgres
 
       - name: Create Tables
-        run: psql -v ON_ERROR_STOP=1 --username postgres --dbname postgres
+        run: psql -v ON_ERROR_STOP=1 --host postgres --username postgres --dbname postgres
+        env:
+          POSTGRES_HOST: postgres
+          POSTGRES_PORT: 5432
 
       
     
