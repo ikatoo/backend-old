@@ -42,7 +42,7 @@ jobs:
 
       - name: Create Tables
         run: |
-          apt install postgres-client
+          apt install -y postgresql-client
           psql -v ON_ERROR_STOP=1 --username postgres --dbname postgres -a -f ./db/scripts/init.sql
       
       - name: Install Dependencies
