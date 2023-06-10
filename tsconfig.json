@@ -18,8 +18,7 @@
     "skipLibCheck": true
   },
   "include": [
-    "src/**/*",
-    "vitestGlobalSetup.ts"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",
