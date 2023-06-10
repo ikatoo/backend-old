@@ -35,12 +35,13 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     container: postgres
-      - uses: actions/checkout@v3
-        with:
-          ref: ci/postgres
+      steps:
+        - uses: actions/checkout@v3
+          with:
+            ref: ci/postgres
 
-      - name: Create Tables
-        run: psql -v ON_ERROR_STOP=1 --username postgres --dbname postgres
+        - name: Create Tables
+          run: psql -v ON_ERROR_STOP=1 --username postgres --dbname postgres
 
       
     
