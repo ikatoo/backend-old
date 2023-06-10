@@ -45,8 +45,9 @@ jobs:
       - name: Create Tables
         env:
           PGPASSWORD: postgres
-        run: psql -v ON_ERROR_STOP=1 --host postgres --username postgres --dbname postgres -a -f /db/scripts/init.sql
-        # run: docker run -it --rm -v ./db:/db postgres psql -v ON_ERROR_STOP=1 --host postgres --username postgres --dbname postgres -a -f /db/scripts/init.sql
+        run: |
+          ls
+          psql -v ON_ERROR_STOP=1 --host postgres --username postgres --dbname postgres -a -f db/scripts/init.sql
 
       
     
