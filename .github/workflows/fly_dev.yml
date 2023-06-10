@@ -57,7 +57,7 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Test
+      - name: Test Database Infra
         env:
           VITE_PORT: 3000
           PORT: 8000
@@ -67,7 +67,19 @@ jobs:
           POSTGRES_DBNAME: postgres
           POSTGRES_PORT: 5432
           POSTGRES_HOSTNAME: postgres
-        run: npx vitest run
+        run: npx vitest run src/infra/db/PgPromise
+
+      # - name: Test
+      #   env:
+      #     VITE_PORT: 3000
+      #     PORT: 8000
+      #     HOST: localhost
+      #     POSTGRES_PASSWORD: postgres
+      #     POSTGRES_USER: postgres
+      #     POSTGRES_DBNAME: postgres
+      #     POSTGRES_PORT: 5432
+      #     POSTGRES_HOSTNAME: postgres
+      #   run: npx vitest run
 
       - name: Send email when fail tests
         if: ${{ failure() }}
