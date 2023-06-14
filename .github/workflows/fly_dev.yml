@@ -77,7 +77,7 @@ jobs:
           subject: Failed tests
           to: mckatoo@gmail.com
           from: iKatoo Repository
-          html_body: Tests of the repository <a href="https://github.com/${{github.repository}}/${{github.ref_name}}">${{github.repository}}</a> if failed. Please, verify and fix de code.
+          html_body: Tests of the repository <a href="https://github.com/${{github.repository}}/tree/${{github.ref_name}}">${{github.repository}}</a> if failed. Please, verify and fix de code.
         
 
   # deploy:
