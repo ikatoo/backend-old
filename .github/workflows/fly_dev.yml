@@ -52,19 +52,16 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
     
-      # - name: Install Dependencies
-      #   run: npm ci
+      - name: Install Dependencies
+        run: npm ci
 
-      # - name: Typecheck
-      #   run: npm run typecheck
+      - name: Typecheck
+        run: npm run typecheck
 
-      # - name: Test
-      #   env:
-      #     NODE_ENV: ci
-      #   run: npx vitest run
-
-      - name: Failed
-        run: exit 1
+      - name: Test
+        env:
+          NODE_ENV: ci
+        run: npx vitest run
 
       - name: Send email when fail tests
         if: ${{ failure() }}
