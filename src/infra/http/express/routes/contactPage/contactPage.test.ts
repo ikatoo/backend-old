@@ -1,6 +1,6 @@
 import { ContactPageRepository } from "@/infra/db";
 import { app } from "@/infra/http/express/server";
-import contactPageMock from "@/mock/contactPageMock";
+import contactPageMock from "@shared/mocks/contactPageMock/result.json";
 import request from "supertest";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 

@@ -1,5 +1,5 @@
 import { SkillsPageRepository } from "@/infra/db";
-import skillPageMock from "@/mock/skillPageMock";
+import skillPageMock from "@shared/mocks/skillsPageMock/result.json";
 import { SkillsPage } from "@/repository/ISkillsPage";
 import { Server, ServerApplicationState } from "@hapi/hapi";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";

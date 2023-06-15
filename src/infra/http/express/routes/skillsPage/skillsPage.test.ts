@@ -1,6 +1,6 @@
 import { SkillsPageRepository } from "@/infra/db";
 import { app } from "@/infra/http/express/server";
-import skillPageMock from "@/mock/skillPageMock";
+import skillPageMock from "@shared/mocks/skillsPageMock/result.json";
 import request from "supertest";
 import { afterEach, describe, expect, test } from "vitest";
 

@@ -1,5 +1,5 @@
 import { ProjectsRepository } from "@/infra/db";
-import projectsPageMock from "@/mock/projectsPageMock";
+import projectsPageMock from "@shared/mocks/projectsMock/result.json";
 import { ProjectWithId } from "@/repository/IProject";
 import { afterEach, describe, expect, test } from "vitest";
 import {

@@ -1,5 +1,5 @@
 import { AboutPageRepository } from "@/infra/db";
-import aboutPageMock from "@/mock/aboutPageMock";
+import aboutPageMock from "@shared/mocks/aboutPageMock/result.json";
 import { afterEach, describe, expect, test } from "vitest";
 import { createAboutPageHandler, deleteAboutPageHandler, getAboutPageHandler, updateAboutPageHandler } from "./aboutPageController";
 
@@ -27,7 +27,7 @@ describe("AboutPage Controller test", () => {
 
   test("Update about page without error", async () => {
     await aboutPageRepository.createAboutPage(aboutPageMock);
-    await expect(updateAboutPageHandler({parameters: { title: 'new title' }}))
+    await expect(updateAboutPageHandler({ parameters: { title: 'new title' } }))
       .resolves.not.toThrow()
   });
 

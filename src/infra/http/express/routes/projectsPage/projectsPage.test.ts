@@ -1,7 +1,7 @@
 import { ProjectsRepository } from "@/infra/db";
 import { app } from "@/infra/http/express/server";
-import projectsPageMock from "@/mock/projectsPageMock";
 import { ProjectWithId } from "@/repository/IProject";
+import projectsPageMock from "@shared/mocks/projectsMock/result.json";
 import request from "supertest";
 import { afterEach, describe, expect, test } from "vitest";
 
