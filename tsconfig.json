@@ -9,6 +9,10 @@
         "src/*",
         "src"
       ],
+      "@shared/*": [
+        "shared/*",
+        "shared"
+      ],
     },
     "resolveJsonModule": true,
     "outDir": "./dist",
@@ -18,7 +22,8 @@
     "skipLibCheck": true
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "shared/**/*",
   ],
   "exclude": [
     "node_modules",
