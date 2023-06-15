@@ -4,7 +4,7 @@
   "description": "Backend API from ikatoo.com.br",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/src/infra/http/index.js",
+    "start": "node dist/infra/http/index.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --no-threads",
     "test:watch": "vitest",
