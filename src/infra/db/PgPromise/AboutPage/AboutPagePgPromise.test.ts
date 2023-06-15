@@ -1,4 +1,4 @@
-import aboutPageMock from "@/mock/aboutPageMock";
+import aboutPageMock from "@shared/mocks/aboutPageMock/result.json";
 import { afterEach, describe, expect, test } from "vitest";
 import db from "..";
 import AboutPagePgPromise from "./AboutPagePgPromise";

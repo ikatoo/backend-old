@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "vitest";
 import ContactPagePgPromise from "./ContactPagePgPromise";
 import db from "..";
-import contactPageMock from "@/mock/contactPageMock";
+import contactPageMock from "@shared/mocks/contactPageMock/result.json";
 import { ContactPage } from "@/repository/IContactPage";
 
 describe("Basic operations in ContactPage Postgres Database", () => {

@@ -1,5 +1,5 @@
 import { AboutPageRepository } from "@/infra/db";
-import aboutPageMock from "@/mock/aboutPageMock";
+import aboutPageMock from "@shared/mocks/aboutPageMock/result.json";
 import request from "supertest";
 import { afterEach, describe, expect, test } from "vitest";
 import { app } from "../../server";

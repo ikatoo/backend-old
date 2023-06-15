@@ -1,4 +1,4 @@
-import projectsPageMock from "@/mock/projectsPageMock";
+import projectsPageMock from "@shared/mocks/projectsMock/result.json";
 import { ProjectWithId } from "@/repository/IProject";
 import { dateToString } from "@/utils/transformers/dateTransform";
 import { afterEach, describe, expect, test } from "vitest";

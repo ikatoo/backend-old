@@ -1,7 +1,7 @@
 import { ContactPageRepository } from "@/infra/db";
-import contactPageMock from "@/mock/contactPageMock";
 import { ContactPage } from "@/repository/IContactPage";
 import { Server, ServerApplicationState } from "@hapi/hapi";
+import contactPageMock from "@shared/mocks/contactPageMock/result.json";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { init } from "../../server";
 
