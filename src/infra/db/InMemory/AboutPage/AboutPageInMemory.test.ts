@@ -1,4 +1,4 @@
-import aboutPageMock from "@/mock/aboutPageMock";
+import aboutPageMock from "@shared/mocks/aboutPageMock/result.json";
 import { describe, expect, test } from "vitest";
 import AboutPageInMemory from "./AboutPageInMemory";
 

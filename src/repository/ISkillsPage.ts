@@ -5,7 +5,6 @@ export const SkillsPageSchema = z.object({
   description: z.string(),
   skills: z.array(z.object({
     skillTitle: z.string(),
-    rankPercent: z.number()
   })),
   lastJobs: z.array(z.object({
     jobTitle: z.string(),

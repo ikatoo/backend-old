@@ -1,4 +1,4 @@
-import skillPageMock from "@/mock/skillPageMock";
+import skillPageMock from "@shared/mocks/skillsPageMock/result.json";
 import { describe, expect, test } from "vitest";
 import SkillsPageInMemory from "./SkillsPageInMemory";
 

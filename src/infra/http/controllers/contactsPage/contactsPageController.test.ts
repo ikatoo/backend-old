@@ -1,5 +1,5 @@
 import { ContactPageRepository } from "@/infra/db";
-import contactPageMock from "@/mock/contactPageMock";
+import contactPageMock from "@shared/mocks/contactPageMock/result.json";
 import { afterEach, describe, expect, test } from "vitest";
 import { createContactsPageHandler, deleteContactsPageHandler, getContactsPageHandler, updateContactsPageHandler } from "./contactsPageController";
 

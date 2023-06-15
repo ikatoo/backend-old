@@ -1,7 +1,7 @@
 import { ProjectsRepository } from "@/infra/db";
-import projectsPageMock from "@/mock/projectsPageMock";
 import { ProjectWithId } from "@/repository/IProject";
 import { Server, ServerApplicationState } from "@hapi/hapi";
+import projectsPageMock from "@shared/mocks/projectsMock/result.json";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { init } from "../../server";
 
