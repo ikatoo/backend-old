@@ -1,4 +1,4 @@
-name: Test and Deploy from Dev
+name: Tests Workflow
 on:
   push:
     branches:
