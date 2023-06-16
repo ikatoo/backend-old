@@ -70,6 +70,15 @@ describe("EXPRESS: /about routes", () => {
     expect(statusCode).toBe(204);
   });
 
+  test("PATCH Method: responds with 204 when update with same data", async () => {
+    await aboutPageRepository.createAboutPage(aboutPageMock);
+    const { statusCode } = await request(app)
+      .patch('/about')
+      .send(aboutPageMock)
+
+    expect(statusCode).toBe(204);
+  });
+
   test("PATCH Method: responds with 409 when try update with invalid payload", async () => {
     await aboutPageRepository.createAboutPage(aboutPageMock);
     const { statusCode } = await request(app)

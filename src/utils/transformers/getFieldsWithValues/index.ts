@@ -1,9 +1,4 @@
-const toSnakeCase = (field: string) => {
-  return field.replace(/\W+/g, " ")
-    .split(/ |\B(?=[A-Z])/)
-    .map(word => word.toLowerCase())
-    .join('_');
-};
+import { toSnakeCase } from "../toSnakeCase";
 
 export const getFieldsWithValues = <T>(page: Partial<T>) => {
   return Object.keys(page).map((field, index) => {
