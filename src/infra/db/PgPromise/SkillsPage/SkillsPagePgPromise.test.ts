@@ -26,6 +26,33 @@ describe("Basic operations in SkillsPage PgPromise Database", () => {
     await repository.createSkillsPage(skillPageMock);
     const newValue = {
       description: "new description",
+      skills: [
+        {
+          skillTitle: 'skill 1',
+        },
+        {
+          skillTitle: 'skill 2',
+        },
+        {
+          skillTitle: 'skill 3',
+        },
+      ],
+      lastJobs: [
+        {
+          jobTitle: "new job 1",
+          jobDescription: "desc new job 1",
+          yearMonthStart: "2021 - 01",
+          yearMonthEnd: "2022 - 01",
+          link: "https://job1.com.br",
+        },
+        {
+          jobTitle: "new job 2",
+          jobDescription: "desc new job 2",
+          yearMonthStart: "2022 - 02",
+          yearMonthEnd: "2023 - 02",
+          link: "https://job2.com.br",
+        },
+      ]
     };
     await repository.updateSkillsPage(newValue);
     const actual = await repository.getSkillsPage();

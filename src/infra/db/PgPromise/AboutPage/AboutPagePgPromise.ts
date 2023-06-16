@@ -1,5 +1,6 @@
 import IAboutPage, { AboutPage } from "@/repository/IAboutPage";
 import db from "..";
+import { getFieldsWithValues } from "@/utils/transformers/getFieldsWithValues";
 
 export default class AboutPagePgPromise implements IAboutPage {
   async clear(): Promise<void> {
@@ -31,8 +32,7 @@ export default class AboutPagePgPromise implements IAboutPage {
   }
 
   async updateAboutPage(page: Partial<AboutPage>): Promise<void> {
-    const fieldsWithValues = Object.keys(page).map((key, index) =>
-      `${key} = '${Object.values(page)[index]}'`)
+    const fieldsWithValues = getFieldsWithValues<AboutPage>(page)
 
     const query = `update about_page set ${fieldsWithValues};`
     await db.none(query);
