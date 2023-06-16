@@ -26,6 +26,17 @@ describe("Basic operations in AboutPage Postgres Database", () => {
     await repository.createAboutPage(aboutPageMock);
     const newValue = {
       description: "new description",
+      skills: [
+        {
+          title: 'skill 1',
+        },
+        {
+          title: 'skill 2',
+        },
+        {
+          title: 'skill 3',
+        },
+      ]
     };
     await repository.updateAboutPage(newValue);
     const actual = await repository.getAboutPage();

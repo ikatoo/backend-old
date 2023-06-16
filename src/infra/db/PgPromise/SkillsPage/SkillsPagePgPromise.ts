@@ -1,4 +1,5 @@
 import ISkillsPage, { SkillsPage } from "@/repository/ISkillsPage";
+import { getFieldsWithValues } from "@/utils/transformers/getFieldsWithValues";
 import db from "..";
 
 export default class SkillsPagePgPromise implements ISkillsPage {
@@ -34,9 +35,9 @@ export default class SkillsPagePgPromise implements ISkillsPage {
   }
 
   async updateSkillsPage(page: Partial<SkillsPage>): Promise<void> {
-    const query = `update skills_page set ${Object.keys(page).map((key, index) =>
-      `${key} = '${Object.values(page)[index]}'`)
-      };`
+    const fieldsWithValues = getFieldsWithValues<SkillsPage>(page)
+
+    const query = `update skills_page set ${fieldsWithValues};`
     await db.none(query);
   }
 
@@ -44,3 +45,5 @@ export default class SkillsPagePgPromise implements ISkillsPage {
     await db.none('delete from skills_page;')
   }
 }
+
+
