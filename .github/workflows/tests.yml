@@ -4,7 +4,11 @@ on:
     branches:
       - "*"
   workflow_dispatch:
-  
+    inputs:
+      environment:
+        description: 'Environment to run tests against'
+        type: environment
+    
 jobs:
   tests:
     name: Tests
