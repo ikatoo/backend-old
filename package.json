@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node dist/infra/http/index.js",
     "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --watch --noEmit",
     "test": "vitest run --no-threads",
     "test:watch": "vitest",
     "test:infra": "vitest run --no-threads src/infra",
