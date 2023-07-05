@@ -1,9 +1,9 @@
 import { v2 } from "cloudinary";
 import { describe, expect, test, vi } from "vitest";
-import Cloudinary from ".";
+import CloudinaryRepository from ".";
 import { env } from "@/utils/env";
 
-const imageRepository = new Cloudinary()
+const imageRepository = new CloudinaryRepository()
 
 describe('cloudinary implementation', () => {
   test('should upload a file and return a url of the file', async () => {
