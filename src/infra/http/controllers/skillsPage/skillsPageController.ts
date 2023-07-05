@@ -23,21 +23,12 @@ async function createSkillsPageHandler(handlerProps?: HandlerProps): ControllerR
   const validPage = SkillsPageSchema.safeParse(handlerProps?.parameters)
   if (!validPage.success)
     throw new ConflictError('Invalid type.')
-
-  // return {
-  //   error: 'Invalid type.',
-  //   statusCode: 409
-  // }
   try {
     await skillsPageRepository.createSkillsPage(validPage.data)
     return { statusCode: 201 }
   } catch (error) {
     if (error instanceof Error)
       throw new ConflictError(error.message)
-    // return {
-    //   error: error instanceof Error ? error.message : undefined,
-    //   statusCode: 409
-    // }
   }
 }
 
@@ -49,10 +40,6 @@ async function updateSkillsPageHandler(handlerProps?: HandlerProps): ControllerR
   const validPage = PartialSkillsPageSchema.safeParse(handlerProps?.parameters)
   if (!validPage.success || Object.keys(validPage.data).length === 0)
     throw new ConflictError('Invalid type.')
-  // return {
-  //   error: 'Invalid type.',
-  //   statusCode: 409
-  // }
   try {
     await skillsPageRepository.updateSkillsPage(validPage.data)
     return {
@@ -61,10 +48,6 @@ async function updateSkillsPageHandler(handlerProps?: HandlerProps): ControllerR
   } catch (error) {
     if (error instanceof Error)
       throw new ConflictError(error.message)
-    // return {
-    //   error: error instanceof Error ? error.message : undefined,
-    //   statusCode: 409
-    // }
   }
 }
 
@@ -74,8 +57,6 @@ async function deleteSkillsPageHandler(): ControllerResponse {
 }
 
 export {
-  getSkillsPageHandler,
-  createSkillsPageHandler,
-  updateSkillsPageHandler,
-  deleteSkillsPageHandler
+  createSkillsPageHandler, deleteSkillsPageHandler, getSkillsPageHandler, updateSkillsPageHandler
 };
+
