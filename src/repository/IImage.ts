@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z } from "zod";
 
 export const ImageSchema = z.object({
   url: z.string().url("Invalid url"),
@@ -11,7 +11,8 @@ export type Image = z.infer<typeof ImageSchema>
 
 export default interface IImage {
   uploadImage(imagePath: string): Promise<Image>;
-  getImage(publicId: string): Promise<Image | undefined>;
-  deleteImage(publicId: string): Promise<void>;
-  clear(): Promise<void>
+  getImage(publicId: string): Promise<string | undefined>;
+  deleteImage(publicId: string): Promise<{
+    result: "ok" | unknown
+  }>;
 }
