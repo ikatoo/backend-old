@@ -1,53 +1,65 @@
-import { describe, expect, test, vi } from "vitest";
-import { getImageHandler } from "./imageController";
-import { env } from "@/utils/env";
 import { StorageRepository } from "@/infra/storage";
+import { v2 } from "cloudinary";
+import { describe, expect, test, vi } from "vitest";
+import { deleteImageHandler, getImageHandler, uploadImageHandler } from "./imageController";
 
 describe("Image Controller test", () => {
   const repository = new StorageRepository()
 
   test("should get image url", async () => {
     const publicIdMock = 'folder/image.jpg'
-    const urlMock = `${env.CLOUDINARY_URL}${publicIdMock}`
+    const urlMock = `https://res.cloudinary.com/mckatoo/image/upload/v1/${publicIdMock}`
     const expected = {
       body: {
         url: urlMock,
-        statusCode: 200
-      }
+      },
+      statusCode: 200
     }
     vi.spyOn(repository, 'getImage').mockResolvedValue(urlMock)
     const result = await getImageHandler({ parameters: publicIdMock })
 
-    // expect(result).toEqual(expected)
+    expect(result).toEqual(expected)
   });
 
-  // test("Create skills page data without error", async () => {
-  //   await expect(createSkillsPageHandler({ parameters: skillPageMock }))
-  //     .resolves.not.toThrow()
-  //   const page = await skillsPageRepository.getSkillsPage()
+  test("should upload a image", async () => {
+    const mock = {
+      secure_url: 'https://cloudinary.com/folder/image.png',
+      public_id: "folder/image.png",
+    }
+    vi.spyOn(v2.uploader, 'upload').mockResolvedValue({
+      ...mock,
+      version: 0,
+      signature: "",
+      width: 0,
+      height: 0,
+      format: "",
+      resource_type: "image",
+      created_at: "",
+      tags: [],
+      pages: 0,
+      bytes: 0,
+      type: "",
+      etag: "",
+      placeholder: false,
+      url: "",
+      access_mode: "",
+      original_filename: "",
+      moderation: [],
+      access_control: [],
+      context: {},
+      metadata: {}
+    })
+    const result = await uploadImageHandler({ parameters: "folder/image.png" })
 
-  //   expect(page).toEqual(skillPageMock)
-  // });
+    expect(result).toEqual({
+      statusCode: 201, body: { url: mock.secure_url, public_id: mock.public_id }
+    })
+  });
 
-  // test("Update skills page data with 204 status code", async () => {
-  //   await skillsPageRepository.createSkillsPage(skillPageMock);
-  //   const newData = {
-  //     title: 'new title',
-  //     description: 'new Description'
-  //   }
-  //   const result = await updateSkillsPageHandler({ parameters: newData })
-  //   const page = await skillsPageRepository.getSkillsPage()
+  test('should delete the image without error', async () => {
+    const publicId = 'folder/image.jpg'
+    vi.spyOn(repository, 'deleteImage').mockResolvedValue({ result: "ok" })
 
-  //   expect(result?.statusCode).toEqual(204)
-  //   expect(page).toEqual({ ...skillPageMock, ...newData })
-  // });
-
-  // test("Delete skills page data with 204 status code", async () => {
-  //   await skillsPageRepository.createSkillsPage(skillPageMock);
-  //   const result = await deleteSkillsPageHandler()
-  //   const page = await skillsPageRepository.getSkillsPage()
-
-  //   expect(result?.statusCode).toEqual(204)
-  //   expect(page).toBeUndefined()
-  // });
+    await expect(deleteImageHandler({ parameters: publicId })).resolves.not.toThrowError()
+  })
 });

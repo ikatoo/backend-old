@@ -1,5 +1,5 @@
 import { StorageRepository } from "@/infra/storage";
-import { ConflictError } from "@/utils/httpErrors";
+import { ConflictError, HttpError } from "@/utils/httpErrors";
 
 const repository = new StorageRepository()
 
@@ -33,6 +33,9 @@ async function uploadImageHandler(handlerProps?: HandlerProps): ControllerRespon
   } catch (error) {
     if (error instanceof Error)
       throw new ConflictError(error.message)
+
+    if (typeof error === 'object')
+      throw new HttpError(JSON.stringify(error), 500)
   }
 }
 
