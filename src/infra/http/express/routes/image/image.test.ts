@@ -1,7 +1,7 @@
 // import { SkillsPageRepository } from "@/infra/db";
-import { app } from "@/infra/http/express/server";
-import imageUploadMock from "@shared/mocks/imageUploadMock/result.json";
-import request from "supertest";
+// import { app } from "@/infra/http/express/server";
+// import imageUploadMock from "@shared/mocks/imageUploadMock/result.json";
+// import request from "supertest";
 import { afterEach, describe, expect, test } from "vitest";
 
 describe("EXPRESS: /image routes", () => {
