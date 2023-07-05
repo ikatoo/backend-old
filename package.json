@@ -12,9 +12,9 @@
     "test:infra:watch": "vitest --no-threads src/infra",
     "test:utils": "vitest run --no-threads src/utils",
     "test:utils:watch": "vitest --no-threads src/utils",
-    "dev:hapi": "cross-env NODE_ENV=dev tsx --watch src/infra/http/hapi/main.ts",
-    "dev:express": "cross-env NODE_ENV=dev tsx --watch src/infra/http/express/main.ts",
-    "dev": "cross-env NODE_ENV=dev tsx --watch src/infra/http/index.ts",
+    "dev:hapi": "cross-env NODE_ENV=dev tsx watch src/infra/http/hapi/main.ts",
+    "dev:express": "cross-env NODE_ENV=dev tsx watch src/infra/http/express/main.ts",
+    "dev": "cross-env NODE_ENV=dev tsx watch src/infra/http/index.ts --no-cache",
     "build": "rimraf dist && tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "repository": {
@@ -36,6 +36,8 @@
     "@types/bcrypt": "^5.0.0",
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
+    "@types/morgan": "^1.9.4",
+    "@types/multer": "^1.4.7",
     "@types/node": "^18.15.0",
     "@types/supertest": "^2.0.12",
     "cross-env": "^7.0.3",
@@ -56,6 +58,8 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-async-errors": "^3.1.1",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
     "pg-promise": "^11.4.3",
     "zod": "^3.21.4"
   }
