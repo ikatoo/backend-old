@@ -1,5 +1,4 @@
 declare type HandlerResponse = {
-  // error?: string
   statusCode?: number
   body?: object
 }
