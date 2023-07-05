@@ -1,13 +1,7 @@
-import { z } from "zod";
-
-export const ImageSchema = z.object({
-  url: z.string().url("Invalid url"),
-  public_id: z.string(),
-})
-
-export const PartialImageSchema = ImageSchema.partial()
-
-export type Image = z.infer<typeof ImageSchema>
+export type Image = {
+  url: string
+  public_id: string
+}
 
 export default interface IImage {
   uploadImage(imagePath: string): Promise<Image>;
