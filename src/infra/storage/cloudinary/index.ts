@@ -6,7 +6,7 @@ import {
 
 import IImage, { Image } from "@/repository/IImage";
 
-export default class Cloudinary implements IImage {
+export default class CloudinaryRepository implements IImage {
 
   private readonly options: UploadApiOptions = {
     use_filename: true,
