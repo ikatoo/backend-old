@@ -13,7 +13,7 @@ jobs:
       matrix:
         node: [18]
     env:
-      VITE_PORT: 3000
+      NODE_ENV: ci
       PORT: 8000
       HOST: localhost
       POSTGRES_PASSWORD: postgres
