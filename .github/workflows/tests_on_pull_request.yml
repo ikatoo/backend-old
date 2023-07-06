@@ -21,6 +21,11 @@ jobs:
       POSTGRES_DBNAME: postgres
       POSTGRES_PORT: 5432
       POSTGRES_HOSTNAME: postgres
+      CLOUDNARY_CLOUDNAME: test
+      CLOUDNARY_FOLDER: test
+      CLOUDNARY_APIKEY: test
+      CLOUDNARY_APISECRET: test
+      CLOUDINARY_URL: test
 
     services:
       postgres:
