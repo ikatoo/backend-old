@@ -1,8 +1,5 @@
 name: Tests Workflow on Push
-on:
-  push:
-    branches:
-      - "*"
+on: push
     
 jobs:
   tests:
