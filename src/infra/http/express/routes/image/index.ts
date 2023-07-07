@@ -5,6 +5,11 @@ import { Router } from "express";
 
 const imageRoutes = Router()
 
+imageRoutes.put(
+  '/image',
+  (_req, res) => res.status(405).send()
+)
+
 imageRoutes.post(
   '/image',
   multer.single('file'),

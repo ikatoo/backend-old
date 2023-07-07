@@ -1,35 +1,36 @@
-// import { SkillsPageRepository } from "@/infra/db";
-// import { app } from "@/infra/http/express/server";
-// import imageUploadMock from "@shared/mocks/imageUploadMock/result.json";
-// import request from "supertest";
-import { afterEach, describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
+
+import { StorageRepository } from "@/infra/storage";
+import { v2 } from "cloudinary";
+import request from "supertest";
+import { app } from "../../server";
+
 
 describe("EXPRESS: /image routes", () => {
-  // const repository = new SkillsPageRepository();
 
-  afterEach(async () => {
-    // await repository.clear()
+  const repository = new StorageRepository()
+
+  test("PUT Method: responds with 405 code when try use put method", async () => {
+    const { statusCode } = await request(app)
+      .put("/image")
+      .send()
+
+    expect(statusCode).toEqual(405);
+  })
+
+  test.skip("GET Method: result is equal the mock with 200 statusCode", async () => {
+    const mockedUrl = 'https://url.com/image.jpg'
+    vi.spyOn(v2, 'url').mockResolvedValue(mockedUrl)
+
+    const { body, statusCode } = await request(app)
+      .get("/image")
+      .send({
+        publicId: 'image.jpg'
+      })
+
+    expect(body).toEqual({ url: mockedUrl });
+    expect(statusCode).toBe(200);
   });
-
-  test.todo('test')
-
-  // test("PUT Method: responds with 405 code when try use put method", async () => {
-  //   const { statusCode } = await request(app)
-  //     .put("/image")
-  //     .send()
-
-  //   expect(statusCode).toEqual(405);
-  // })
-
-  // test("GET Method: result is equal the mock with 200 statusCode", async () => {
-  //   await repository.createSkillsPage(skillPageMock);
-  //   const { body, statusCode } = await request(app)
-  //     .get("/image")
-  //     .send()
-
-  //   expect(body).toEqual(skillPageMock);
-  //   expect(statusCode).toBe(200);
-  // });
 
   // test("GET Method: responds with 204 when there is no data to return", async () => {
   //   const { body, statusCode } = await request(app)
