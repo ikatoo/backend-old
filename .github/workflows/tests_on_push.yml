@@ -22,7 +22,7 @@ jobs:
       CLOUDNARY_FOLDER: test
       CLOUDNARY_APIKEY: test
       CLOUDNARY_APISECRET: test
-      CLOUDINARY_URL: test
+      CLOUDINARY_URL: cloudinary://123:asdf234@cloudname
 
     services:
       postgres:
