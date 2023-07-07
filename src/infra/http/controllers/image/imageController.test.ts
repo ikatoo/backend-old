@@ -2,7 +2,7 @@ import { StorageRepository } from "@/infra/storage";
 import { v2 } from "cloudinary";
 import { describe, expect, test, vi } from "vitest";
 import { deleteImageHandler, getImageHandler, uploadImageHandler } from "./imageController";
-
+vi.mock('cloudinary')
 describe("Image Controller test", () => {
   const repository = new StorageRepository()
 
@@ -15,7 +15,7 @@ describe("Image Controller test", () => {
       },
       statusCode: 200
     }
-    vi.spyOn(repository, 'getImage').mockResolvedValue(urlMock)
+    vi.spyOn(v2, 'url').mockResolvedValue(urlMock)
     const result = await getImageHandler({ parameters: publicIdMock })
 
     expect(result).toEqual(expected)
@@ -59,7 +59,9 @@ describe("Image Controller test", () => {
   test('should delete the image without error', async () => {
     const publicId = 'folder/image.jpg'
     vi.spyOn(repository, 'deleteImage').mockResolvedValue({ result: "ok" })
+    await deleteImageHandler({ parameters: publicId })
 
+    // expect(spy).toHaveBeenCalledTimes(1)
     await expect(deleteImageHandler({ parameters: publicId })).resolves.not.toThrowError()
   })
 });
