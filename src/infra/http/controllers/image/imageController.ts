@@ -4,9 +4,10 @@ import { ConflictError, HttpError } from "@/utils/httpErrors";
 const repository = new StorageRepository()
 
 async function getImageHandler(handlerProps?: HandlerProps): ControllerResponse {
-  const publicId = Object.keys(handlerProps?.parameters!).find(e => e === 'publicId')
+  const field = Object.keys(handlerProps?.parameters!).find(e => e === 'publicId')
+  const publicId = Object.values(handlerProps?.parameters!)[0]
 
-  if (!publicId) return {
+  if (!field || !publicId) return {
     statusCode: 400
   }
 
@@ -23,7 +24,7 @@ async function getImageHandler(handlerProps?: HandlerProps): ControllerResponse 
 async function uploadImageHandler(handlerProps?: HandlerProps): ControllerResponse {
   const file = Object.values(handlerProps?.parameters!)[0]
 
-  if (!file) return {
+  if (!Object.keys(handlerProps?.parameters!).find(key => key === 'file') || !file) return {
     statusCode: 400
   }
 
@@ -32,7 +33,7 @@ async function uploadImageHandler(handlerProps?: HandlerProps): ControllerRespon
     return {
       statusCode: 201, body: {
         url: result.url,
-        public_id: result.public_id,
+        publicId: result.public_id,
       }
     }
   } catch (error) {
@@ -45,9 +46,10 @@ async function uploadImageHandler(handlerProps?: HandlerProps): ControllerRespon
 }
 
 async function deleteImageHandler(handlerProps?: HandlerProps): ControllerResponse {
-  const publicId = Object.keys(handlerProps?.parameters!).find(e => e === 'publicId')
+  const field = Object.keys(handlerProps?.parameters!).find(e => e === 'publicId')
+  const publicId = Object.values(handlerProps?.parameters!)[0]
 
-  if (!publicId) return {
+  if (!field || !publicId) return {
     statusCode: 400
   }
 

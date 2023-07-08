@@ -2,6 +2,7 @@ import { StorageRepository } from "@/infra/storage";
 import { v2 } from "cloudinary";
 import { describe, expect, test, vi } from "vitest";
 import { deleteImageHandler, getImageHandler, uploadImageHandler } from "./imageController";
+import { env } from "@/utils/env";
 vi.mock('cloudinary')
 describe("Image Controller test", () => {
   const repository = new StorageRepository()
@@ -55,21 +56,27 @@ describe("Image Controller test", () => {
     })
     const result = await uploadImageHandler({
       parameters: {
-        imagePath: "folder/image.png"
+        file: "shared/fixtures/test-image.jpg"
       }
     })
 
     expect(result).toEqual({
-      statusCode: 201, body: { url: mock.secure_url, public_id: mock.public_id }
+      statusCode: 201, body: { url: mock.secure_url, publicId: mock.public_id }
     })
   });
 
   test('should delete the image without error', async () => {
     const publicId = 'folder/image.jpg'
-    vi.spyOn(repository, 'deleteImage').mockResolvedValue({ result: "ok" })
+    const spyDestroyFn = vi.spyOn(v2.uploader, "destroy").mockResolvedValue({ result: "ok" })
     const result = await deleteImageHandler({ parameters: { publicId } })
 
-    // expect(spy).toHaveBeenCalledTimes(1)
-    // expect(result).toEqual({ body: { result: 'ok' }, statusCode: 204 })
+    expect(spyDestroyFn).toHaveBeenCalledTimes(1)
+    expect(spyDestroyFn).toHaveBeenCalledWith(publicId, {
+      folder: env.CLOUDNARY_FOLDER,
+      overwrite: true,
+      unique_filename: false,
+      use_filename: true,
+    })
+    expect(result).toEqual({ statusCode: 204 })
   })
 });
