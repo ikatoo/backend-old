@@ -18,7 +18,7 @@ describe("EXPRESS: /image routes", () => {
     expect(statusCode).toEqual(405);
   })
 
-  test.skip("GET Method: result is equal the mock with 200 statusCode", async () => {
+  test("GET Method: result is equal the mock with 200 statusCode", async () => {
     const mockedUrl = 'https://url.com/image.jpg'
     vi.spyOn(v2, 'url').mockResolvedValue(mockedUrl)
 
@@ -30,6 +30,45 @@ describe("EXPRESS: /image routes", () => {
 
     expect(body).toEqual({ url: mockedUrl });
     expect(statusCode).toBe(200);
+  });
+
+  test.skip("POST Method: receive file using multipart data and result 201 statusCode with url", async () => {
+    const mockedFile = Buffer.alloc(1024 * 1024 * 10, '.')
+
+    const mock = {
+      secure_url: 'https://cloudinary.com/folder/image.png',
+      public_id: "folder/image.png",
+    }
+    const uploadSpy = vi.spyOn(v2.uploader, "upload").mockResolvedValue({
+      ...mock,
+      version: 0,
+      signature: "",
+      width: 0,
+      height: 0,
+      format: "",
+      resource_type: "image",
+      created_at: "",
+      tags: [],
+      pages: 0,
+      bytes: 0,
+      type: "",
+      etag: "",
+      placeholder: false,
+      url: "",
+      access_mode: "",
+      original_filename: "",
+      moderation: [],
+      access_control: [],
+      context: {},
+      metadata: {}
+    })
+
+    const { body, statusCode } = await request(app)
+      .post("/image")
+      .set("Content-Type", "multipart/form-data")
+      .attach('file', mockedFile)
+    expect(body).toEqual({ url: mock.secure_url });
+    expect(statusCode).toBe(201);
   });
 
   // test("GET Method: responds with 204 when there is no data to return", async () => {
