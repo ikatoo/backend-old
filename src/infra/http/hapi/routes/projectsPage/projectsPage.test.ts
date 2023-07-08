@@ -33,7 +33,6 @@ describe("/project routes", () => {
       method: "get",
       url: "/projects",
     });
-    // const projects = result as ProjectWithId[]
     const { id, ...actual } = (result as ProjectWithId[])[0]
 
     expect(statusCode).toBe(200);

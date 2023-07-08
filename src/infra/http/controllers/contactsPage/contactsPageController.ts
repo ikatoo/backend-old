@@ -19,10 +19,6 @@ async function createContactsPageHandler(handlerProps?: HandlerProps): Controlle
   const validPage = ContactPageSchema.safeParse(handlerProps?.parameters)
   if (!validPage.success)
     throw new ConflictError('Invalid type.')
-  // return {
-  //   error: 'Invalid type.',
-  //   statusCode: 409
-  // }
   try {
     await contactsPageRepository.createContactPage(validPage.data)
     return {
