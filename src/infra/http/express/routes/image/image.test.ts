@@ -1,6 +1,7 @@
 import { describe, expect, test, vi } from "vitest";
 
 import { StorageRepository } from "@/infra/storage";
+import { env } from "@/utils/env";
 import { v2 } from "cloudinary";
 import request from "supertest";
 import { app } from "../../server";
@@ -32,9 +33,7 @@ describe("EXPRESS: /image routes", () => {
     expect(statusCode).toBe(200);
   });
 
-  test.skip("POST Method: receive file using multipart data and result 201 statusCode with url", async () => {
-    const mockedFile = Buffer.alloc(1024 * 1024 * 10, '.')
-
+  test("POST Method: receive file using multipart data and result 201 statusCode with url", async () => {
     const mock = {
       secure_url: 'https://cloudinary.com/folder/image.png',
       public_id: "folder/image.png",
@@ -66,81 +65,29 @@ describe("EXPRESS: /image routes", () => {
     const { body, statusCode } = await request(app)
       .post("/image")
       .set("Content-Type", "multipart/form-data")
-      .attach('file', mockedFile)
-    expect(body).toEqual({ url: mock.secure_url });
+      .attach('file', 'shared/fixtures/test-image.jpg')
+    expect(body).toEqual({ url: mock.secure_url, publicId: mock.public_id });
+    expect(uploadSpy).toHaveBeenCalledTimes(1)
     expect(statusCode).toBe(201);
   });
 
-  // test("GET Method: responds with 204 when there is no data to return", async () => {
-  //   const { body, statusCode } = await request(app)
-  //     .get("/image")
-  //     .send()
+  test('should delete the image using publicId', async () => {
+    const publicId = 'folder/image.png'
 
-  //   expect(statusCode).toBe(204);
-  //   expect(body).toEqual({});
-  // });
+    const spyDestroyFn = vi.spyOn(v2.uploader, 'destroy').mockResolvedValue({ result: 'ok' })
 
-  // test("POST Method: create skills page with 204 statusCode", async () => {
-  //   const { statusCode } = await request(app)
-  //     .post("/image")
-  //     .send(skillPageMock)
-  //   const page = await repository.getSkillsPage()
+    const { statusCode } = await request(app)
+      .delete("/image")
+      .send({ publicId })
 
-  //   expect(statusCode).toBe(201);
-  //   expect(page).toEqual(skillPageMock)
-  // });
-
-  // test("POST Method: responds with 409 when try create page with existent data", async () => {
-  //   await repository.createSkillsPage(skillPageMock);
-  //   const { statusCode } = await request(app)
-  //     .post("/image")
-  //     .send(skillPageMock)
-
-  //   expect(statusCode).toBe(409);
-  // })
-
-  // test("POST Method: responds with 400 when request without payload", async () => {
-  //   const { statusCode } = await request(app)
-  //     .post("/image")
-  //     .send()
-
-  //   expect(statusCode).toBe(400);
-  // })
-
-  // test("PATCH Method: responds with 204 when update", async () => {
-  //   const { statusCode } = await request(app)
-  //     .patch("/image")
-  //     .send({ title: 'new title' })
-
-  //   expect(statusCode).toBe(204);
-  // });
-
-  // test("PATCH Method: responds with 409 when try update with invalid payload", async () => {
-  //   await repository.createSkillsPage(skillPageMock);
-  //   const { statusCode } = await request(app)
-  //     .patch("/image")
-  //     .send({ invalid: 'payload' })
-
-  //   expect(statusCode).toBe(409);
-  // });
-
-  // test("PATCH Method: responds with 400 when try update without payload", async () => {
-  //   const { statusCode } = await request(app)
-  //     .patch("/image")
-  //     .send()
-
-  //   expect(statusCode).toBe(400);
-  // });;
-
-  // test("DELETE Method: responde with status 204", async () => {
-  //   await repository.createSkillsPage(skillPageMock);
-  //   const { statusCode } = await request(app)
-  //     .delete("/image")
-  //     .send()
-  //   const actual = await repository.getSkillsPage()
-
-  //   expect(statusCode).toBe(204)
-  //   expect(actual).toBeUndefined()
-  // })
+    expect(statusCode).toEqual(204)
+    expect(spyDestroyFn).toHaveBeenCalledTimes(1)
+    expect(spyDestroyFn).toHaveBeenCalledWith(publicId, {
+      folder: env.CLOUDNARY_FOLDER,
+      overwrite: true,
+      unique_filename: false,
+      use_filename: true,
+    })
+  })
 
 });
