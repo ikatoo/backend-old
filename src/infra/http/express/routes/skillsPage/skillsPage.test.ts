@@ -88,7 +88,7 @@ describe("EXPRESS: /skills routes", () => {
       .send()
 
     expect(statusCode).toBe(400);
-  });;
+  });
 
   test("DELETE Method: responde with status 204", async () => {
     await repository.createSkillsPage(skillPageMock);
@@ -99,6 +99,6 @@ describe("EXPRESS: /skills routes", () => {
 
     expect(statusCode).toBe(204)
     expect(actual).toBeUndefined()
-  })
+  });
 
 });
