@@ -1,4 +1,5 @@
 import { expressAdapter } from '@/infra/http/adapters/expressAdapter';
+import { expressMulterAdapter } from '@/infra/http/adapters/expressMulterAdapter';
 import { deleteImageHandler, getImageHandler, uploadImageHandler } from '@/infra/http/controllers/image/imageController';
 import multer from '@/utils/multer';
 import { Router } from "express";
@@ -13,7 +14,7 @@ imageRoutes.put(
 imageRoutes.post(
   '/image',
   multer.single('file'),
-  expressAdapter(uploadImageHandler)
+  expressMulterAdapter(uploadImageHandler)
 )
 
 imageRoutes.delete(
