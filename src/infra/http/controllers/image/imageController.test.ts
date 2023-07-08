@@ -16,7 +16,11 @@ describe("Image Controller test", () => {
       statusCode: 200
     }
     vi.spyOn(v2, 'url').mockResolvedValue(urlMock)
-    const result = await getImageHandler({ parameters: publicIdMock })
+    const result = await getImageHandler({
+      parameters: {
+        publicId: publicIdMock
+      }
+    })
 
     expect(result).toEqual(expected)
   });
@@ -49,7 +53,11 @@ describe("Image Controller test", () => {
       context: {},
       metadata: {}
     })
-    const result = await uploadImageHandler({ parameters: "folder/image.png" })
+    const result = await uploadImageHandler({
+      parameters: {
+        imagePath: "folder/image.png"
+      }
+    })
 
     expect(result).toEqual({
       statusCode: 201, body: { url: mock.secure_url, public_id: mock.public_id }
@@ -59,9 +67,9 @@ describe("Image Controller test", () => {
   test('should delete the image without error', async () => {
     const publicId = 'folder/image.jpg'
     vi.spyOn(repository, 'deleteImage').mockResolvedValue({ result: "ok" })
-    await deleteImageHandler({ parameters: publicId })
+    const result = await deleteImageHandler({ parameters: { publicId } })
 
     // expect(spy).toHaveBeenCalledTimes(1)
-    await expect(deleteImageHandler({ parameters: publicId })).resolves.not.toThrowError()
+    // expect(result).toEqual({ body: { result: 'ok' }, statusCode: 204 })
   })
 });

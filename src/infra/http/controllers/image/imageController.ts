@@ -4,10 +4,13 @@ import { ConflictError, HttpError } from "@/utils/httpErrors";
 const repository = new StorageRepository()
 
 async function getImageHandler(handlerProps?: HandlerProps): ControllerResponse {
-  if (typeof handlerProps?.parameters !== 'string') return {
+  const publicId = Object.keys(handlerProps?.parameters!).find(e => e === 'publicId')
+
+  if (!publicId) return {
     statusCode: 400
   }
-  const url = await repository.getImage(handlerProps.parameters)
+
+  const url = await repository.getImage(publicId)
   if (!url) {
     return { statusCode: 204 }
   }
@@ -18,12 +21,14 @@ async function getImageHandler(handlerProps?: HandlerProps): ControllerResponse 
 }
 
 async function uploadImageHandler(handlerProps?: HandlerProps): ControllerResponse {
-  if (typeof handlerProps?.parameters !== 'string') return {
+  const file = Object.values(handlerProps?.parameters!)[0]
+
+  if (!file) return {
     statusCode: 400
   }
 
   try {
-    const result = await repository.uploadImage(handlerProps.parameters)
+    const result = await repository.uploadImage(file.path)
     return {
       statusCode: 201, body: {
         url: result.url,
@@ -40,11 +45,13 @@ async function uploadImageHandler(handlerProps?: HandlerProps): ControllerRespon
 }
 
 async function deleteImageHandler(handlerProps?: HandlerProps): ControllerResponse {
-  if (typeof handlerProps?.parameters !== 'string') return {
+  const publicId = Object.keys(handlerProps?.parameters!).find(e => e === 'publicId')
+
+  if (!publicId) return {
     statusCode: 400
   }
 
-  await repository.deleteImage(handlerProps.parameters)
+  await repository.deleteImage(publicId)
   return { statusCode: 204 }
 }
 
