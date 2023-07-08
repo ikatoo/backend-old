@@ -3,6 +3,9 @@ import path from "path";
 
 export default multer({
   storage: multer.diskStorage({}),
+  limits: {
+    fileSize: 2 * 1024 * 1024
+  },
   fileFilter: (_request, file, callbackFn) => {
     let ext = path.extname(file.originalname);
     if (ext !== ".jpg" && ext !== ".jpeg" && ext !== ".png") {
