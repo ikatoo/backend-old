@@ -10,12 +10,13 @@ export default class ContactPagePgPromise implements IContactPage {
   async createContactPage(page: ContactPage): Promise<void> {
     await db.none(
       `insert into contacts_page (
-        title, description, localization
-      ) values ($1,$2,$3);`,
+        title, description, localization, email
+      ) values ($1,$2,$3,$4);`,
       [
         page.title,
         page.description,
-        `${page.localization.lat},${page.localization.lng}`
+        `${page.localization.lat},${page.localization.lng}`,
+        page.email
       ],
     );
   }
@@ -30,7 +31,8 @@ export default class ContactPagePgPromise implements IContactPage {
       localization: {
         lat: page.localization.x,
         lng: page.localization.y,
-      }
+      },
+      email: page.email
     }
   }
 
