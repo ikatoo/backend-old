@@ -8,7 +8,8 @@ export const LocalizationSchema = z.object({
 export const ContactPageSchema = z.object({
   title: z.string(),
   description: z.string(),
-  localization: LocalizationSchema
+  localization: LocalizationSchema,
+  email: z.string({required_error: 'Email is required'}).email({message: 'Invalid email address'})
 })
 
 export const PartialContactPageSchema = ContactPageSchema.partial()
