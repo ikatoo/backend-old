@@ -1,13 +1,12 @@
-import { env } from "@/utils/env";
 import nodemailer from 'nodemailer';
 import { describe, expect, test, vi } from "vitest";
-import NodeMailerImplementation from "./nodemailer";
+import NodeMailerImplementation from ".";
 
 describe('Mailer:', () => {
   const mailer = new NodeMailerImplementation()
 
   test('should sucess on send email', async () => {
-    const {accepted, response} = await mailer.send({
+    const { accepted, response } = await mailer.send({
       from: 'from@email.com',
       to: 'to@email.com',
       subject: 'subject test',
