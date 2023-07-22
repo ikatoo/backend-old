@@ -3,6 +3,10 @@ import { getFieldsWithValues } from "@/utils/transformers/getFieldsWithValues";
 import db from "../..";
 
 export default class UsersPgPromise implements IUser {
+  async clear(): Promise<void> {
+    await db.none('delete from users;')
+  }
+
   async createUser(user: User): Promise<void> {
     await db.none(
       'insert into users (name, email, password) values ($1, $2, $3)',

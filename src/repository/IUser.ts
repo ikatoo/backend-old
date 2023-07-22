@@ -22,4 +22,5 @@ export default interface IUser {
   findUsersByName(partialName: string): Promise<User[] | []>
   updateUser(id: number, user: Partial<User>): Promise<void>;
   deleteUser(id: number): Promise<void>;
+  clear(): Promise<void>;
 }
