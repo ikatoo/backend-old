@@ -76,18 +76,15 @@ async function getUserByEmail(handlerProps?: HandlerProps): ControllerResponse {
 }
 
 async function findUsersByName(handlerProps?: HandlerProps): ControllerResponse {
-  if (!Object.keys(handlerProps?.parameters!).length) return {
-    statusCode: 400
+  const partialName = `${Object.values(handlerProps?.parameters!)[0]}`
+  if (!partialName.length) {
+    return {
+      statusCode: 400
+    }
   }
-  // const valid = PartialUserSchema.safeParse(handlerProps?.parameters)
-  // if (!valid.success || Object.keys(valid.data).length === 0 || !valid.data.name)
-  const parameters = handlerProps?.parameters
-  // if (!parameters.includes('partialName'))
-  //   throw new ConflictError('Invalid parameters.')
+  const users = await usersRepository.findUsersByName(`${partialName}`)
 
-  // const partialName = Object.values(handlerProps.parameters)[0]
-  // await usersRepository.findUsersByName(partialName)
-  return { statusCode: 204 }
+  return { statusCode: 200, body: users }
 }
 
 export {
