@@ -27,12 +27,12 @@ export default class UsersPgPromise implements IUser {
   }
 
   async findUsersByName(partialName: string): Promise<User[] | []> {
-    const users = await db.many<User>(
+    const users = await db.manyOrNone<User>(
       "select * from users where name like '%$1:value%';",
       partialName
     )
 
-    return users
+    return [...users]
   }
 
   async updateUser(id: number, user: Partial<User>): Promise<void> {
