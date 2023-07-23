@@ -16,72 +16,53 @@ async function listUsers(): ControllerResponse {
 }
 
 async function createUser(handlerProps?: HandlerProps): ControllerResponse {
-  if (!Object.keys(handlerProps?.parameters!).length) return {
-    statusCode: 400
-  }
-
-  const valid = UserSchema.safeParse(handlerProps?.parameters)
-  if (!valid.success)
+  const validParameter = Object.keys(handlerProps?.parameters!).includes('user')
+  const user = Object.values(handlerProps?.parameters!)[0]
+  const validUser = UserSchema.safeParse(user)
+  if (!user || !validParameter || !validUser.success)
     throw new ConflictError('Invalid parameters.')
-  try {
-    await usersRepository.createUser(valid.data)
-    return { statusCode: 201 }
-  } catch (error) {
-    if (error instanceof Error)
-      throw new ConflictError(error.message)
-  }
+
+  await usersRepository.createUser(user)
+  return { statusCode: 201 }
 }
 
-async function updateUser(handlerProps?: HandlerProps): ControllerResponse {
-  if (!Object.keys(handlerProps?.parameters!).length) return {
-    statusCode: 400
-  }
-
-  const valid = PartialUserSchema.safeParse(handlerProps?.parameters)
-  if (!valid.success || Object.keys(valid.data).length === 0)
+async function updateUser(handlerProps: HandlerProps): ControllerResponse {
+  const validParameter = Object.keys(handlerProps?.parameters!).includes('user')
+  const user = Object.values(handlerProps?.parameters!)[0]
+  const validUser = PartialUserSchema.safeParse(user)
+  if (!user || !validParameter || !validUser.success)
     throw new ConflictError('Invalid parameters.')
-  try {
-    await usersRepository.updateUser(parseInt(`${valid.data.id}`), valid.data)
-    return {
-      statusCode: 204
-    }
-  } catch (error) {
-    if (error instanceof Error)
-      throw new ConflictError(error.message)
+
+  await usersRepository.updateUser(validUser.data.id ?? 0, validUser.data)
+
+  return {
+    statusCode: 204
   }
 }
 
 async function deleteUser(handlerProps?: HandlerProps): ControllerResponse {
-  if (!Object.keys(handlerProps?.parameters!).length) return {
-    statusCode: 400
-  }
-  const valid = PartialUserSchema.safeParse(handlerProps?.parameters)
-  if (!valid.success || Object.keys(valid.data).length === 0)
-    throw new ConflictError('Invalid parameters.')
+  const validParameter = Object.keys(handlerProps?.parameters!).includes('id')
+  const id = `${Object.values(handlerProps?.parameters!)[0]}`
+  if (!id.length || !validParameter) throw new ConflictError('Invalid parameters.')
 
-  await usersRepository.deleteUser(parseInt(`${valid.data.id}`))
+  await usersRepository.deleteUser(+id)
   return { statusCode: 204 }
 }
 
 async function getUserByEmail(handlerProps?: HandlerProps): ControllerResponse {
-  if (!Object.keys(handlerProps?.parameters!).length) return {
-    statusCode: 400
-  }
-  const valid = PartialUserSchema.safeParse(handlerProps?.parameters)
-  if (!valid.success || Object.keys(valid.data).length === 0 || !valid.data.email)
-    throw new ConflictError('Invalid parameters.')
+  const validParameter = Object.keys(handlerProps?.parameters!).includes('email')
+  const email = `${Object.values(handlerProps?.parameters!)[0]}`
+  if (!email.length || !validParameter) throw new ConflictError('Invalid parameters.')
+  const user = await usersRepository.getUserByEmail(email)
 
-  await usersRepository.getUserByEmail(valid.data.email)
-  return { statusCode: 204 }
+  return { statusCode: 200, body: user }
 }
 
 async function findUsersByName(handlerProps?: HandlerProps): ControllerResponse {
+  const validParameter = Object.keys(handlerProps?.parameters!).includes('partialName')
   const partialName = `${Object.values(handlerProps?.parameters!)[0]}`
-  if (!partialName.length) {
-    return {
-      statusCode: 400
-    }
-  }
+  if (!partialName.length || !validParameter) throw new ConflictError('Invalid parameters.')
+
   const users = await usersRepository.findUsersByName(`${partialName}`)
 
   return { statusCode: 200, body: users }
