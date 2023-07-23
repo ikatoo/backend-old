@@ -15,9 +15,15 @@ export default class UsersPgPromise implements IUser {
   }
 
   async listUsers(): Promise<User[] | []> {
-    const users = await db.many<User>('select * from users;')
+    const users = await db.manyOrNone<User>('select * from users;')
 
-    return users
+    return [...users]
+  }
+
+  async getUserByID(id: number): Promise<User | undefined> {
+    const user = await db.oneOrNone<User>('select * from users where id=$1', id)
+
+    return user ?? undefined
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
