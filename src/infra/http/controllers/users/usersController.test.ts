@@ -1,16 +1,24 @@
 import { UsersRepository } from "@/infra/db/PgPromise/Users";
 import { User } from "@/repository/IUser";
-import { afterEach, describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
+import { findUsersByName } from "./usersPageController";
 
 describe("User Controller test", () => {
   const userRepository = new UsersRepository()
-  const userMock: User = {
-    name: 'test name',
-    email: 'teste@email.com',
-    password: 'senhasecreta'
-  }
+  const usersMock: User[] = [
+    {
+      name: 'test name1',
+      email: 'teste1@email.com',
+      password: 'senhasecreta1'
+    },
+    {
+      name: 'test name2',
+      email: 'teste2@email.com',
+      password: 'senhasecreta2'
+    },
+  ]
 
-  afterEach(async () => {
+  beforeEach(async () => {
     await userRepository.clear()
   })
 
@@ -18,7 +26,21 @@ describe("User Controller test", () => {
 
   test.todo("Get user by email");
 
-  test.todo("Find user by partial name");
+  test("Find user by partial name", async () => {
+    usersMock.forEach(async user => {
+      await userRepository.createUser(user)
+    })
+
+    const response = await findUsersByName({ parameters: { partialName: 'name1' } })
+    const { body, statusCode } = response as HandlerResponse
+    const expected = (body as User[]).map(user => {
+      const { id, ...rest } = user
+      return rest
+    })
+
+    expect(statusCode).toEqual(200)
+    expect(expected).toEqual([usersMock[0]])
+  });
 
   test.todo("Create user without error");
 
