@@ -20,7 +20,7 @@ usersRoutes.get(
 )
 
 usersRoutes.get(
-  '/user/name/:partialName',
+  '/users/name/:partialName',
   expressAdapter(usersController.findUsersByName)
 )
 
