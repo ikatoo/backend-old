@@ -6,6 +6,7 @@ import { contactRoutes } from './contactPage'
 import { projectsRoutes } from './projectsPage'
 import { skillsRoutes } from './skillsPage'
 import { imageRoutes } from './image'
+import { usersRoutes } from './users'
 
 const routes = Router()
 
@@ -19,5 +20,6 @@ routes.use(contactRoutes)
 routes.use(projectsRoutes)
 routes.use(skillsRoutes)
 routes.use(imageRoutes)
+routes.use(usersRoutes)
 
 export { routes }
