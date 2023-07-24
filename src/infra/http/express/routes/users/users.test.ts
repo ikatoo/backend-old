@@ -49,6 +49,43 @@ describe("EXPRESS: /users routes", () => {
     expect(statusCode).toBe(200);
   });
 
+  test("GET Method: get user by email with 200 statusCode", async () => {
+    const expected = usersMock[0]
+    usersMock.forEach(async user => {
+      await userRepository.createUser(user)
+    })
+    while ((await userRepository.listUsers()).length < usersMock.length) { }
+
+    const { body, statusCode } = await request(app)
+      .get(`/user/email/${expected.email}`)
+      .send()
+
+    const { id, ...result } = (body as User)
+
+    expect(result).toEqual(expected);
+    expect(statusCode).toBe(200);
+  });
+
+  test("GET Method: find users by partial name with 200 statusCode", async () => {
+    const expected = [usersMock[0]]
+    usersMock.forEach(async user => {
+      await userRepository.createUser(user)
+    })
+    while ((await userRepository.listUsers()).length < usersMock.length) { }
+
+    const { body, statusCode } = await request(app)
+      .get('/users/name/1')
+      .send()
+
+    const result = (body as User[]).map(user => {
+      const { id, ...rest } = user
+      return rest
+    })
+
+    expect(result).toEqual(expected);
+    expect(statusCode).toBe(200);
+  });
+
   test("GET Method: responds with 204 when there is no data to return", async () => {
     const { body, statusCode } = await request(app)
       .get("/users")
