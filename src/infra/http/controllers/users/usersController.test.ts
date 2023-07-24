@@ -1,7 +1,7 @@
 import { UsersRepository } from "@/infra/db/PgPromise/Users";
 import { User } from "@/repository/IUser";
 import { beforeEach, describe, expect, test } from "vitest";
-import { createUser, deleteUser, findUsersByName, getUserByEmail, listUsers, updateUser } from "./usersPageController";
+import { createUser, deleteUser, findUsersByName, getUserByEmail, listUsers, updateUser } from "./usersController";
 
 describe("User Controller test", () => {
   const userRepository = new UsersRepository()

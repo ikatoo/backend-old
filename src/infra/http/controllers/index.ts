@@ -1,4 +1,9 @@
 import { getAboutPageHandler } from "./aboutPage/aboutPageController";
 import { getSkillsPageHandler } from "./skillsPage/skillsPageController";
+import * as usersController from "./users/usersController";
 
-export { getAboutPageHandler, getSkillsPageHandler };
+export {
+  getAboutPageHandler,
+  getSkillsPageHandler,
+  usersController
+};
