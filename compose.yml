@@ -29,9 +29,9 @@ services:
     networks:
       - ikatoo-db-net
 
-  api:
-    build: .
-    env_file:
-      - .env
-    ports:
-      - ${PORT}
+  # api:
+  #   build: .
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - ${PORT}
