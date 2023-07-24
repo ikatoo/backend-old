@@ -26,7 +26,7 @@ async function createUser(handlerProps?: HandlerProps): ControllerResponse {
   return { statusCode: 201 }
 }
 
-async function updateUser(handlerProps: HandlerProps): ControllerResponse {
+async function updateUser(handlerProps?: HandlerProps): ControllerResponse {
   const validParameter = Object.keys(handlerProps?.parameters!).includes('user')
   const user = Object.values(handlerProps?.parameters!)[0]
   const validUser = PartialUserSchema.safeParse(user)
