@@ -1,4 +1,4 @@
-import IUser, { User } from "@/repository/IUser";
+import IUser, { User, UserWithoutPassword } from "@/repository/IUser";
 import { getFieldsWithValues } from "@/utils/transformers/getFieldsWithValues";
 import db from "../..";
 
@@ -14,8 +14,8 @@ export default class UsersPgPromise implements IUser {
     )
   }
 
-  async listUsers(): Promise<User[] | []> {
-    const users = await db.manyOrNone<User>('select * from users;')
+  async listUsers(): Promise<UserWithoutPassword[] | []> {
+    const users = await db.manyOrNone<User>('select id, name, email from users;')
 
     return [...users]
   }
@@ -32,9 +32,9 @@ export default class UsersPgPromise implements IUser {
     return user ?? undefined
   }
 
-  async findUsersByName(partialName: string): Promise<User[] | []> {
+  async findUsersByName(partialName: string): Promise<UserWithoutPassword[] | []> {
     const users = await db.manyOrNone<User>(
-      "select * from users where name like '%$1:value%';",
+      "select id, name, email from users where name like '%$1:value%';",
       partialName
     )
 
