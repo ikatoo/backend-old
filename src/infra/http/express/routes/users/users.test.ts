@@ -32,10 +32,9 @@ describe("EXPRESS: /users routes", () => {
   })
 
   test("GET Method: list all users with 200 statusCode", async () => {
-    usersMock.forEach(async user => {
-      await userRepository.createUser(user)
-    })
-    while ((await userRepository.listUsers()).length < usersMock.length) { }
+    for (let index = 0; index < usersMock.length; index++) {
+      await userRepository.createUser(usersMock[index])
+    }
     const { body, statusCode } = await request(app)
       .get("/users")
       .send()
@@ -51,10 +50,9 @@ describe("EXPRESS: /users routes", () => {
 
   test("GET Method: get user by email with 200 statusCode", async () => {
     const expected = usersMock[0]
-    usersMock.forEach(async user => {
-      await userRepository.createUser(user)
-    })
-    while ((await userRepository.listUsers()).length < usersMock.length) { }
+    for (let index = 0; index < usersMock.length; index++) {
+      await userRepository.createUser(usersMock[index])
+    }
 
     const { body, statusCode } = await request(app)
       .get(`/user/email/${expected.email}`)
@@ -68,10 +66,9 @@ describe("EXPRESS: /users routes", () => {
 
   test("GET Method: find users by partial name with 200 statusCode", async () => {
     const expected = [usersMock[0]]
-    usersMock.forEach(async user => {
-      await userRepository.createUser(user)
-    })
-    while ((await userRepository.listUsers()).length < usersMock.length) { }
+    for (let index = 0; index < usersMock.length; index++) {
+      await userRepository.createUser(usersMock[index])
+    }
 
     const { body, statusCode } = await request(app)
       .get('/users/name/1')

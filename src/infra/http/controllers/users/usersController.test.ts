@@ -23,10 +23,9 @@ describe("User Controller test", () => {
   })
 
   test("List all users", async () => {
-    usersMock.forEach(user => {
-      userRepository.createUser(user)
-    })
-    while ((await userRepository.listUsers()).length < usersMock.length) { }
+    for (let index = 0; index < usersMock.length; index++) {
+      await userRepository.createUser(usersMock[index])
+    }
 
     const response = await listUsers()
     const { body, statusCode } = response as HandlerResponse
@@ -41,10 +40,9 @@ describe("User Controller test", () => {
   });
 
   test("Get user by email", async () => {
-    usersMock.forEach(async user => {
-      await userRepository.createUser(user)
-    })
-    while ((await userRepository.listUsers()).length < usersMock.length) { }
+    for (let index = 0; index < usersMock.length; index++) {
+      await userRepository.createUser(usersMock[index])
+    }
 
     const response = await getUserByEmail({ parameters: { email: usersMock[0].email } })
     const body = response?.body as User
@@ -54,10 +52,9 @@ describe("User Controller test", () => {
   });
 
   test("Find user by partial name", async () => {
-    usersMock.forEach(async user => {
-      await userRepository.createUser(user)
-    })
-    while ((await userRepository.listUsers()).length < usersMock.length) { }
+    for (let index = 0; index < usersMock.length; index++) {
+      await userRepository.createUser(usersMock[index])
+    }
 
     const response = await findUsersByName({ parameters: { partialName: 'name1' } })
     const { body, statusCode } = response as HandlerResponse
@@ -85,10 +82,9 @@ describe("User Controller test", () => {
   });
 
   test("Update users data with 204 status code", async () => {
-    usersMock.forEach(async user => {
-      await userRepository.createUser(user)
-    })
-    while ((await userRepository.listUsers()).length < usersMock.length) { }
+    for (let index = 0; index < usersMock.length; index++) {
+      await userRepository.createUser(usersMock[index])
+    }
 
     const userForUpdate = await userRepository.getUserByEmail(usersMock[0].email)
     const updatedUser = { ...userForUpdate, name: 'updated name', email: 'updated@email.com' }
@@ -102,10 +98,9 @@ describe("User Controller test", () => {
   });
 
   test("Delete users data with 204 status code", async () => {
-    usersMock.forEach(async user => {
-      await userRepository.createUser(user)
-    })
-    while ((await userRepository.listUsers()).length < usersMock.length) { }
+    for (let index = 0; index < usersMock.length; index++) {
+      await userRepository.createUser(usersMock[index])
+    }
 
     const userForDelete = await userRepository.getUserByEmail(usersMock[0].email)
     const response = await deleteUser({ parameters: { id: userForDelete?.id } })
