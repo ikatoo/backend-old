@@ -1,7 +1,7 @@
+import { User } from "@/repository/IUser";
 import { beforeEach, describe, expect, test } from "vitest";
 import UsersPgPromise from ".";
 import db from "../..";
-import { User } from "@/repository/IUser";
 
 describe("Basic operations in Users Repository", () => {
   const usersRepository = new UsersPgPromise()
@@ -29,9 +29,10 @@ describe("Basic operations in Users Repository", () => {
     const mock = mockedUsers[0]
     await usersRepository.createUser(mock)
 
-    const result = await db.any('select * from users;')
+    const result = await db.any('select name, email from users;')
+    const expected = [{ name: mock.name, email: mock.email }]
 
-    expect(result).toEqual([{ id: result[0].id, ...mock }])
+    expect(result).toEqual(expected)
   });
 
   test("LIST ALL Method", async () => {
@@ -43,11 +44,14 @@ describe("Basic operations in Users Repository", () => {
     const results = (await usersRepository.listUsers())
       .map(result => ({
         name: result.name,
-        email: result.email,
-        password: result.password
+        email: result.email
       }))
+    const expected = mockedUsers.map(user => ({
+      name: user.name,
+      email: user.email
+    }))
 
-    expect(results).toEqual(mockedUsers)
+    expect(results).toEqual(expected)
   });
 
   test("GET BY EMAIL Method", async () => {
@@ -69,8 +73,13 @@ describe("Basic operations in Users Repository", () => {
       values
     )
     const result = await usersRepository.findUsersByName('2')
+    const expected = [{
+      id: result[0].id,
+      name: mock.name,
+      email: mock.email
+    }]
 
-    expect(result).toEqual([{ id: result[0].id, ...mock }])
+    expect(result).toEqual(expected)
   });
 
   test("UPDATE Method", async () => {
