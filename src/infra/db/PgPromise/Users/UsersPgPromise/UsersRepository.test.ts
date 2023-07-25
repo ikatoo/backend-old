@@ -21,8 +21,8 @@ describe("Basic operations in Users Repository", () => {
     value => `('${value.name}','${value.email}','${value.password}')`
   ).toString()
 
-  beforeEach(async () => {
-    await db.none('delete from users;')
+  beforeEach(() => {
+    db.none('delete from users;')
   })
 
   test("CREATE Method", async () => {
