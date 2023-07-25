@@ -1,4 +1,5 @@
 import IUser, { User, UserWithoutPassword } from "@/repository/IUser";
+import { hasher } from "@/utils/hasher";
 import { getFieldsWithValues } from "@/utils/transformers/getFieldsWithValues";
 import db from "../..";
 
@@ -8,9 +9,10 @@ export default class UsersPgPromise implements IUser {
   }
 
   async createUser(user: User): Promise<void> {
-    await db.none(
+    const hashPassword = await hasher(10, user.password)
+    db.none(
       'insert into users (name, email, password) values ($1, $2, $3)',
-      [user.name, user.email, user.password]
+      [user.name, user.email, hashPassword]
     )
   }
 
