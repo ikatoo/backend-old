@@ -38,13 +38,16 @@ describe("EXPRESS: /users routes", () => {
     const { body, statusCode } = await request(app)
       .get("/users")
       .send()
-    const expected = (body as User[]).map(user => ({
+    const result = (body as User[]).map(user => ({
       name: user.name,
       email: user.email,
-      password: user.password
+    }))
+    const expected = usersMock.map(user => ({
+      name: user.name,
+      email: user.email
     }))
 
-    expect(expected).toEqual(usersMock);
+    expect(result).toEqual(expected);
     expect(statusCode).toBe(200);
   });
 
@@ -65,7 +68,6 @@ describe("EXPRESS: /users routes", () => {
   });
 
   test("GET Method: find users by partial name with 200 statusCode", async () => {
-    const expected = [usersMock[0]]
     for (let index = 0; index < usersMock.length; index++) {
       await userRepository.createUser(usersMock[index])
     }
@@ -75,9 +77,13 @@ describe("EXPRESS: /users routes", () => {
       .send()
 
     const result = (body as User[]).map(user => {
-      const { id, ...rest } = user
+      const { id, password, ...rest } = user
       return rest
     })
+    const expected = [{
+      name: usersMock[0].name,
+      email: usersMock[0].email
+    }]
 
     expect(result).toEqual(expected);
     expect(statusCode).toBe(200);

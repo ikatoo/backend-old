@@ -1,5 +1,5 @@
 import { UsersRepository } from "@/infra/db/PgPromise/Users";
-import { User } from "@/repository/IUser";
+import { User, UserWithoutPassword } from "@/repository/IUser";
 import { beforeEach, describe, expect, test } from "vitest";
 import { createUser, deleteUser, findUsersByName, getUserByEmail, listUsers, updateUser } from "./usersController";
 
@@ -30,13 +30,17 @@ describe("User Controller test", () => {
     const response = await listUsers()
     const { body, statusCode } = response as HandlerResponse
     await userRepository.clear()
-    const expected = (body as User[]).map(user => {
+    const result = (body as UserWithoutPassword[]).map(user => {
       const { id, ...rest } = user
       return rest
     })
+    const expected = usersMock.map(user => ({
+      name: user.name,
+      email: user.email
+    }))
 
     expect(statusCode).toEqual(200)
-    expect(expected).toEqual(usersMock)
+    expect(result).toEqual(expected)
   });
 
   test("Get user by email", async () => {
@@ -58,13 +62,15 @@ describe("User Controller test", () => {
 
     const response = await findUsersByName({ parameters: { partialName: 'name1' } })
     const { body, statusCode } = response as HandlerResponse
-    const expected = (body as User[]).map(user => {
-      const { id, ...rest } = user
-      return rest
-    })
+    const result = body as UserWithoutPassword[]
+    const expected = [{
+      id: result[0].id,
+      name: usersMock[0].name,
+      email: usersMock[0].email
+    }]
 
     expect(statusCode).toEqual(200)
-    expect(expected).toEqual([usersMock[0]])
+    expect(result).toEqual(expected)
   });
 
   test("Create user without error", async () => {
@@ -97,7 +103,7 @@ describe("User Controller test", () => {
     expect(expected).toEqual({ ...updatedUser, id: userForUpdate?.id })
   });
 
-  test("Delete users data with 204 status code", async () => {
+  test("Delete user data with 204 status code", async () => {
     for (let index = 0; index < usersMock.length; index++) {
       await userRepository.createUser(usersMock[index])
     }
@@ -106,9 +112,14 @@ describe("User Controller test", () => {
     const response = await deleteUser({ parameters: { id: userForDelete?.id } })
 
     const status = response?.statusCode
-    const expected = await userRepository.listUsers()
+    const result = await userRepository.listUsers()
+    const expected = [{
+      id: result[0].id,
+      name: usersMock[1].name,
+      email: usersMock[1].email
+    }]
 
     expect(status).toEqual(204)
-    expect(expected).toEqual([{ id: expected[0].id, ...usersMock[1] }])
+    expect(result).toEqual(expected)
   });
 });
