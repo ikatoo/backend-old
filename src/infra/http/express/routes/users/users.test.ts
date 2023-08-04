@@ -1,7 +1,7 @@
 import { UsersRepository } from "@/infra/db/PgPromise/Users";
 import { app } from "@/infra/http/express/server";
 import { User } from "@/repository/IUser";
-import { hasher } from "@/utils/hasher";
+import { compareHash, hasher } from "@/utils/hasher";
 import request from "supertest";
 import { afterEach, describe, expect, test } from "vitest";
 
@@ -64,16 +64,15 @@ describe("EXPRESS: /users routes", () => {
       .get(`/user/email/${usersMock[0].email}`)
       .send()
 
-    const { id, ...result } = (body as User)
-    const hashPassword = await hasher(10, usersMock[0].password)
+    const { id, password: hash, ...result } = (body as User)
     const expected = {
       name: usersMock[0].name,
       email: usersMock[0].email,
-      password: hashPassword
     }
 
     expect(result).toEqual(expected);
     expect(statusCode).toBe(200);
+    expect(await compareHash(usersMock[0].password, hash)).toBeTruthy()
   });
 
   test("GET Method: find users by partial name with 200 statusCode", async () => {
