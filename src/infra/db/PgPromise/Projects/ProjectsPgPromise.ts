@@ -52,16 +52,14 @@ export default class ProjectsPgPromise implements IProjects {
 
   async createProject(project: Project): Promise<void> {
     await db.none(
-      `insert into projects (
-        title, description, snapshot, github_link, last_update
-      ) values ($1,$2,$3,$4,$5);`,
+      'insert into projects (title, description, snapshot, github_link, last_update) values ($1,$2,$3,$4,$5);',
       [
         project.description.title,
         project.description.content,
         project.snapshot,
         project.githubLink,
         stringToDate(project.description.subTitle)
-      ],
+      ]
     );
   }
 
@@ -80,22 +78,20 @@ export default class ProjectsPgPromise implements IProjects {
   }
 
   async updateProject(id: number, project: PartialProject): Promise<void> {
+    const { description, githubLink, snapshot } = project
+    const lastUpdate = description?.subTitle?.split(': ')[1]
+    const values = [
+      !!githubLink ? `github_link='${githubLink}'` : '',
+      !!snapshot ? `snapshot='${snapshot}'` : '',
+      !!description?.title ? `title='${description?.title}'` : '',
+      !!description?.content ? `description='${description?.content}'` : '',
+      !!lastUpdate ? `last_update='${stringToDate(lastUpdate ?? '').toISOString()}'` : ''
+    ].filter(item => item !== '').toString()
+
     await db.none(
-      `update projects set 
-      ${project.description?.title ? 'title=$2' : ''} 
-      ${project.description?.content ? ',description=$3' : ''} 
-      ${project.snapshot ? ',snapshot=$4' : ''} 
-      ${project.githubLink ? ',github_link=$5' : ''} 
-      ${project.description?.subTitle ? ',last_update =$6' : ''} 
-       where id = $1`,
-      [
-        id,
-        project.description?.title,
-        project.description?.content,
-        project.snapshot,
-        project.githubLink,
-        project.description?.subTitle ? stringToDate(project.description.subTitle) : undefined
-      ]);
+      'update projects set $1:raw where id = $2',
+      [values, id]
+    )
   }
 
   async deleteProject(id: number): Promise<void> {
