@@ -1,5 +1,6 @@
 import IContactPage, { ContactPage, Localization } from "@/repository/IContactPage";
 import db from "..";
+import { getFieldsWithValues } from "@/utils/transformers/getFieldsWithValues";
 
 export default class ContactPagePgPromise implements IContactPage {
 
@@ -9,9 +10,7 @@ export default class ContactPagePgPromise implements IContactPage {
 
   async createContactPage(page: ContactPage): Promise<void> {
     await db.none(
-      `insert into contacts_page (
-        title, description, localization, email
-      ) values ($1,$2,$3,$4);`,
+      'insert into contacts_page (title, description, localization, email) values ($1,$2,$3,$4);',
       [
         page.title,
         page.description,
@@ -37,15 +36,15 @@ export default class ContactPagePgPromise implements IContactPage {
   }
 
   async updateContactPage(page: Partial<ContactPage>): Promise<void> {
-    const query = `update contacts_page set ${Object.keys(page).map((key, index) => {
-      if (key === 'localization') {
+    const values = Object.keys(page).map((key, index) => {
+      if(key === 'localization'){
         const localization = Object.values(page)[index] as Localization
         return `localization = \'${localization.lat},${localization.lng}\'`
       }
-
       return `${key} = '${Object.values(page)[index]}'`
-    })};`
-    await db.none(query);
+    }).toString()
+
+    await db.none('update contacts_page set $1:raw;', [values])
   }
 
   async deleteContactPage(): Promise<void> {

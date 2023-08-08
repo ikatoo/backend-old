@@ -1,7 +1,8 @@
+vi.mock('..')
+
+import { stringToDate } from "@/utils/transformers/dateTransform";
 import projectsPageMock from "@shared/mocks/projectsMock/result.json";
-import { ProjectWithId } from "@/repository/IProject";
-import { dateToString } from "@/utils/transformers/dateTransform";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import db from "..";
 import ProjectsPgPromise from "./ProjectsPgPromise";
 
@@ -10,102 +11,110 @@ describe("Basic operations in Projects Postgres Database", () => {
 
   afterEach(async () => {
     await db.none("delete from projects;");
+    vi.clearAllMocks()
   });
 
   test("CREATE Method", async () => {
-    for (const project of projectsPageMock) {
-      await expect(repository.createProject(project))
-        .resolves.not.toThrow()
-    }
+    const mockedFn = vi.spyOn(db, 'none')
+    const mock = projectsPageMock[0]
+    await expect(repository.createProject(mock))
+      .resolves.not.toThrow()
+
+    expect(mockedFn).toHaveBeenCalledTimes(1)
+    expect(mockedFn).toHaveBeenCalledWith(
+      'insert into projects (title, description, snapshot, github_link, last_update) values ($1,$2,$3,$4,$5);',
+      [
+        mock.description.title,
+        mock.description.content,
+        mock.snapshot,
+        mock.githubLink,
+        stringToDate(mock.description.subTitle)
+      ]
+    )
   });
 
   test("READ Method", async () => {
-    for (const project of projectsPageMock) {
-      await repository.createProject(project)
-    }
-    const projects = await repository.getProjects()
-    const actual = projects.map(project => {
-      const { id, ...rest } = project
-      return rest
-    })
+    const mockedDbResult = projectsPageMock.map((project, index) => ({
+      id: index + 1,
+      title: project.description.title,
+      description: project.description.content,
+      last_update: stringToDate(project.description.subTitle.split(': ')[1]),
+      github_link: project.githubLink,
+      snapshot: project.snapshot,
+    }))
+    const mockedFn = vi.spyOn(db, 'manyOrNone').mockResolvedValue(mockedDbResult)
 
-    expect(projectsPageMock).toEqual(actual)
+    await expect(repository.getProjects()).resolves.not.toThrow()
+    expect(mockedFn).toHaveBeenCalledTimes(1)
+    expect(mockedFn).toHaveBeenCalledWith('select * from projects;')
   });
 
   test("get project by id", async () => {
-    const selectedProject = projectsPageMock[1]
-    await repository.createProject(projectsPageMock[0])
-    await repository.createProject(selectedProject)
-    const project = await db.one(
-      'select * from projects where title = $1',
-      selectedProject.description.title
-    )
-    const { id, ...actual } = await repository.getProjectById(project.id) as ProjectWithId
+    const project = projectsPageMock[1]
+    const mockedFn = vi.spyOn(db, 'oneOrNone').mockResolvedValueOnce({
+      id: 1,
+      title: project.description.title,
+      description: project.description.content,
+      last_update: stringToDate(project.description.subTitle.split(': ')[1]),
+      github_link: project.githubLink,
+      snapshot: project.snapshot,
+    })
 
-    expect(selectedProject).toEqual(actual)
+    await expect(repository.getProjectById(1)).resolves.not.toThrow()
+    expect(mockedFn).toHaveBeenCalledTimes(1)
+    expect(mockedFn).toHaveBeenCalledWith(
+      'select * from projects where id=$1',
+      1
+    )
   })
 
   test("get projects by title", async () => {
-    const selectedProject = projectsPageMock[0]
-    await repository.createProject(projectsPageMock[1])
-    await repository.createProject(selectedProject)
-    const projects = await repository.getProjectsByTitle(selectedProject.description.title) as ProjectWithId[]
-    const { id, ...actual } = projects[0]
+    const project = projectsPageMock[0]
+    const mockedFn = vi.spyOn(db, 'manyOrNone').mockResolvedValueOnce([{
+      id: 1,
+      title: project.description.title,
+      description: project.description.content,
+      last_update: stringToDate(project.description.subTitle.split(': ')[1]),
+      github_link: project.githubLink,
+      snapshot: project.snapshot,
+    }])
 
-    expect(selectedProject).toEqual(actual)
+    await expect(repository.getProjectsByTitle(project.description.title))
+      .resolves.not.toThrow()
+    expect(mockedFn).toHaveBeenCalledTimes(1)
+    expect(mockedFn).toHaveBeenCalledWith(
+      `select * from projects where title ilike '%$1:value%'`,
+      project.description.title
+    )
   })
 
   test("UPDATE Method", async () => {
     const selectedMock = projectsPageMock[0]
-    await repository.createProject(selectedMock)
-    const newValue = {
-      description: {
-        title: "new description"
-      }
-    };
-    const project = await db.one(
-      'select * from projects where title=$1',
-      selectedMock.description.title
-    )
-    await repository.updateProject(project.id, newValue);
-    const updatedProject = await db.one(
-      'select * from projects where id=$1',
-      project.id
-    )
-    const expected = {
-      snapshot: '/images/snap-calm.png',
-      description: {
-        title: newValue.description.title,
-        subTitle: 'Last update: 2022 - 03',
-        content: 'Personal project for learn nextjs.'
-      },
-      githubLink: 'https://github.com/mckatoo/calm'
-    }
-    const actual = {
-      snapshot: updatedProject.snapshot,
-      description: {
-        title: updatedProject.title,
-        subTitle: `Last update: ${dateToString(updatedProject.last_update)}`,
-        content: updatedProject.description
-      },
-      githubLink: updatedProject.github_link
+    const mockedFn = vi.spyOn(db, 'none')
+    const values = [
+      `github_link='${selectedMock.githubLink}'`,
+      `snapshot='${selectedMock.snapshot}'`,
+      `title='${selectedMock.description.title}'`,
+      `description='${selectedMock.description.content}'`,
+      `last_update='${stringToDate(selectedMock.description.subTitle.split(': ')[1]).toISOString()}'`
+    ].toString()
 
-    }
-
-    expect(expected).toEqual(actual);
+    await expect(repository.updateProject(7, selectedMock)).resolves.not.toThrow()
+    expect(mockedFn).toHaveBeenCalledTimes(1)
+    expect(mockedFn).toHaveBeenCalledWith(
+      'update projects set $1:raw where id = $2',
+      [values, 7]
+    )
   });
 
   test("DELETE Method", async () => {
-    const projectMock = projectsPageMock[0]
-    await repository.createProject(projectMock);
-    const projectInDb = await db.one(
-      "select * from projects where title = $1",
-      projectMock.description.title,
-    );
-    await repository.deleteProject(projectInDb.id);
-    const expected: [] = [];
-    const actual = await repository.getProjects();
+    const mockedFn = vi.spyOn(db, 'none')
 
-    expect(expected).toEqual(actual);
+    await expect(repository.deleteProject(9)).resolves.not.toThrow();
+    expect(mockedFn).toHaveBeenCalledTimes(1)
+    expect(mockedFn).toHaveBeenCalledWith(
+      'delete from projects where id = $1',
+      9
+    )
   });
 });

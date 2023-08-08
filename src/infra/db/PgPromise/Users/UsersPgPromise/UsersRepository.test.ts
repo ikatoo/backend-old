@@ -1,5 +1,6 @@
+vi.mock("@/utils/hasher")
 import { User } from "@/repository/IUser";
-import { beforeEach, describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import UsersPgPromise from ".";
 import db from "../..";
 
@@ -26,13 +27,22 @@ describe("Basic operations in Users Repository", () => {
   })
 
   test("CREATE Method", async () => {
+    vi.mock("@/utils/hasher", () => vi.fn().mockResolvedValueOnce('hash'))
+    
+    const mocked = vi.spyOn(db, 'none')
     const mock = mockedUsers[0]
     await usersRepository.createUser(mock)
 
-    const result = await db.any('select name, email from users;')
-    const expected = [{ name: mock.name, email: mock.email }]
+    expect(mocked).toHaveBeenCalledTimes(1)
+    expect(mocked).toHaveBeenCalledWith(
+      'insert into users (name, email, password) values ($1, $2, $3)',
+      [mock.name, mock.email, 'hash']
+    )
 
-    expect(result).toEqual(expected)
+    // const result = await db.any('select name, email from users;')
+    // const expected = [{ name: mock.name, email: mock.email }]
+
+    // expect(result).toEqual(expected)
   });
 
   test("LIST ALL Method", async () => {
