@@ -10,14 +10,12 @@ export default class SkillsPagePgPromise implements ISkillsPage {
 
   async createSkillsPage(page: SkillsPage): Promise<void> {
     await db.none(
-      `insert into skills_page (
-      title, description, skills, last_jobs
-    ) values ($1,$2,$3,$4);`,
+      'insert into skills_page (title, description, skills, last_jobs) values ($1,$2,$3,$4);',
       [
         page.title,
         page.description,
-        { skills: page.skills },
-        { lastJobs: page.lastJobs }
+        JSON.stringify(page.skills),
+        JSON.stringify(page.lastJobs)
       ],
     );
   }
@@ -28,8 +26,8 @@ export default class SkillsPagePgPromise implements ISkillsPage {
     const mappedPage = {
       title: page.title,
       description: page.description,
-      skills: page.skills.skills,
-      lastJobs: page.last_jobs.lastJobs
+      skills: page.skills,
+      lastJobs: page.last_jobs
     }
     return mappedPage
   }
@@ -37,8 +35,10 @@ export default class SkillsPagePgPromise implements ISkillsPage {
   async updateSkillsPage(page: Partial<SkillsPage>): Promise<void> {
     const fieldsWithValues = getFieldsWithValues<SkillsPage>(page)
 
-    const query = `update skills_page set ${fieldsWithValues};`
-    await db.none(query);
+    await db.none(
+      'update skills_page set $1:raw;',
+      fieldsWithValues.toString()
+    );
   }
 
   async deleteSkillsPage(): Promise<void> {
