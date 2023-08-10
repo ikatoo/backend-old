@@ -54,8 +54,13 @@ async function getUserByEmail(handlerProps?: HandlerProps): ControllerResponse {
   const email = `${Object.values(handlerProps?.parameters!)[0]}`
   if (!email.length || !validParameter) throw new ConflictError('Invalid parameters.')
   const user = await usersRepository.getUserByEmail(email)
+  const body = !!user ? {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+  } : undefined
 
-  return { statusCode: 200, body: user }
+  return { statusCode: 200, body }
 }
 
 async function findUsersByName(handlerProps?: HandlerProps): ControllerResponse {
@@ -69,6 +74,6 @@ async function findUsersByName(handlerProps?: HandlerProps): ControllerResponse 
 }
 
 export {
-  createUser, deleteUser, listUsers, updateUser, getUserByEmail, findUsersByName
+  createUser, deleteUser, findUsersByName, getUserByEmail, listUsers, updateUser
 };
 
