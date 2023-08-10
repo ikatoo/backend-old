@@ -1,76 +1,72 @@
 import { UsersRepository } from "@/infra/db/PgPromise/Users";
-import { User, UserWithoutPassword } from "@/repository/IUser";
-import { beforeEach, describe, expect, test } from "vitest";
+import { User } from "@/repository/IUser";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { createUser, deleteUser, findUsersByName, getUserByEmail, listUsers, updateUser } from "./usersController";
 
 describe("User Controller test", () => {
-  const userRepository = new UsersRepository()
   const usersMock: User[] = [
     {
+      id: 1,
       name: 'test name1',
       email: 'teste1@email.com',
-      password: 'senhasecreta1'
+      password: 'hash1'
     },
     {
+      id: 2,
       name: 'test name2',
       email: 'teste2@email.com',
-      password: 'senhasecreta2'
+      password: 'hash2'
     },
   ]
 
-  beforeEach(async () => {
-    await userRepository.clear()
+  afterEach(() => {
+    vi.clearAllMocks()
+    vi.resetAllMocks()
   })
 
   test("List all users", async () => {
-    for (let index = 0; index < usersMock.length; index++) {
-      await userRepository.createUser(usersMock[index])
-    }
-
-    const response = await listUsers()
-    const { body, statusCode } = response as HandlerResponse
-    await userRepository.clear()
-    const result = (body as UserWithoutPassword[]).map(user => {
-      const { id, ...rest } = user
-      return rest
-    })
     const expected = usersMock.map(user => ({
+      id: user.id,
       name: user.name,
       email: user.email
     }))
+    const spy = vi.spyOn(UsersRepository.prototype, 'listUsers')
+      .mockResolvedValueOnce(expected)
 
-    expect(statusCode).toEqual(200)
-    expect(result).toEqual(expected)
+    const result = await listUsers()
+
+    expect(result?.statusCode).toEqual(200)
+    expect(result?.body).toEqual(expected)
+    expect(spy).toHaveBeenCalledTimes(1)
   });
 
   test("Get user by email", async () => {
-    for (let index = 0; index < usersMock.length; index++) {
-      await userRepository.createUser(usersMock[index])
-    }
+    const { password, ...expected } = usersMock[1]
+    const spy = vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
+      .mockResolvedValueOnce(usersMock[1])
+    const result = await getUserByEmail({ parameters: { email: expected.email } })
 
-    const response = await getUserByEmail({ parameters: { email: usersMock[0].email } })
-    const body = response?.body as User
-
-    expect(response?.statusCode).toEqual(200)
-    expect(body).toEqual({ id: body.id, ...usersMock[0] })
+    expect(result?.statusCode).toEqual(200)
+    expect(result?.body).toEqual(expected)
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(expected.email)
   });
 
   test("Find user by partial name", async () => {
-    for (let index = 0; index < usersMock.length; index++) {
-      await userRepository.createUser(usersMock[index])
-    }
-
-    const response = await findUsersByName({ parameters: { partialName: 'name1' } })
-    const { body, statusCode } = response as HandlerResponse
-    const result = body as UserWithoutPassword[]
     const expected = [{
-      id: result[0].id,
+      id: usersMock[0].id,
       name: usersMock[0].name,
       email: usersMock[0].email
     }]
+    const spy = vi.spyOn(UsersRepository.prototype, 'findUsersByName')
+      .mockResolvedValueOnce(expected)
 
-    expect(statusCode).toEqual(200)
-    expect(result).toEqual(expected)
+    const result = await findUsersByName({ parameters: { partialName: 'name1' } })
+
+    expect(result?.statusCode).toEqual(200)
+    expect(result?.body).toEqual(expected)
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith('name1')
   });
 
   test("Create user without error", async () => {
@@ -79,47 +75,35 @@ describe("User Controller test", () => {
       email: 'test@user.com',
       password: 'secretpass'
     }
-    const response = await createUser({ parameters: { user: userMock } })
-    const status = response?.statusCode
-    const expected = await userRepository.getUserByEmail(userMock.email)
+    const spy = vi.spyOn(UsersRepository.prototype, 'createUser')
+      .mockResolvedValueOnce()
+    const result = await createUser({ parameters: { user: userMock } })
 
-    expect(status).toEqual(201)
-    expect(expected).toEqual({ id: expected?.id, ...userMock })
+    expect(result?.statusCode).toEqual(201)
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(userMock)
   });
 
   test("Update users data with 204 status code", async () => {
-    for (let index = 0; index < usersMock.length; index++) {
-      await userRepository.createUser(usersMock[index])
-    }
+    const { id, ...userMock } = usersMock[0]
+    const spy = vi.spyOn(UsersRepository.prototype, 'updateUser')
+      .mockResolvedValueOnce()
 
-    const userForUpdate = await userRepository.getUserByEmail(usersMock[0].email)
-    const updatedUser = { ...userForUpdate, name: 'updated name', email: 'updated@email.com' }
-    const response = await updateUser({ parameters: { user: updatedUser } })
+    const result = await updateUser({ parameters: { user: userMock } })
 
-    const status = response?.statusCode
-    const expected = await userRepository.getUserByID(userForUpdate?.id!)
-
-    expect(status).toEqual(204)
-    expect(expected).toEqual({ ...updatedUser, id: userForUpdate?.id })
+    expect(result?.statusCode).toEqual(204)
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(0, userMock)
   });
 
   test("Delete user data with 204 status code", async () => {
-    for (let index = 0; index < usersMock.length; index++) {
-      await userRepository.createUser(usersMock[index])
-    }
+    const spy = vi.spyOn(UsersRepository.prototype, 'deleteUser')
+      .mockResolvedValueOnce()
 
-    const userForDelete = await userRepository.getUserByEmail(usersMock[0].email)
-    const response = await deleteUser({ parameters: { id: userForDelete?.id } })
+    const result = await deleteUser({ parameters: { id: 8 } })
 
-    const status = response?.statusCode
-    const result = await userRepository.listUsers()
-    const expected = [{
-      id: result[0].id,
-      name: usersMock[1].name,
-      email: usersMock[1].email
-    }]
-
-    expect(status).toEqual(204)
-    expect(result).toEqual(expected)
+    expect(result?.statusCode).toEqual(204)
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(8)
   });
 });

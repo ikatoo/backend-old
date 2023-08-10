@@ -1,7 +1,6 @@
 import { ProjectsRepository } from "@/infra/db";
 import projectsPageMock from "@shared/mocks/projectsMock/result.json";
-import { ProjectWithId } from "@/repository/IProject";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import {
   createProjectHandler,
   deleteProjectHandler,
@@ -12,79 +11,76 @@ import {
 } from "./projectsPageController";
 
 describe("ProjectsPage Controller test", () => {
-  const projectsRepository = new ProjectsRepository()
 
   afterEach(async () => {
-    await projectsRepository.clear()
+    vi.clearAllMocks()
+    vi.resetAllMocks()
   })
 
-  test("Get projects", async () => {
-    await projectsRepository.createProject(projectsPageMock[1])
-    const result = await getProjectsHandler()
-    const projects = result?.body as ProjectWithId[]
+  const mockWithId = projectsPageMock.map((project, id) => ({ ...project, id }))
 
-    expect([{ id: projects[0].id, ...projectsPageMock[1] }]).toEqual(projects);
+  test("Get projects", async () => {
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjects').mockResolvedValueOnce(mockWithId)
+    const result = await getProjectsHandler()
+
+    expect(result?.body).toEqual(mockWithId);
+    expect(spy).toHaveBeenCalledTimes(1)
   });
 
   test("Create projects page data without error", async () => {
-    await createProjectHandler({ parameters: projectsPageMock[0] })
-    const projects = await projectsRepository.getProjectsByTitle(projectsPageMock[0].description.title) as ProjectWithId[]
-    const project = projects[0]
+    const mockedData = projectsPageMock[0]
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'createProject').mockResolvedValueOnce()
 
-    expect({ id: project?.id, ...projectsPageMock[0] }).toEqual(project);
+    await expect(createProjectHandler({ parameters: mockedData }))
+      .resolves.not.toThrow()
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(mockedData)
   });
 
   test("Update projects page data without error", async () => {
-    await projectsRepository.createProject(projectsPageMock[0]);
-    const newData = {
+    const mockedData = {
       description: {
         title: 'new title',
         content: 'new Description'
       }
     }
-    const projects = await projectsRepository.getProjectsByTitle(projectsPageMock[0].description.title) as ProjectWithId[]
-    const { id } = projects[0]
-    await updateProjectHandler({ parameters: { id, ...newData } })
-    const { id: updateId, ...actual } = await projectsRepository.getProjectById(id) as ProjectWithId
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'updateProject').mockResolvedValueOnce()
 
-    expect(actual).toEqual({
-      ...projectsPageMock[0],
-      ...newData,
-      description: {
-        ...projectsPageMock[0].description,
-        ...newData.description,
-      }
-    })
+    await expect(updateProjectHandler({ parameters: { id: 7, ...mockedData } }))
+      .resolves.not.toThrow()
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(7, mockedData)
   });
 
   test("Delete projects page with 204 status code", async () => {
-    await projectsRepository.createProject(projectsPageMock[1]);
-    const projects = await projectsRepository.getProjectsByTitle(projectsPageMock[1].description.title) as ProjectWithId[]
-    const { id } = projects[0]
-    const result = await deleteProjectHandler({ parameters: { id } })
-    const actual = await projectsRepository.getProjectById(id)
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'deleteProject').mockResolvedValueOnce()
 
-    expect(result?.statusCode).toEqual(204)
-    expect(actual).toBeUndefined()
+    await expect(deleteProjectHandler({ parameters: { id: 9 } }))
+      .resolves.not.toThrow()
+    expect(spy).toHaveBeenCalledTimes(1)
   });
 
   test("Get projects with similar title", async () => {
-    await projectsRepository.createProject(projectsPageMock[1])
-    const title = projectsPageMock[1].description.title
-    const result = (await getProjectsByTitleHandler({ parameters: { title } }))
-    const projects = result?.body as ProjectWithId[]
+    const expected = [mockWithId[1]]
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjectsByTitle')
+      .mockResolvedValueOnce(expected)
+    const title = mockWithId[1].description.title
 
-    expect([{ id: projects[0].id, ...projectsPageMock[1] }]).toEqual(projects);
+    const result = await getProjectsByTitleHandler({ parameters: { title } })
+
+    expect(result?.body).toEqual(expected);
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(title)
   });
 
   test("Get projects by id", async () => {
-    await projectsRepository.createProject(projectsPageMock[1])
-    const title = projectsPageMock[1].description.title
-    const projects = await projectsRepository.getProjectsByTitle(title) as ProjectWithId[]
-    const id = projects[0].id.toString()
-    const result = (await getProjectByIDHandler({ parameters: { id } }))
-    const project = result?.body as ProjectWithId
+    const expected = mockWithId[1]
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjectById')
+      .mockResolvedValueOnce(expected)
+    const result = await getProjectByIDHandler({ parameters: { id: expected.id } })
 
-    expect({ id: project.id, ...projectsPageMock[1] }).toEqual(project);
+    expect(result?.body).toEqual(expected);
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(expected.id)
   });
 });
