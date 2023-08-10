@@ -1,6 +1,6 @@
 import { ContactPageRepository } from "@/infra/db";
 import { ContactPageSchema, PartialContactPageSchema } from "@/repository/IContactPage";
-import { ConflictError, HttpError, InternalError } from "@/utils/httpErrors";
+import { ConflictError, InternalError } from "@/utils/httpErrors";
 
 const contactsPageRepository = new ContactPageRepository();
 
@@ -66,8 +66,5 @@ async function deleteContactsPageHandler(): ControllerResponse {
 }
 
 export {
-  getContactsPageHandler,
-  createContactsPageHandler,
-  updateContactsPageHandler,
-  deleteContactsPageHandler
+  createContactsPageHandler, deleteContactsPageHandler, getContactsPageHandler, updateContactsPageHandler
 };

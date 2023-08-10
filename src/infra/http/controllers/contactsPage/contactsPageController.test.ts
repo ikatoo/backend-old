@@ -1,49 +1,49 @@
 import { ContactPageRepository } from "@/infra/db";
 import contactPageMock from "@shared/mocks/contactPageMock/result.json";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { createContactsPageHandler, deleteContactsPageHandler, getContactsPageHandler, updateContactsPageHandler } from "./contactsPageController";
 
 describe("ContactsPage Controller test", () => {
-  const contactsPageRepository = new ContactPageRepository()
-
   afterEach(async () => {
-    await contactsPageRepository.clear()
+    vi.clearAllMocks()
+    vi.resetAllMocks()
   })
 
   test("Get contacts page data", async () => {
-    await contactsPageRepository.createContactPage(contactPageMock);
+    const spy = vi.spyOn(ContactPageRepository.prototype, 'getContactPage').mockResolvedValueOnce(contactPageMock)
     const result = await getContactsPageHandler()
 
-    expect(contactPageMock).toEqual(result?.body);
+    expect(result?.body).toEqual(contactPageMock);
+    expect(spy).toHaveBeenCalledTimes(1)
   });
 
   test("Create contacts page data without error", async () => {
+    const spy = vi.spyOn(ContactPageRepository.prototype, 'createContactPage').mockResolvedValueOnce()
+
     await expect(createContactsPageHandler({ parameters: contactPageMock }))
       .resolves.not.toThrow()
-    const page = await contactsPageRepository.getContactPage()
-
-    expect(page).toEqual(contactPageMock)
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(contactPageMock)
   });
 
   test("Update contacts page data without error", async () => {
-    await contactsPageRepository.createContactPage(contactPageMock);
-    const newData = {
+    const mockedData = {
       title: 'new title',
       description: 'new Description'
     }
-    await expect(updateContactsPageHandler({ parameters: newData }))
-      .resolves.not.toThrow()
-    const page = await contactsPageRepository.getContactPage()
+    const spy = vi.spyOn(ContactPageRepository.prototype, 'updateContactPage').mockResolvedValueOnce()
 
-    expect(page).toEqual({ ...contactPageMock, ...newData })
+    await expect(updateContactsPageHandler({ parameters: mockedData }))
+      .resolves.not.toThrow()
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(mockedData)
   });
 
   test("Delete contacts page data", async () => {
-    await contactsPageRepository.createContactPage(contactPageMock);
+    const spy = vi.spyOn(ContactPageRepository.prototype, 'deleteContactPage').mockResolvedValueOnce()
+
     await expect(deleteContactsPageHandler())
       .resolves.not.toThrow()
-    const page = await contactsPageRepository.getContactPage()
-
-    expect(page).toBeUndefined()
+    expect(spy).toHaveBeenCalledTimes(1)
   });
 });
