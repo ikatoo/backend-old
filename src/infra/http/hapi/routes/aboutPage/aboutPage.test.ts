@@ -51,11 +51,14 @@ describe("/about routes", () => {
     });
 
     expect(statusCode).toBe(204);
-    expect(result).toEqual({})
+    expect(result).toEqual(null)
     expect(spy).toHaveBeenCalledTimes(1)
   });
 
   test("POST Method: responds with 204", async () => {
+    const spy = vi.spyOn(AboutPageRepository.prototype, 'createAboutPage')
+      .mockResolvedValueOnce()
+
     const res = await server.inject({
       method: "post",
       url: "/about",
@@ -63,10 +66,16 @@ describe("/about routes", () => {
     });
 
     expect(res.statusCode).toBe(201);
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(aboutPageMock)
   });
 
-  test("POST Method: responds with 409", async () => {
-    await aboutPageRepository.createAboutPage(aboutPageMock);
+  test("POST Method: responds with 409 when try create with existent data", async () => {
+    const spy = vi.spyOn(AboutPageRepository.prototype, 'createAboutPage')
+      .mockImplementationOnce(() => {
+        throw new Error("duplicate");
+      })
+
     const res = await server.inject({
       method: "post",
       url: "/about",
@@ -74,6 +83,12 @@ describe("/about routes", () => {
     });
 
     expect(res.statusCode).toBe(409);
+    expect(res.result).toHaveProperty('message')
+    expect(
+      (res.result as { message: string }).message
+    ).toEqual('Duplicated data.')
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(aboutPageMock)
   });
 
   test("POST Method: responds with 400 when request without payload", async () => {
@@ -86,17 +101,21 @@ describe("/about routes", () => {
   });
 
   test("PATCH Method: responds with 204 when update", async () => {
+    const mockedData = { title: 'new title' }
+    const spy = vi.spyOn(AboutPageRepository.prototype, 'updateAboutPage').mockResolvedValueOnce()
+    
     const res = await server.inject({
       method: "patch",
       url: "/about",
-      payload: { title: 'new title' }
+      payload: mockedData
     });
 
     expect(res.statusCode).toBe(204);
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(mockedData)
   });
 
   test("PATCH Method: responds with 409 when try update with invalid payload", async () => {
-    await aboutPageRepository.createAboutPage(aboutPageMock);
     const res = await server.inject({
       method: "patch",
       url: "/about",
@@ -116,14 +135,14 @@ describe("/about routes", () => {
   });
 
   test("DELETE Method: responde with status 204", async () => {
-    await aboutPageRepository.createAboutPage(aboutPageMock);
+    const spy = vi.spyOn(AboutPageRepository.prototype, 'deleteAboutPage').mockResolvedValueOnce()
+    
     const { statusCode } = await server.inject({
       method: "delete",
       url: "/about",
     });
-    const actual = await aboutPageRepository.getAboutPage()
 
     expect(statusCode).toBe(204)
-    expect(actual).toBeUndefined()
+    expect(spy).toHaveBeenCalledTimes(1)
   })
 });

@@ -5,8 +5,6 @@ import request from "supertest";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 describe("/contact routes", () => {
-  const repository = new ContactPageRepository();
-
   afterEach(async () => {
     vi.clearAllMocks()
     vi.restoreAllMocks()

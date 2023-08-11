@@ -37,7 +37,7 @@ describe('getFieldsWithValues:', () => {
       }
     };
     const result = getFieldsWithValues(page);
-    const expected = ["name = 'John Doe'", `address = '{"address": {"street":"123 Main St","city":"Example City","country":"Example Country"}}'`]
+    const expected = ["name = 'John Doe'", `address = '{"street":"123 Main St","city":"Example City","country":"Example Country"}'`]
 
     expect(result).toEqual(expected)
   })
