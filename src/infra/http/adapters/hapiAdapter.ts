@@ -1,4 +1,4 @@
-import { ConflictError, HttpError, InternalError } from "@/utils/httpErrors"
+import { HttpError, InternalError } from "@/utils/httpErrors"
 import { Request, ResponseToolkit } from "@hapi/hapi"
 
 export default (handler: HandlerFunction) => {

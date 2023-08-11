@@ -8,7 +8,7 @@ describe("EXPRESS: /about routes", () => {
   afterEach(async () => {
     vi.clearAllMocks()
     vi.restoreAllMocks()
-    vi.resetAllMocks()
+    vi.restoreAllMocks()
   });
 
   test("PUT Method: responds with 405 code when try use put method", async () => {
