@@ -6,7 +6,7 @@ import { createContactsPageHandler, deleteContactsPageHandler, getContactsPageHa
 describe("ContactsPage Controller test", () => {
   afterEach(async () => {
     vi.clearAllMocks()
-    vi.resetAllMocks()
+    vi.restoreAllMocks()
   })
 
   test("Get contacts page data", async () => {
