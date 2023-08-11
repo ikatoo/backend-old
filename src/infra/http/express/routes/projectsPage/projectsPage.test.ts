@@ -121,7 +121,7 @@ describe("EXPRESS: /project routes", () => {
 
     expect(statusCode).toBe(204);
     expect(spy).toHaveBeenCalledTimes(1)
-    expect(spy).toHaveBeenCalledWith('99')
+    expect(spy).toHaveBeenCalledWith(99)
   });
 
   test("GET Method: get project with id", async () => {

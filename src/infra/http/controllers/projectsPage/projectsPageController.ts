@@ -92,7 +92,7 @@ async function deleteProjectHandler(handlerProps?: HandlerProps): ControllerResp
     statusCode: 400
   }
 
-  await projectsRepository.deleteProject(id)
+  await projectsRepository.deleteProject(+id)
 
   return { statusCode: 204 }
 }
