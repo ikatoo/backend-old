@@ -1,12 +1,10 @@
 import { UsersRepository } from "@/infra/db/PgPromise/Users";
 import { app } from "@/infra/http/express/server";
 import { User } from "@/repository/IUser";
-import { compareHash, hasher } from "@/utils/hasher";
 import request from "supertest";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
 describe("EXPRESS: /users routes", () => {
-  const userRepository = new UsersRepository()
   const usersMock: User[] = [
     {
       name: 'user test1',
@@ -21,7 +19,8 @@ describe("EXPRESS: /users routes", () => {
   ]
 
   afterEach(async () => {
-    await userRepository.clear()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
   });
 
   test("PUT Method: responds with 405 code when try use put method", async () => {
@@ -33,140 +32,150 @@ describe("EXPRESS: /users routes", () => {
   })
 
   test("GET Method: list all users with 200 statusCode", async () => {
-    for (let index = 0; index < usersMock.length; index++) {
-      await userRepository.createUser(usersMock[index])
-    }
+    const expected = usersMock.map(
+      (user, id) => ({ id, name: user.name, email: user.email })
+    )
+    const spy = vi.spyOn(UsersRepository.prototype, 'listUsers')
+      .mockResolvedValueOnce(expected)
+
     const { body, statusCode } = await request(app)
       .get("/users")
       .send()
-    const result = (body as User[]).map(user => ({
-      name: user.name,
-      email: user.email,
-    }))
-    const expected = usersMock.map(user => ({
-      name: user.name,
-      email: user.email
-    }))
 
-    expect(result).toEqual(expected);
+    expect(body).toEqual(expected);
     expect(statusCode).toBe(200);
+    expect(spy).toHaveBeenCalledTimes(1)
   });
 
   test("GET Method: get user by email with 200 statusCode", async () => {
-    for (let index = 0; index < usersMock.length; index++) {
-      if (index === 0) {
-        const hash = await hasher(10, usersMock[0].password)
-      }
-      await userRepository.createUser(usersMock[index])
-    }
+    const mockedUser = { id: 4, ...usersMock[0] }
+    const spy = vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
+      .mockResolvedValue(mockedUser)
 
     const { body, statusCode } = await request(app)
-      .get(`/user/email/${usersMock[0].email}`)
+      .get(`/user/email/${mockedUser.email}`)
       .send()
+    const { password, ...expected } = body
 
-    const { id, password: hash, ...result } = (body as User)
-    const expected = {
-      name: usersMock[0].name,
-      email: usersMock[0].email,
-    }
-
-    expect(result).toEqual(expected);
     expect(statusCode).toBe(200);
-    expect(await compareHash(usersMock[0].password, hash)).toBeTruthy()
+    expect(body).toEqual(expected)
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(mockedUser.email)
   });
 
   test("GET Method: find users by partial name with 200 statusCode", async () => {
-    for (let index = 0; index < usersMock.length; index++) {
-      await userRepository.createUser(usersMock[index])
-    }
+    const spy = vi.spyOn(UsersRepository.prototype, 'findUsersByName')
+      .mockResolvedValueOnce([{
+        id: 1,
+        name: usersMock[0].name,
+        email: usersMock[0].email
+      }])
 
     const { body, statusCode } = await request(app)
       .get('/users/name/1')
       .send()
 
-    const result = (body as User[]).map(user => {
-      const { id, password, ...rest } = user
-      return rest
-    })
     const expected = [{
+      id: 1,
       name: usersMock[0].name,
       email: usersMock[0].email
     }]
 
-    expect(result).toEqual(expected);
+    expect(body).toEqual(expected);
     expect(statusCode).toBe(200);
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith('1')
   });
 
   test("GET Method: responds with 204 when there is no data to return", async () => {
+    const spy = vi.spyOn(UsersRepository.prototype, 'listUsers')
+      .mockResolvedValueOnce([])
+
     const { body, statusCode } = await request(app)
       .get("/users")
       .send()
 
     expect(statusCode).toBe(204);
     expect(body).toEqual({});
+    expect(spy).toHaveBeenCalledTimes(1)
   });
 
-  // test("POST Method: create skills page with 204 statusCode", async () => {
-  //   const { statusCode } = await request(app)
-  //     .post("/users")
-  //     .send(skillPageMock)
-  //   const page = await repository.getSkillsPage()
+  test("POST Method: create user with 204 statusCode", async () => {
+    const spy = vi.spyOn(UsersRepository.prototype, 'createUser')
+      .mockResolvedValueOnce()
+    vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
+      .mockResolvedValueOnce(undefined)
 
-  //   expect(statusCode).toBe(201);
-  //   expect(page).toEqual(skillPageMock)
-  // });
+    const { statusCode } = await request(app)
+      .post("/user")
+      .send({ user: usersMock[1] })
 
-  // test("POST Method: responds with 409 when try create page with existent data", async () => {
-  //   await repository.createUser(skillPageMock);
-  //   const { statusCode } = await request(app)
-  //     .post("/users")
-  //     .send(skillPageMock)
+    expect(statusCode).toBe(201);
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(usersMock[1])
+  });
 
-  //   expect(statusCode).toBe(409);
-  // })
+  test("POST Method: responds with 409 when try create user with existent email", async () => {
+    vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
+      .mockResolvedValueOnce(usersMock[1])
 
-  // test("POST Method: responds with 400 when request without payload", async () => {
-  //   const { statusCode } = await request(app)
-  //     .post("/users")
-  //     .send()
+    const { statusCode } = await request(app)
+      .post("/user")
+      .send({ user: usersMock[1] })
 
-  //   expect(statusCode).toBe(400);
-  // })
+    expect(statusCode).toBe(409);
+  })
 
-  // test("PATCH Method: responds with 204 when update", async () => {
-  //   const { statusCode } = await request(app)
-  //     .patch("/users")
-  //     .send({ title: 'new title' })
+  test("POST Method: responds with 409 when request without payload", async () => {
+    const { body, statusCode } = await request(app)
+      .post("/user")
+      .send()
 
-  //   expect(statusCode).toBe(204);
-  // });
+    expect(statusCode).toBe(409);
+    expect(body.message).toEqual('Invalid parameters.')
+  })
 
-  // test("PATCH Method: responds with 409 when try update with invalid payload", async () => {
-  //   await repository.createUser(skillPageMock);
-  //   const { statusCode } = await request(app)
-  //     .patch("/users")
-  //     .send({ invalid: 'payload' })
+  test("PATCH Method: responds with 204 when update", async () => {
+    const mockedData = { id: 4, name: 'new name' }
+    const spy = vi.spyOn(UsersRepository.prototype, 'updateUser')
+      .mockResolvedValueOnce()
 
-  //   expect(statusCode).toBe(409);
-  // });
+    const { statusCode } = await request(app)
+      .patch("/user")
+      .send({ user: mockedData })
 
-  // test("PATCH Method: responds with 400 when try update without payload", async () => {
-  //   const { statusCode } = await request(app)
-  //     .patch("/users")
-  //     .send()
+    expect(statusCode).toBe(204);
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(4, mockedData)
+  });
 
-  //   expect(statusCode).toBe(400);
-  // });
+  test("PATCH Method: responds with 409 when try update with invalid payload", async () => {
+    const { statusCode } = await request(app)
+      .patch("/user")
+      .send({ invalid: 'payload' })
 
-  // test("DELETE Method: responde with status 204", async () => {
-  //   await repository.createUser(skillPageMock);
-  //   const { statusCode } = await request(app)
-  //     .delete("/users")
-  //     .send()
-  //   const actual = await repository.getSkillsPage()
+    expect(statusCode).toBe(409);
+  });
 
-  //   expect(statusCode).toBe(204)
-  //   expect(actual).toBeUndefined()
-  // });
+  test("PATCH Method: responds with 400 when try update without payload", async () => {
+    const { body, statusCode } = await request(app)
+      .patch("/user")
+      .send()
 
+    expect(statusCode).toBe(409);
+    expect(body.message).toEqual('Invalid parameters.')
+  });
+
+  test("DELETE Method: responde with status 204", async () => {
+    const spy = vi.spyOn(UsersRepository.prototype, 'deleteUser')
+      .mockResolvedValueOnce()
+
+    const { statusCode } = await request(app)
+      .delete("/user/id/90")
+      .send()
+
+    expect(statusCode).toBe(204)
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(90)
+  });
 });
