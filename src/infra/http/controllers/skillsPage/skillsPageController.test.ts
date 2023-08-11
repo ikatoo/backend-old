@@ -6,7 +6,7 @@ import { createSkillsPageHandler, deleteSkillsPageHandler, getSkillsPageHandler,
 describe("SkillsPage Controller test", () => {
   afterEach(async () => {
     vi.clearAllMocks()
-    vi.resetAllMocks()
+    vi.restoreAllMocks()
   })
 
   test("Get skills page data", async () => {

@@ -6,7 +6,7 @@ import { createAboutPageHandler, deleteAboutPageHandler, getAboutPageHandler, up
 describe("AboutPage Controller test", () => {
   afterEach(() => {
     vi.clearAllMocks()
-    vi.resetAllMocks()
+    vi.restoreAllMocks()
   })
 
   test("Get about page data", async () => {

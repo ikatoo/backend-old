@@ -21,7 +21,7 @@ describe("User Controller test", () => {
 
   afterEach(() => {
     vi.clearAllMocks()
-    vi.resetAllMocks()
+    vi.restoreAllMocks()
   })
 
   test("List all users", async () => {
@@ -77,6 +77,8 @@ describe("User Controller test", () => {
     }
     const spy = vi.spyOn(UsersRepository.prototype, 'createUser')
       .mockResolvedValueOnce()
+    vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
+      .mockResolvedValueOnce(undefined)
     const result = await createUser({ parameters: { user: userMock } })
 
     expect(result?.statusCode).toEqual(201)
