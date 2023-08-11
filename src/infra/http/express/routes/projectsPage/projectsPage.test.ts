@@ -1,15 +1,15 @@
 import { ProjectsRepository } from "@/infra/db";
 import { app } from "@/infra/http/express/server";
-import { ProjectWithId } from "@/repository/IProject";
 import projectsPageMock from "@shared/mocks/projectsMock/result.json";
 import request from "supertest";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
 describe("EXPRESS: /project routes", () => {
-  const repository = new ProjectsRepository()
+  const mockWithID = projectsPageMock.map((project, id) => ({ id, ...project }))
 
   afterEach(async () => {
-    await repository.clear()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
   });
 
   test("PUT Method: responds with 405 code when try use put method", async () => {
@@ -21,44 +21,55 @@ describe("EXPRESS: /project routes", () => {
   })
 
   test("GET Method: result is equal the mock with 200 statusCode", async () => {
-    await repository.createProject(projectsPageMock[1]);
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjects')
+      .mockResolvedValueOnce(mockWithID)
+
     const { body, statusCode } = await request(app)
       .get("/projects")
       .send()
-    const { id, ...actual } = body[0]
 
     expect(statusCode).toBe(200);
-    expect(actual).toEqual(projectsPageMock[1]);
-    expect(body).toHaveLength(1)
+    expect(body).toEqual(mockWithID)
+    expect(spy).toHaveBeenCalledTimes(1)
   });
 
   test("GET Method: responds with 204 when not found data", async () => {
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjects')
+      .mockResolvedValueOnce([])
+
     const { body, statusCode } = await request(app)
       .get("/projects")
       .send()
 
     expect(statusCode).toBe(204);
     expect(body).toEqual({})
+    expect(spy).toHaveBeenCalledTimes(1)
   })
 
   test("POST Method: create project with 204 statusCode", async () => {
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'createProject')
+      .mockResolvedValueOnce()
+
     const { statusCode } = await request(app)
       .post("/project")
       .send(projectsPageMock[0])
-    const title = projectsPageMock[0].description.title
-    const projects = await repository.getProjectsByTitle(title) as ProjectWithId[]
-    const { id, ...actual } = projects[0]
+
     expect(statusCode).toBe(201);
-    expect(actual).toEqual(projectsPageMock[0])
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(projectsPageMock[0])
   });
 
   test("POST Method: responds with 409 when try create page with existent data", async () => {
-    await repository.createProject(projectsPageMock[1]);
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'createProject')
+      .mockImplementationOnce(() => { throw new Error('duplicate') })
+
     const { statusCode } = await request(app)
       .post("/project")
-      .send(projectsPageMock[1])
+      .send(projectsPageMock[0])
 
     expect(statusCode).toBe(409);
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(projectsPageMock[0])
   })
 
   test("POST Method: responds with 400 when request without payload", async () => {
@@ -70,89 +81,105 @@ describe("EXPRESS: /project routes", () => {
   })
 
   test("PATCH Method: responds with 204 when update", async () => {
-    await repository.createProject(projectsPageMock[0]);
-    const projects = await repository.getProjectsByTitle(projectsPageMock[0].description.title) as ProjectWithId[]
-    const { id } = projects[0]
+    const mockedID = 8
+    const mockedData = { description: { title: 'new title' } }
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'updateProject')
+      .mockResolvedValueOnce()
+
     const { statusCode } = await request(app)
-      .patch(`/project/id/${id}`)
-      .send({ description: { title: 'new title' } })
+      .patch(`/project/id/${mockedID}`)
+      .send(mockedData)
 
     expect(statusCode).toBe(204);
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(mockedID, mockedData)
   });
 
   test("PATCH Method: responds with 409 when try update with invalid payload", async () => {
-    await repository.createProject(projectsPageMock[0]);
-    const projects = await repository.getProjectsByTitle(projectsPageMock[0].description.title) as ProjectWithId[]
-    const { id } = projects[0]
     const { statusCode } = await request(app)
-      .patch(`/project/id/${id}`)
+      .patch(`/project/id/5`)
       .send({ invalid: 'payload' })
 
     expect(statusCode).toBe(409);
   });
 
   test("PATCH Method: responds with 400 when try update without payload", async () => {
-    await repository.createProject(projectsPageMock[0]);
-    const projects = await repository.getProjectsByTitle(projectsPageMock[0].description.title) as ProjectWithId[]
-    const { id } = projects[0]
     const { statusCode } = await request(app)
-      .patch(`/project/id/${id}`)
+      .patch(`/project/id/6`)
       .send()
 
     expect(statusCode).toBe(400);
   });
 
   test("DELETE Method: responds with 204", async () => {
-    await repository.createProject(projectsPageMock[0]);
-    const projects = await repository.getProjectsByTitle(projectsPageMock[0].description.title) as ProjectWithId[]
-    const { id } = projects[0]
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'deleteProject')
+      .mockResolvedValueOnce()
+
     const { statusCode } = await request(app)
-      .delete(`/project/id/${id}`)
+      .delete(`/project/id/99`)
       .send()
 
     expect(statusCode).toBe(204);
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith('99')
   });
 
   test("GET Method: get project with id", async () => {
-    await repository.createProject(projectsPageMock[0]);
-    const projects = await repository.getProjectsByTitle(projectsPageMock[0].description.title) as ProjectWithId[]
-    const { id } = projects[0]
+    const mockedData = mockWithID[1]
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjectById')
+      .mockResolvedValueOnce(mockedData)
+
     const { statusCode, body } = await request(app)
-      .get(`/project/id/${id}`)
+      .get(`/project/id/${mockedData.id}`)
       .send()
 
     expect(statusCode).toBe(200);
-    expect(body).toEqual({ id, ...projectsPageMock[0] });
+    expect(body).toEqual(mockedData);
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(mockedData.id)
   });
 
   test("GET Method: should return statusCode 404 when project with id not exist", async () => {
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjectById')
+      .mockResolvedValueOnce(undefined)
+
     const { statusCode } = await request(app)
       .get('/project/id/1000000')
       .send()
 
     expect(statusCode).toBe(404);
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(1000000)
   });
 
   test("GET Method: get project with like title", async () => {
-    await repository.createProject(projectsPageMock[0]);
-    const { title } = projectsPageMock[0].description
+    const mockedTitle = 'mocked_title'
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjectsByTitle')
+      .mockResolvedValueOnce(mockWithID)
+
     const { statusCode, body } = await request(app)
-      .get(`/projects/title/${title}`)
+      .get(`/projects/title/${mockedTitle}`)
       .send()
-    const { id, ...actual } = (body as ProjectWithId[])[0]
 
     expect(statusCode).toBe(200);
-    expect(actual).toEqual(projectsPageMock[0]);
+    expect(body).toEqual(mockWithID)
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(mockedTitle)
   });
 
   test("GET Method: should return statusCode 204 when not found data with this title", async () => {
-    await repository.createProject(projectsPageMock[0]);
+    const mockedTitle = 'sdfsdf'
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjectsByTitle')
+      .mockResolvedValueOnce(undefined)
+
     const { statusCode, body } = await request(app)
-      .get('/projects/title/sdfsdf')
+      .get(`/projects/title/${mockedTitle}`)
       .send()
 
     expect(statusCode).toBe(204);
     expect(body).toEqual({})
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith(mockedTitle)
   });
 
 });

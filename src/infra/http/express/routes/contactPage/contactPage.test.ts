@@ -9,7 +9,6 @@ describe("/contact routes", () => {
 
   afterEach(async () => {
     vi.clearAllMocks()
-    vi.resetAllMocks()
     vi.restoreAllMocks()
   });
 
