@@ -2,11 +2,10 @@ import { AboutPageRepository } from "@/infra/db";
 import { AboutPage } from "@/repository/IAboutPage";
 import { Server, ServerApplicationState } from "@hapi/hapi";
 import aboutPageMock from "@shared/mocks/aboutPageMock/result.json";
-import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { init } from "../../server";
 
 describe("/about routes", () => {
-  const aboutPageRepository = new AboutPageRepository();
   let server: Server<ServerApplicationState>;
 
   beforeEach(async () => {
@@ -14,8 +13,9 @@ describe("/about routes", () => {
   });
 
   afterEach(async () => {
-    await aboutPageRepository.clear()
     await server.stop();
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
   });
 
   test("PUT Method: responds with 405 code when try use put method", async () => {
@@ -27,43 +27,32 @@ describe("/about routes", () => {
     expect(statusCode).toEqual(405);
   })
 
-  test("GET Method: result is equal the mock", async () => {
-    await aboutPageRepository.createAboutPage(aboutPageMock);
-    const { result } = await server.inject<HandlerResponse>({
+  test("GET Method: result is equal the mock and status code 200", async () => {
+    const spy = vi.spyOn(AboutPageRepository.prototype, 'getAboutPage')
+      .mockResolvedValueOnce(aboutPageMock)
+
+    const { result, statusCode } = await server.inject<HandlerResponse>({
       method: "get",
       url: "/about",
     });
 
     expect(result).toEqual(aboutPageMock);
-  });
-
-  test("GET Method: responds with 200", async () => {
-    await aboutPageRepository.createAboutPage(aboutPageMock);
-    const res = await server.inject({
-      method: "get",
-      url: "/about",
-    });
-
-    expect(res.statusCode).toBe(200);
-  });
-
-  test("GET Method: responds with data", async () => {
-    await aboutPageRepository.createAboutPage(aboutPageMock);
-    const { result } = await server.inject<HandlerResponse>({
-      method: "get",
-      url: "/about",
-    });
-
-    expect(result).toEqual(aboutPageMock);
+    expect(statusCode).toEqual(200)
+    expect(spy).toHaveBeenCalledTimes(1)
   });
 
   test("GET Method: responds with 204 statusCode when there is no data to return", async () => {
-    const res = await server.inject({
+    const spy = vi.spyOn(AboutPageRepository.prototype, 'getAboutPage')
+      .mockResolvedValueOnce(undefined)
+
+    const { result, statusCode } = await server.inject({
       method: "get",
       url: "/about",
     });
 
-    expect(res.statusCode).toBe(204);
+    expect(statusCode).toBe(204);
+    expect(result).toEqual({})
+    expect(spy).toHaveBeenCalledTimes(1)
   });
 
   test("POST Method: responds with 204", async () => {
