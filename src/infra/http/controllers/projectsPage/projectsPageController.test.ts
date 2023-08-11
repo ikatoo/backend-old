@@ -14,7 +14,7 @@ describe("ProjectsPage Controller test", () => {
 
   afterEach(async () => {
     vi.clearAllMocks()
-    vi.resetAllMocks()
+    vi.restoreAllMocks()
   })
 
   const mockWithId = projectsPageMock.map((project, id) => ({ ...project, id }))

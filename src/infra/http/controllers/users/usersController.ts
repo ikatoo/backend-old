@@ -22,6 +22,9 @@ async function createUser(handlerProps?: HandlerProps): ControllerResponse {
   if (!user || !validParameter || !validUser.success)
     throw new ConflictError('Invalid parameters.')
 
+  const alredyExists = !!(await usersRepository.getUserByEmail(validUser.data.email))
+  if (alredyExists) throw new ConflictError('This email already exists')
+  
   await usersRepository.createUser(user)
   return { statusCode: 201 }
 }
