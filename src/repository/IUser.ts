@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-const Email = z.string().email("is not valid format of email")
+export const Email = z.string().email("is not valid format of email")
 
 type Email = z.infer<typeof Email>
 
