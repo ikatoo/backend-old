@@ -30,4 +30,5 @@ export const env = {
   SMTP_SECURE: getEnv('SMTP_SECURE') === 'true',
   SMTP_USERNAME: getEnv('SMTP_USERNAME'),
   SMTP_PASSWORD: getEnv('SMTP_PASSWORD'),
+  JWT_SECRET: getEnv('JWT_SECRET')
 };
