@@ -28,6 +28,7 @@ jobs:
       SMTP_USERNAME: nelda40@ethereal.email
       SMTP_PASSWORD: MBeHrSTvuCq2MVzQWp
       SMTP_SECURE: false
+      JWT_SECRET: d6769cb7d01dc7be43b420a8d9b56697
 
     services:
       postgres:
