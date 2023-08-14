@@ -6,15 +6,28 @@ describe('Mailer:', () => {
   const mailer = new NodeMailerImplementation()
 
   test('should sucess on send email', async () => {
-    const { accepted, response } = await mailer.send({
+    const mock = {
       from: 'from@email.com',
       to: 'to@email.com',
       subject: 'subject test',
       message: '<p>message</p>'
-    })
+    }
+
+    vi.spyOn(nodemailer, 'createTransport').mockReturnValue({
+      sendMail: vi.fn().mockResolvedValueOnce({
+        response: 'ok',
+        envelope: {},
+        messageId: 'messageID',
+        accepted: 'accepted',
+        rejected: '',
+        pending: 'pending'
+      })
+    } as any);
+
+    const { accepted, response } = await mailer.send(mock)
 
     expect(accepted).toBeTruthy()
-    expect(response.startsWith('250 Accepted [STATUS=new MSGID='))
+    expect(response).toEqual('ok')
   })
 
   test('should fail on send mail', async () => {
