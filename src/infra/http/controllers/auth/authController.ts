@@ -29,11 +29,15 @@ async function authentication(handlerProps?: HandlerProps): ControllerResponse {
 }
 
 const verifyToken = async (handlerProps?: HandlerProps): ControllerResponse => {
-  const keyParameters = Object.keys(handlerProps?.parameters ?? {})
-  const validParameters = keyParameters.includes('token') && keyParameters.length === 1
-  if (!validParameters) throw new BadRequestError('Token is required.')
+  const parameters = handlerProps?.parameters ?? {}
+  const keyParameters = Object.keys(parameters)
+  const token = `${Object.values(parameters)[0]}`
+  const validParameters = keyParameters.includes('token') &&
+    keyParameters.length === 1
+  if (!validParameters || !token.length)
+    throw new BadRequestError('Token is required.')
 
-  return { statusCode: 200, body: {} }
+  return { statusCode: 200 }
 }
 
 export {
