@@ -2,13 +2,13 @@ import { UsersRepository } from "@/infra/db/PgPromise/Users";
 import { AuthSchema } from "@/repository/IAuth";
 import { env } from "@/utils/env";
 import { compareHash } from "@/utils/hasher";
-import { BadRequestError, HttpError, UnauthorizedError } from "@/utils/httpErrors";
+import { BadRequestError, UnauthorizedError } from "@/utils/httpErrors";
 import { sign } from "jsonwebtoken";
 
 const usersRepository = new UsersRepository();
 
-async function authentication(handlerProps: HandlerProps): ControllerResponse {
-  const validParameters = AuthSchema.safeParse(handlerProps.parameters)
+async function authentication(handlerProps?: HandlerProps): ControllerResponse {
+  const validParameters = AuthSchema.safeParse(handlerProps?.parameters)
   if (!validParameters.success)
     throw new BadRequestError('Invalid parameters')
 
@@ -28,6 +28,15 @@ async function authentication(handlerProps: HandlerProps): ControllerResponse {
 
 }
 
+const verifyToken = async (handlerProps?: HandlerProps): ControllerResponse => {
+  const keyParameters = Object.keys(handlerProps?.parameters ?? {})
+  const validParameters = keyParameters.includes('token') && keyParameters.length === 1
+  if (!validParameters) throw new BadRequestError('Token is required.')
+
+  return { statusCode: 200, body: {} }
+}
+
 export {
-  authentication
+  authentication,
+  verifyToken
 };
