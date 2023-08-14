@@ -2,7 +2,7 @@ import { UsersRepository } from "@/infra/db/PgPromise/Users";
 import * as crypto from "@/utils/hasher";
 import jwt from "jsonwebtoken";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { authentication } from "./authController";
+import { authentication, verifyToken } from "./authController";
 
 describe("Auth Controller test", () => {
   const mock = {
@@ -17,53 +17,71 @@ describe("Auth Controller test", () => {
     vi.restoreAllMocks()
   })
 
-  test("Auth user with success", async () => {
-    vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
-      .mockResolvedValueOnce(mock)
-    vi.spyOn(crypto, 'compareHash').mockResolvedValueOnce(true)
-    vi.spyOn(jwt, 'sign').mockImplementation(() => ('valid-access-token'))
+  describe('authentication', () => {
+    test("Auth user with success", async () => {
+      vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
+        .mockResolvedValueOnce(mock)
+      vi.spyOn(crypto, 'compareHash').mockResolvedValueOnce(true)
+      vi.spyOn(jwt, 'sign').mockImplementation(() => ('valid-access-token'))
 
-    const result = await authentication({
-      parameters: { email: mock.email, password: mock.password }
-    })
-
-    expect(result?.statusCode).toEqual(200)
-    expect(result?.body).toHaveProperty('accessToken', 'valid-access-token')
-  });
-
-  test("Fail on try auth user with invalid parameters", async () => {
-    await expect(authentication({
-      parameters: { invalid: 'parameter' }
-    })).rejects.toThrowError('Invalid parameters')
-  })
-
-  test("Fail on try auth user with invalid email", async () => {
-    vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
-      .mockResolvedValueOnce(undefined)
-
-    await expect(authentication({
-      parameters: { email: 'invalid@email.com', password: 'somepass' }
-    })).rejects.toThrowError('Invalid email or password')
-  })
-
-  test("Fail on try auth user with invalid password", async () => {
-    vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
-      .mockResolvedValueOnce(mock)
-    vi.spyOn(crypto, 'compareHash').mockResolvedValueOnce(false)
-
-    await expect(authentication({
-      parameters: { email: mock.email, password: 'invalidpass' }
-    })).rejects.toThrowError('Invalid email or password')
-  })
-
-  test("Fail on try auth user when database access is fail", async () => {
-    vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
-      .mockImplementationOnce(() => {
-        throw new Error();
+      const result = await authentication({
+        parameters: { email: mock.email, password: mock.password }
       })
 
-    await expect(authentication({
-      parameters: { email: mock.email, password: mock.password }
-    })).rejects.toThrowError()
+      expect(result?.statusCode).toEqual(200)
+      expect(result?.body).toHaveProperty('accessToken', 'valid-access-token')
+    });
+
+    test("Fail on try auth user with invalid parameters", async () => {
+      await expect(authentication({
+        parameters: { invalid: 'parameter' }
+      })).rejects.toThrowError('Invalid parameters')
+    })
+
+    test("Fail on try auth user with invalid email", async () => {
+      vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
+        .mockResolvedValueOnce(undefined)
+
+      await expect(authentication({
+        parameters: { email: 'invalid@email.com', password: 'somepass' }
+      })).rejects.toThrowError('Invalid email or password')
+    })
+
+    test("Fail on try auth user with invalid password", async () => {
+      vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
+        .mockResolvedValueOnce(mock)
+      vi.spyOn(crypto, 'compareHash').mockResolvedValueOnce(false)
+
+      await expect(authentication({
+        parameters: { email: mock.email, password: 'invalidpass' }
+      })).rejects.toThrowError('Invalid email or password')
+    })
+
+    test("Fail on try auth user when database access is fail", async () => {
+      vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
+        .mockImplementationOnce(() => {
+          throw new Error();
+        })
+
+      await expect(authentication({
+        parameters: { email: mock.email, password: mock.password }
+      })).rejects.toThrowError()
+    })
+  })
+
+  describe('verifyToken', () => {
+    test('should fail on not send parameters', async () => {
+      await expect(verifyToken())
+        .rejects.toThrowError('Token is required.')
+    })
+
+    test('should fail on use invalid parameters', async () => {
+      await expect(verifyToken({ parameters: { invalid: 'parameter' } }))
+        .rejects.toThrowError('Token is required')
+    })
+
+    test.todo('should fail on use invalid token')
+    test.todo('should return statusCode 200 on use a valid token')
+    test.todo('shold fail on use a expired token')
   })
 });
