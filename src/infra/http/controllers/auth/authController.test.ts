@@ -80,8 +80,13 @@ describe("Auth Controller test", () => {
         .rejects.toThrowError('Token is required')
     })
 
+    test('should fail on use a empty token', async () => {
+      await expect(verifyToken({ parameters: { token: '' } }))
+        .rejects.toThrowError('Token is required')
+    })
+
     test.todo('should fail on use invalid token')
-    test.todo('should return statusCode 200 on use a valid token')
     test.todo('shold fail on use a expired token')
+    test.todo('should return statusCode 200 on use a valid token')
   })
 });
