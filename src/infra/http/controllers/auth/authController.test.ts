@@ -73,17 +73,17 @@ describe("Auth Controller test", () => {
   describe('verifyToken', () => {
     test('should fail on not send parameters', async () => {
       await expect(verifyToken())
-        .rejects.toThrowError('Token is required.')
+        .rejects.toThrowError('Unauthorized')
     })
 
     test('should fail on use invalid parameters', async () => {
       await expect(verifyToken({ parameters: { invalid: 'parameter' } }))
-        .rejects.toThrowError('Token is required')
+        .rejects.toThrowError('Unauthorized')
     })
 
     test('should fail on use a empty token', async () => {
       await expect(verifyToken({ parameters: { token: '' } }))
-        .rejects.toThrowError('Token is required')
+        .rejects.toThrowError('Unauthorized')
     })
 
     test('should fail on use invalid token', async () => {
