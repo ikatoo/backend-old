@@ -1,6 +1,7 @@
 import { UsersRepository } from "@/infra/db/PgPromise/Users";
+import { env } from "@/utils/env";
 import * as crypto from "@/utils/hasher";
-import jwt from "jsonwebtoken";
+import jwt, { sign } from "jsonwebtoken";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { authentication, verifyToken } from "./authController";
 
@@ -85,8 +86,61 @@ describe("Auth Controller test", () => {
         .rejects.toThrowError('Token is required')
     })
 
-    test.todo('should fail on use invalid token')
-    test.todo('shold fail on use a expired token')
-    test.todo('should return statusCode 200 on use a valid token')
+    test('should fail on use invalid token', async () => {
+      await expect(verifyToken({ parameters: { token: 'invalid-token' } }))
+        .rejects.toThrowError('Unauthorized')
+    })
+
+    test('should fail on use invalid id', async () => {
+      const accessToken = sign(
+        { id: 7 },
+        env.JWT_SECRET,
+        { expiresIn: '1h' }
+      )
+      await expect(verifyToken({
+        parameters: {
+          token: accessToken
+        }
+      })).rejects.toThrowError('Unauthorized')
+    })
+
+    test('should return statusCode 200 on use a valid token', async () => {
+      vi.spyOn(UsersRepository.prototype, 'getUserByID')
+        .mockResolvedValueOnce(mock)
+
+      const accessToken = sign(
+        { id: mock.id },
+        env.JWT_SECRET,
+        { expiresIn: '1h' }
+      )
+      const result = await verifyToken({
+        parameters: {
+          token: accessToken
+        }
+      })
+
+      expect(result?.statusCode).toEqual(200)
+    })
+
+    test('shold fail on use a expired token', async () => {
+      vi.spyOn(UsersRepository.prototype, 'getUserByID')
+        .mockResolvedValueOnce(mock)
+      const accessToken = sign(
+        { id: mock.id },
+        env.JWT_SECRET,
+        { expiresIn: '1h' }
+      )
+      vi.useFakeTimers()
+      setTimeout(async () => {
+        vi.fn()
+      }, 1000 * 60 * 60);
+      vi.advanceTimersToNextTimer()
+
+      await expect(verifyToken({
+        parameters: {
+          token: accessToken
+        }
+      })).rejects.toThrowError('Unauthorized')
+    })
   })
 });
