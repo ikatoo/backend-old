@@ -1,9 +1,10 @@
 import { UsersRepository } from "@/infra/db/PgPromise/Users";
 import { AuthSchema } from "@/repository/IAuth";
+import { User } from "@/repository/IUser";
 import { env } from "@/utils/env";
 import { compareHash } from "@/utils/hasher";
 import { BadRequestError, UnauthorizedError } from "@/utils/httpErrors";
-import { sign } from "jsonwebtoken";
+import { sign, verify } from "jsonwebtoken";
 
 const usersRepository = new UsersRepository();
 
@@ -36,6 +37,16 @@ const verifyToken = async (handlerProps?: HandlerProps): ControllerResponse => {
     keyParameters.length === 1
   if (!validParameters || !token.length)
     throw new BadRequestError('Token is required.')
+
+  try {
+    const { id } = verify(token, env.JWT_SECRET) as { id: number }
+    const user = await usersRepository.getUserByID(id) as User
+
+    if (!user)
+      throw new Error()
+  } catch {
+    throw new UnauthorizedError('Unauthorized')
+  }
 
   return { statusCode: 200 }
 }
