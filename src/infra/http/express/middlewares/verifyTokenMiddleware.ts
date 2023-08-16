@@ -1,10 +1,17 @@
-import { NextFunction, Request, Response } from "express"
 import { verifyToken } from "@/infra/http/controllers/auth/authController"
+import { UnauthorizedError } from "@/utils/httpErrors"
+import { NextFunction, Request, Response } from "express"
 
-export default async (request: Request, _response: Response, next: NextFunction) => {
+export default async (request: Request, response: Response, next: NextFunction) => {
   const { authorization } = request.headers
   const token = authorization?.replace('Bearer ', '')
-  await verifyToken({ parameters: { token } })
-
-  next()
+  try {
+    await verifyToken({ parameters: { token } })
+    next()
+  } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      const { message, statusCode } = error
+      return response.status(statusCode).json({ message })
+    }
+  }
 }
