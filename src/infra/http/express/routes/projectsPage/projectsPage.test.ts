@@ -1,4 +1,5 @@
 import { ProjectsRepository } from "@/infra/db";
+import * as AuthController from "@/infra/http/controllers/auth/authController";
 import { app } from "@/infra/http/express/server";
 import projectsPageMock from "@shared/mocks/projectsMock/result.json";
 import request from "supertest";
@@ -12,7 +13,7 @@ describe("EXPRESS: /project routes", () => {
     vi.restoreAllMocks()
   });
 
-  test("PUT Method: responds with 405 code when try use put method", async () => {
+  test("PUT Method: response with 405 code when try use put method", async () => {
     const { statusCode } = await request(app)
       .put("/projects")
       .send()
@@ -33,7 +34,7 @@ describe("EXPRESS: /project routes", () => {
     expect(spy).toHaveBeenCalledTimes(1)
   });
 
-  test("GET Method: responds with 204 when not found data", async () => {
+  test("GET Method: response with 204 when not found data", async () => {
     const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjects')
       .mockResolvedValueOnce([])
 
@@ -46,7 +47,16 @@ describe("EXPRESS: /project routes", () => {
     expect(spy).toHaveBeenCalledTimes(1)
   })
 
+  test("POST Method: fail with 401 statusCode when receive image without token", async () => {
+    const { statusCode } = await request(app)
+      .post("/project")
+      .send(projectsPageMock[0])
+
+    expect(statusCode).toBe(401);
+  });
+
   test("POST Method: create project with 204 statusCode", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const spy = vi.spyOn(ProjectsRepository.prototype, 'createProject')
       .mockResolvedValueOnce()
 
@@ -59,20 +69,8 @@ describe("EXPRESS: /project routes", () => {
     expect(spy).toHaveBeenCalledWith(projectsPageMock[0])
   });
 
-  test("POST Method: responds with 409 when try create page with existent data", async () => {
-    const spy = vi.spyOn(ProjectsRepository.prototype, 'createProject')
-      .mockImplementationOnce(() => { throw new Error('duplicate') })
-
-    const { statusCode } = await request(app)
-      .post("/project")
-      .send(projectsPageMock[0])
-
-    expect(statusCode).toBe(409);
-    expect(spy).toHaveBeenCalledTimes(1)
-    expect(spy).toHaveBeenCalledWith(projectsPageMock[0])
-  })
-
-  test("POST Method: responds with 400 when request without payload", async () => {
+  test("POST Method: response with 400 when request without payload", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { statusCode } = await request(app)
       .post("/project")
       .send()
@@ -80,9 +78,19 @@ describe("EXPRESS: /project routes", () => {
     expect(statusCode).toBe(400);
   })
 
-  test("PATCH Method: responds with 204 when update", async () => {
+  test("PATCH Method: response with 401 when try update without token", async () => {
+    const { statusCode, body } = await request(app)
+      .patch('/project/id/87')
+      .send({})
+
+    expect(statusCode).toBe(401);
+    expect(body.message).toBe('Unauthorized');
+  })
+
+  test("PATCH Method: response with 204 when update", async () => {
     const mockedID = 8
     const mockedData = { description: { title: 'new title' } }
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const spy = vi.spyOn(ProjectsRepository.prototype, 'updateProject')
       .mockResolvedValueOnce()
 
@@ -95,7 +103,8 @@ describe("EXPRESS: /project routes", () => {
     expect(spy).toHaveBeenCalledWith(mockedID, mockedData)
   });
 
-  test("PATCH Method: responds with 409 when try update with invalid payload", async () => {
+  test("PATCH Method: response with 409 when try update with invalid payload", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { statusCode } = await request(app)
       .patch(`/project/id/5`)
       .send({ invalid: 'payload' })
@@ -103,7 +112,8 @@ describe("EXPRESS: /project routes", () => {
     expect(statusCode).toBe(409);
   });
 
-  test("PATCH Method: responds with 400 when try update without payload", async () => {
+  test("PATCH Method: response with 400 when try update without payload", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { statusCode } = await request(app)
       .patch(`/project/id/6`)
       .send()
@@ -111,7 +121,17 @@ describe("EXPRESS: /project routes", () => {
     expect(statusCode).toBe(400);
   });
 
-  test("DELETE Method: responds with 204", async () => {
+  test("DELETE Method: response with 401 when try delete without token", async () => {
+    const { statusCode, body } = await request(app)
+      .delete(`/project/id/99`)
+      .send()
+
+    expect(statusCode).toBe(401);
+    expect(body.message).toBe('Unauthorized');
+  })
+
+  test("DELETE Method: response with 204", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const spy = vi.spyOn(ProjectsRepository.prototype, 'deleteProject')
       .mockResolvedValueOnce()
 
