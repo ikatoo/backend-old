@@ -1,4 +1,5 @@
 import { ContactPageRepository } from "@/infra/db";
+import * as AuthController from "@/infra/http/controllers/auth/authController";
 import { app } from "@/infra/http/express/server";
 import contactPageMock from "@shared/mocks/contactPageMock/result.json";
 import request from "supertest";
@@ -10,7 +11,7 @@ describe("/contact routes", () => {
     vi.restoreAllMocks()
   });
 
-  test("PUT Method: responds with 405 code when try use put method", async () => {
+  test("PUT Method: response with 405 code when try use put method", async () => {
     const { statusCode } = await request(app)
       .put("/contact")
       .send()
@@ -18,7 +19,7 @@ describe("/contact routes", () => {
     expect(statusCode).toEqual(405);
   })
 
-  test("GET Method: responds with data and 200 status code", async () => {
+  test("GET Method: response with data and 200 status code", async () => {
     const spy = vi.spyOn(ContactPageRepository.prototype, 'getContactPage')
       .mockResolvedValueOnce(contactPageMock)
 
@@ -31,7 +32,7 @@ describe("/contact routes", () => {
     expect(spy).toHaveBeenCalledTimes(1)
   });
 
-  test("GET Method: responds with 204 when not found data", async () => {
+  test("GET Method: response with 204 when not found data", async () => {
     const spy = vi.spyOn(ContactPageRepository.prototype, 'getContactPage')
       .mockResolvedValueOnce(undefined)
 
@@ -44,7 +45,16 @@ describe("/contact routes", () => {
     expect(spy).toHaveBeenCalledTimes(1)
   });
 
+  test("POST Method: should expect 401 statusCode on try create contact without token", async () => {
+    const { statusCode } = await request(app)
+      .post("/contact")
+      .send(contactPageMock)
+
+    expect(statusCode).toBe(401);
+  });
+
   test("POST Method: create contact page with 204 statusCode", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const spy = vi.spyOn(ContactPageRepository.prototype, 'createContactPage')
       .mockResolvedValueOnce()
 
@@ -57,7 +67,8 @@ describe("/contact routes", () => {
     expect(spy).toHaveBeenCalledWith(contactPageMock)
   });
 
-  test("POST Method: responds with 409 when try create page with existent data", async () => {
+  test("POST Method: response with 409 when try create page with existent data", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const spy = vi.spyOn(ContactPageRepository.prototype, 'createContactPage')
       .mockImplementationOnce(() => {
         throw new Error("duplicate");
@@ -74,7 +85,8 @@ describe("/contact routes", () => {
     expect(spy).toHaveBeenCalledWith(contactPageMock)
   })
 
-  test("POST Method: responds with 400 when request without payload", async () => {
+  test("POST Method: response with 400 when request without payload", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { statusCode } = await request(app)
       .post("/contact")
       .send()
@@ -82,7 +94,8 @@ describe("/contact routes", () => {
     expect(statusCode).toBe(400);
   })
 
-  test("PATCH Method: responds with 204 when update", async () => {
+  test("PATCH Method: response with 204 when update", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const mockedData = { title: 'new title' }
     const spy = vi.spyOn(ContactPageRepository.prototype, 'updateContactPage')
       .mockResolvedValueOnce()
@@ -96,7 +109,18 @@ describe("/contact routes", () => {
     expect(spy).toHaveBeenCalledWith(mockedData)
   });
 
-  test("PATCH Method: responds with 409 when try update with invalid payload", async () => {
+  test("PATCH Method: response with 401 statusCode when try update without token", async () => {
+    const mockedData = { title: 'new title' }
+
+    const { statusCode } = await request(app)
+      .patch("/contact")
+      .send(mockedData)
+
+    expect(statusCode).toBe(401);
+  });
+
+  test("PATCH Method: response with 409 when try update with invalid payload", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { statusCode } = await request(app)
       .patch("/contact")
       .send({ invalid: 'payload' })
@@ -104,7 +128,8 @@ describe("/contact routes", () => {
     expect(statusCode).toBe(409);
   });
 
-  test("PATCH Method: responds with 400 when try update without payload", async () => {
+  test("PATCH Method: response with 400 when try update without payload", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { statusCode } = await request(app)
       .patch("/contact")
       .send()
@@ -112,7 +137,8 @@ describe("/contact routes", () => {
     expect(statusCode).toBe(400);
   });
 
-  test("DELETE Method: responde with status 204", async () => {
+  test("DELETE Method: response with status 204", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const spy = vi.spyOn(ContactPageRepository.prototype, 'deleteContactPage')
       .mockResolvedValueOnce()
 
@@ -122,5 +148,13 @@ describe("/contact routes", () => {
 
     expect(statusCode).toBe(204)
     expect(spy).toHaveBeenCalledTimes(1)
+  })
+
+  test("DELETE Method: response with status 401 when try delete without token", async () => {
+    const { statusCode } = await request(app)
+      .delete("/contact")
+      .send()
+
+    expect(statusCode).toBe(401)
   })
 });
