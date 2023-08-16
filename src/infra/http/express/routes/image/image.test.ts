@@ -1,15 +1,13 @@
 import { describe, expect, test, vi } from "vitest";
 
+import * as AuthController from "@/infra/http/controllers/auth/authController";
 import { StorageRepository } from "@/infra/storage";
 import { env } from "@/utils/env";
 import { v2 } from "cloudinary";
 import request from "supertest";
 import { app } from "../../server";
 
-
 describe("EXPRESS: /image routes", () => {
-
-  const repository = new StorageRepository()
 
   test("PUT Method: responds with 405 code when try use put method", async () => {
     const { statusCode } = await request(app)
@@ -34,33 +32,16 @@ describe("EXPRESS: /image routes", () => {
   });
 
   test("POST Method: receive file using multipart data and result 201 statusCode with url", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const mock = {
       secure_url: 'https://cloudinary.com/folder/image.png',
       public_id: "folder/image.png",
     }
-    const uploadSpy = vi.spyOn(v2.uploader, "upload").mockResolvedValue({
-      ...mock,
-      version: 0,
-      signature: "",
-      width: 0,
-      height: 0,
-      format: "",
-      resource_type: "image",
-      created_at: "",
-      tags: [],
-      pages: 0,
-      bytes: 0,
-      type: "",
-      etag: "",
-      placeholder: false,
-      url: "",
-      access_mode: "",
-      original_filename: "",
-      moderation: [],
-      access_control: [],
-      context: {},
-      metadata: {}
-    })
+    const uploadSpy = vi.spyOn(StorageRepository.prototype, 'uploadImage')
+      .mockResolvedValueOnce({
+        url: 'https://cloudinary.com/folder/image.png',
+        public_id: "folder/image.png",
+      })
 
     const { body, statusCode } = await request(app)
       .post("/image")
@@ -71,9 +52,28 @@ describe("EXPRESS: /image routes", () => {
     expect(statusCode).toBe(201);
   });
 
-  test('should delete the image using publicId', async () => {
-    const publicId = 'folder/image.png'
+  test("POST Method: fail on try receive file and result 401 statusCode when request without token", async () => {
+    const { body, statusCode } = await request(app)
+      .post("/image")
+      .set("Content-Type", "multipart/form-data")
+      .attach('file', 'shared/fixtures/test-image.jpg')
 
+    expect(body.message).toEqual('Unauthorized')
+    expect(statusCode).toBe(401);
+  });
+
+  test("DELETE Method: fail on try delete when request without token", async () => {
+    const { statusCode, body } = await request(app)
+      .delete("/image")
+      .send({ publicId: 'folder/image.png' })
+
+    expect(statusCode).toEqual(401)
+    expect(body.message).toEqual('Unauthorized')
+  })
+
+  test('should delete the image using publicId', async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
+    const publicId = 'folder/image.png'
     const spyDestroyFn = vi.spyOn(v2.uploader, 'destroy').mockResolvedValue({ result: 'ok' })
 
     const { statusCode } = await request(app)

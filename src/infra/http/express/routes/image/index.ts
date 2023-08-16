@@ -3,6 +3,7 @@ import { expressMulterAdapter } from '@/infra/http/adapters/expressMulterAdapter
 import { deleteImageHandler, getImageHandler, uploadImageHandler } from '@/infra/http/controllers/image/imageController';
 import multer from '@/utils/multer';
 import { Router } from "express";
+import verifyTokenMiddleware from '../../middlewares/verifyTokenMiddleware';
 
 const imageRoutes = Router()
 
@@ -13,12 +14,14 @@ imageRoutes.put(
 
 imageRoutes.post(
   '/image',
+  verifyTokenMiddleware,
   multer.single('file'),
   expressMulterAdapter(uploadImageHandler)
 )
 
 imageRoutes.delete(
   '/image',
+  verifyTokenMiddleware,
   expressAdapter(deleteImageHandler)
 )
 
