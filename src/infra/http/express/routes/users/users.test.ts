@@ -4,6 +4,7 @@ import { User } from "@/repository/IUser";
 import request from "supertest";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import * as criptoUtil from "@/utils/hasher"
+import * as AuthController from '@/infra/http/controllers/auth/authController'
 
 describe("EXPRESS: /users routes", () => {
   const usersMock: User[] = [
@@ -32,7 +33,17 @@ describe("EXPRESS: /users routes", () => {
     expect(statusCode).toEqual(405);
   })
 
+  test("GET Method: should expect 401 when without token", async () => {
+    const { body, statusCode } = await request(app)
+      .get("/users")
+      .send()
+
+    expect(body.message).toEqual('Unauthorized');
+    expect(statusCode).toBe(401);
+  });
+
   test("GET Method: list all users with 200 statusCode", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const expected = usersMock.map(
       (user, id) => ({ id, name: user.name, email: user.email })
     )
@@ -48,7 +59,17 @@ describe("EXPRESS: /users routes", () => {
     expect(spy).toHaveBeenCalledTimes(1)
   });
 
+  test("GET Method: should expect 401 statusCode when without token", async () => {
+    const { body, statusCode } = await request(app)
+      .get(`/user/email/${usersMock[0].email}`)
+      .send()
+
+    expect(statusCode).toBe(401);
+    expect(body.message).toEqual('Unauthorized')
+  });
+
   test("GET Method: get user by email with 200 statusCode", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const mockedUser = { id: 4, ...usersMock[0] }
     const spy = vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
       .mockResolvedValue(mockedUser)
@@ -64,7 +85,17 @@ describe("EXPRESS: /users routes", () => {
     expect(spy).toHaveBeenCalledWith(mockedUser.email)
   });
 
+  test("GET Method: should expect 401 statusCode when without token", async () => {
+    const { body, statusCode } = await request(app)
+      .get('/users/name/1')
+      .send()
+
+    expect(statusCode).toEqual(401)
+    expect(body.message).toEqual('Unauthorized')
+  })
+
   test("GET Method: find users by partial name with 200 statusCode", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const spy = vi.spyOn(UsersRepository.prototype, 'findUsersByName')
       .mockResolvedValueOnce([{
         id: 1,
@@ -89,6 +120,7 @@ describe("EXPRESS: /users routes", () => {
   });
 
   test("GET Method: responds with 204 when there is no data to return", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const spy = vi.spyOn(UsersRepository.prototype, 'listUsers')
       .mockResolvedValueOnce([])
 
@@ -101,7 +133,17 @@ describe("EXPRESS: /users routes", () => {
     expect(spy).toHaveBeenCalledTimes(1)
   });
 
+  test("POST Method: should expect 401 statusCode when without token", async () => {
+    const { statusCode, body } = await request(app)
+      .post("/user")
+      .send({ user: usersMock[1] })
+
+    expect(statusCode).toEqual(401)
+    expect(body.message).toEqual('Unauthorized')
+  })
+
   test("POST Method: create user with 204 statusCode", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const spy = vi.spyOn(UsersRepository.prototype, 'createUser')
       .mockResolvedValueOnce()
     vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
@@ -122,6 +164,7 @@ describe("EXPRESS: /users routes", () => {
   });
 
   test("POST Method: responds with 409 when try create user with existent email", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
       .mockResolvedValueOnce(usersMock[1])
 
@@ -133,6 +176,7 @@ describe("EXPRESS: /users routes", () => {
   })
 
   test("POST Method: responds with 409 when request without payload", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { body, statusCode } = await request(app)
       .post("/user")
       .send()
@@ -141,7 +185,18 @@ describe("EXPRESS: /users routes", () => {
     expect(body.message).toEqual('Invalid parameters.')
   })
 
+  test("PATCH Method: should expect 401 statusCode when without token", async () => {
+    const mockedData = { id: 4, name: 'new name' }
+    const { statusCode, body } = await request(app)
+      .patch("/user")
+      .send({ user: mockedData })
+
+    expect(statusCode).toBe(401);
+    expect(body.message).toBe('Unauthorized');
+  });
+
   test("PATCH Method: responds with 204 when update", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const mockedData = { id: 4, name: 'new name' }
     const spy = vi.spyOn(UsersRepository.prototype, 'updateUser')
       .mockResolvedValueOnce()
@@ -156,6 +211,7 @@ describe("EXPRESS: /users routes", () => {
   });
 
   test("PATCH Method: responds with 409 when try update with invalid payload", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { statusCode } = await request(app)
       .patch("/user")
       .send({ invalid: 'payload' })
@@ -164,6 +220,7 @@ describe("EXPRESS: /users routes", () => {
   });
 
   test("PATCH Method: responds with 400 when try update without payload", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { body, statusCode } = await request(app)
       .patch("/user")
       .send()
@@ -172,7 +229,17 @@ describe("EXPRESS: /users routes", () => {
     expect(body.message).toEqual('Invalid parameters.')
   });
 
+  test("DELETE Method: should expect 401 status when without token", async () => {
+    const { statusCode, body } = await request(app)
+      .delete("/user/id/90")
+      .send()
+
+    expect(statusCode).toBe(401)
+    expect(body.message).toBe('Unauthorized')
+  });
+
   test("DELETE Method: responde with status 204", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const spy = vi.spyOn(UsersRepository.prototype, 'deleteUser')
       .mockResolvedValueOnce()
 
