@@ -2,10 +2,11 @@ import { Router } from 'express'
 import 'express-async-errors'
 import { readFile } from 'fs/promises'
 import { aboutRoutes } from './about'
+import { authRoutes } from './auth'
 import { contactRoutes } from './contactPage'
+import { imageRoutes } from './image'
 import { projectsRoutes } from './projectsPage'
 import { skillsRoutes } from './skillsPage'
-import { imageRoutes } from './image'
 import { usersRoutes } from './users'
 
 const routes = Router()
@@ -21,5 +22,6 @@ routes.use(projectsRoutes)
 routes.use(skillsRoutes)
 routes.use(imageRoutes)
 routes.use(usersRoutes)
+routes.use(authRoutes)
 
 export { routes }
