@@ -1,8 +1,8 @@
 import { UsersRepository } from "@/infra/db/PgPromise/Users";
 import { User } from "@/repository/IUser";
+import * as crypto from "@/utils/hasher";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { createUser, deleteUser, findUsersByName, getUserByEmail, listUsers, updateUser } from "./usersController";
-import * as crypto from "@/utils/hasher";
 
 describe("User Controller test", () => {
   const usersMock: User[] = [
@@ -85,11 +85,7 @@ describe("User Controller test", () => {
 
     expect(result?.statusCode).toEqual(201)
     expect(spy).toHaveBeenCalledTimes(1)
-    expect(spy).toHaveBeenCalledWith({
-      name: userMock.name,
-      email: userMock.email,
-      password: 'hash'
-    })
+    expect(spy).toHaveBeenCalledWith(userMock)
   });
 
   test("Update users data with 204 status code", async () => {

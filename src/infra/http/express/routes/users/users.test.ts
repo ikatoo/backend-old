@@ -3,7 +3,6 @@ import { app } from "@/infra/http/express/server";
 import { User } from "@/repository/IUser";
 import request from "supertest";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import * as criptoUtil from "@/utils/hasher"
 import * as AuthController from '@/infra/http/controllers/auth/authController'
 
 describe("EXPRESS: /users routes", () => {
@@ -148,7 +147,6 @@ describe("EXPRESS: /users routes", () => {
       .mockResolvedValueOnce()
     vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
       .mockResolvedValueOnce(undefined)
-    vi.spyOn(criptoUtil, 'hasher').mockResolvedValueOnce('hashpass')
 
     const { statusCode } = await request(app)
       .post("/user")
@@ -156,11 +154,7 @@ describe("EXPRESS: /users routes", () => {
 
     expect(statusCode).toBe(201);
     expect(spy).toHaveBeenCalledTimes(1)
-    expect(spy).toHaveBeenCalledWith({
-      name: usersMock[1].name,
-      email: usersMock[1].email,
-      password: 'hashpass'
-    })
+    expect(spy).toHaveBeenCalledWith(usersMock[1])
   });
 
   test("POST Method: responds with 409 when try create user with existent email", async () => {

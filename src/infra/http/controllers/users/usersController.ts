@@ -1,7 +1,8 @@
 import { UsersRepository } from "@/infra/db/PgPromise/Users";
-import { PartialUserSchema, UserSchema } from "@/repository/IUser";
-import { hasher } from "@/utils/hasher";
-import { ConflictError } from "@/utils/httpErrors";
+import NodeMailerImplementation from "@/infra/mailer";
+import { Email, PartialUserSchema, UserSchema } from "@/repository/IUser";
+import { ConflictError, InternalError } from "@/utils/httpErrors";
+import { randomBytes } from "crypto";
 
 const usersRepository = new UsersRepository();
 
@@ -26,8 +27,8 @@ async function createUser(handlerProps?: HandlerProps): ControllerResponse {
   const alredyExists = !!(await usersRepository.getUserByEmail(validUser.data.email))
   if (alredyExists) throw new ConflictError('This email already exists')
 
-  const { id: _, password, ...userWithoutPassword } = validUser.data
-  await usersRepository.createUser({ ...userWithoutPassword, password: await hasher(10, password) })
+  const { id: _, ...userWithoutID } = validUser.data
+  await usersRepository.createUser(userWithoutID)
   return { statusCode: 201 }
 }
 
