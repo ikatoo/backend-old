@@ -1,8 +1,16 @@
+const newPassword = 'new-password'
+vi.mock('crypto', () => ({
+  randomBytes: vi.fn(() => ({
+    toString: vi.fn(() => newPassword)
+  }))
+}))
+
 import { UsersRepository } from "@/infra/db/PgPromise/Users";
+import NodeMailerImplementation from "@/infra/mailer";
 import { User } from "@/repository/IUser";
-import * as crypto from "@/utils/hasher";
+import * as cryptoUtils from "@/utils/hasher";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { createUser, deleteUser, findUsersByName, getUserByEmail, listUsers, updateUser } from "./usersController";
+import { createUser, deleteUser, findUsersByName, getUserByEmail, listUsers, passwordRecovery, updateUser } from "./usersController";
 
 describe("User Controller test", () => {
   const usersMock: User[] = [
@@ -76,7 +84,7 @@ describe("User Controller test", () => {
       email: 'test@user.com',
       password: 'pass'
     }
-    vi.spyOn(crypto, 'hasher').mockResolvedValueOnce('hash')
+    vi.spyOn(cryptoUtils, 'hasher').mockResolvedValueOnce('hash')
     const spy = vi.spyOn(UsersRepository.prototype, 'createUser')
       .mockResolvedValueOnce()
     vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
@@ -110,4 +118,53 @@ describe("User Controller test", () => {
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(8)
   });
+
+  test(
+    "should response with 200 status code when receive a valid email address and send a new password with sucess",
+    async () => {
+      const mockedUser = usersMock[0]
+      vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
+        .mockResolvedValueOnce(mockedUser)
+      vi.spyOn(UsersRepository.prototype, 'updateUser')
+        .mockResolvedValueOnce()
+      const spy = vi.spyOn(NodeMailerImplementation.prototype, 'send')
+        .mockResolvedValueOnce({
+          accepted: true,
+          response: 'ok'
+        })
+
+      const result = await passwordRecovery({ parameters: { email: mockedUser.email } })
+
+      expect(result?.statusCode).toEqual(200)
+      expect(spy).toHaveBeenCalledTimes(1)
+      expect(spy).toHaveBeenCalledWith({
+        from: 'iKatoo',
+        to: mockedUser.email,
+        subject: 'Recovery password',
+        message: `Your new password is: ${newPassword}`
+      })
+    }
+  )
+
+  test(
+    "should reject with error when receive a invalid email address",
+    async () => {
+      vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
+        .mockResolvedValueOnce(undefined)
+
+      await expect(passwordRecovery({ parameters: { email: 'invalid-email' } }))
+        .rejects.toThrowError('Invalid parameters.')
+    }
+  )
+
+  test(
+    "should reject with error when email address not exists in the database",
+    async () => {
+      vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
+        .mockResolvedValueOnce(undefined)
+
+      await expect(passwordRecovery({ parameters: { email: 'invalid@emai.com' } }))
+        .rejects.toThrowError('Invalid parameters.')
+    }
+  )
 });

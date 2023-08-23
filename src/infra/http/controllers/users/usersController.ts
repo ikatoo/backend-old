@@ -79,7 +79,37 @@ async function findUsersByName(handlerProps?: HandlerProps): ControllerResponse 
   return { statusCode: 200, body: users }
 }
 
-export {
-  createUser, deleteUser, findUsersByName, getUserByEmail, listUsers, updateUser
-};
+async function passwordRecovery(handlerProps?: HandlerProps): ControllerResponse {
+  const validParameter = Object.keys(handlerProps?.parameters!).includes('email')
+  const email = `${Object.values(handlerProps?.parameters!)[0]}`
+  const validEmail = Email.safeParse(email)
+  const user = await usersRepository.getUserByEmail(email)
 
+  if (!email || !validParameter || !validEmail.success || !user?.id)
+    throw new ConflictError('Invalid parameters.')
+
+  const newPassword = randomBytes(8).toString('hex')
+  await usersRepository.updateUser(user.id, { password: newPassword })
+
+  const mailer = new NodeMailerImplementation()
+  const { accepted } = await mailer.send({
+    from: 'iKatoo',
+    to: email,
+    subject: 'Recovery password',
+    message: `Your new password is: ${newPassword}`
+  })
+
+  if (!accepted) throw new InternalError()
+
+  return { statusCode: 200 }
+}
+
+export {
+  createUser,
+  deleteUser,
+  findUsersByName,
+  getUserByEmail,
+  listUsers,
+  passwordRecovery,
+  updateUser
+}
