@@ -46,4 +46,9 @@ usersRoutes.delete(
   expressAdapter(usersController.deleteUser)
 )
 
+usersRoutes.post(
+  '/user/password-recovery',
+  expressAdapter(usersController.passwordRecovery)
+)
+
 export { usersRoutes };

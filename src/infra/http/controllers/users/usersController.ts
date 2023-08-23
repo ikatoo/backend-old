@@ -101,7 +101,7 @@ async function passwordRecovery(handlerProps?: HandlerProps): ControllerResponse
 
   if (!accepted) throw new InternalError()
 
-  return { statusCode: 200 }
+  return { statusCode: 204 }
 }
 
 export {

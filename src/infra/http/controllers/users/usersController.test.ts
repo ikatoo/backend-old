@@ -135,7 +135,7 @@ describe("User Controller test", () => {
 
       const result = await passwordRecovery({ parameters: { email: mockedUser.email } })
 
-      expect(result?.statusCode).toEqual(200)
+      expect(result?.statusCode).toEqual(204)
       expect(spy).toHaveBeenCalledTimes(1)
       expect(spy).toHaveBeenCalledWith({
         from: 'iKatoo',
