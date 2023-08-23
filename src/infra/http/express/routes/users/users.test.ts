@@ -1,9 +1,10 @@
 import { UsersRepository } from "@/infra/db/PgPromise/Users";
+import * as AuthController from '@/infra/http/controllers/auth/authController';
 import { app } from "@/infra/http/express/server";
+import NodeMailerImplementation from "@/infra/mailer";
 import { User } from "@/repository/IUser";
 import request from "supertest";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import * as AuthController from '@/infra/http/controllers/auth/authController'
 
 describe("EXPRESS: /users routes", () => {
   const usersMock: User[] = [
@@ -232,7 +233,7 @@ describe("EXPRESS: /users routes", () => {
     expect(body.message).toBe('Unauthorized')
   });
 
-  test("DELETE Method: responde with status 204", async () => {
+  test("DELETE Method: response with status 204", async () => {
     vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const spy = vi.spyOn(UsersRepository.prototype, 'deleteUser')
       .mockResolvedValueOnce()
@@ -244,5 +245,68 @@ describe("EXPRESS: /users routes", () => {
     expect(statusCode).toBe(204)
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(90)
+  });
+
+  test("POST Method: response with status 204 when restore the password with success", async () => {
+    const userMock = { id: 7, ...usersMock[0] }
+    vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
+      .mockResolvedValueOnce(userMock)
+    vi.spyOn(UsersRepository.prototype, 'updateUser')
+      .mockResolvedValueOnce()
+    vi.spyOn(NodeMailerImplementation.prototype, 'send')
+      .mockResolvedValueOnce({
+        accepted: true,
+        response: 'ok'
+      })
+
+    const { statusCode } = await request(app)
+      .post("/user/password-recovery")
+      .send({ email: userMock.email })
+
+    expect(statusCode).toBe(204)
+  });
+
+  test("POST Method: response with status 409 when email is not valid", async () => {
+    vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
+      .mockResolvedValueOnce(undefined)
+
+    const { statusCode, body } = await request(app)
+      .post("/user/password-recovery")
+      .send({ email: 'invalid-email' })
+
+    expect(statusCode).toBe(409)
+    expect(body.message).toEqual('Invalid parameters.')
+  });
+
+  test("POST Method: response with status 409 when email not exists in the database", async () => {
+    vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
+      .mockResolvedValueOnce(undefined)
+
+    const { statusCode, body } = await request(app)
+      .post("/user/password-recovery")
+      .send({ email: 'invalid@email.com' })
+
+    expect(statusCode).toBe(409)
+    expect(body.message).toEqual('Invalid parameters.')
+  });
+  
+  test("POST Method: response with status 500 when fail on send email", async () => {
+    const userMock = { id: 7, ...usersMock[0] }
+    vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
+      .mockResolvedValueOnce(userMock)
+    vi.spyOn(UsersRepository.prototype, 'updateUser')
+      .mockResolvedValueOnce()
+    vi.spyOn(NodeMailerImplementation.prototype, 'send')
+      .mockResolvedValueOnce({
+        accepted: false,
+        response: ''
+      })
+
+    const { statusCode, body } = await request(app)
+      .post("/user/password-recovery")
+      .send({ email: userMock.email })
+
+    expect(statusCode).toEqual(500)
+    expect(body.message).toEqual('Internal Server Error')
   });
 });
