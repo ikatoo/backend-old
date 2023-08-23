@@ -44,7 +44,8 @@ export default class UsersPgPromise implements IUser {
   }
 
   async updateUser(id: number, user: Partial<User>): Promise<void> {
-    const values = getFieldsWithValues(user).toString()
+    const fields = !user.password ? user : { ...user, password: await hasher(10, user.password) }
+    const values = getFieldsWithValues(fields).toString()
 
     await db.none('update users set $1:raw where id=$2;', [values, id])
   }

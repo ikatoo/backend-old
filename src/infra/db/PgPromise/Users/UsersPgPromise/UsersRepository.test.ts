@@ -1,11 +1,11 @@
 vi.mock('../..')
-vi.mock('@/utils/hasher', () => ({ hasher: vi.fn().mockResolvedValueOnce('hash') }))
+vi.mock('@/utils/hasher')
 
-import { User } from "@/repository/IUser";
+import * as cryptoUtil from '@/utils/hasher';
+import { getFieldsWithValues } from "@/utils/transformers/getFieldsWithValues";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import UsersPgPromise from ".";
 import db from "../..";
-import { getFieldsWithValues } from "@/utils/transformers/getFieldsWithValues";
 
 describe("Basic operations in Users Repository", () => {
   const usersRepository = new UsersPgPromise()
@@ -21,9 +21,6 @@ describe("Basic operations in Users Repository", () => {
       password: 'secretpass2'
     },
   ]
-  const values = mockedUsers.map(
-    value => `('${value.name}','${value.email}','${value.password}')`
-  ).toString()
 
   afterEach(() => {
     vi.restoreAllMocks()
@@ -36,6 +33,7 @@ describe("Basic operations in Users Repository", () => {
 
   test("CREATE Method", async () => {
     const mockedFn = vi.spyOn(db, 'none')
+    vi.spyOn(cryptoUtil, 'hasher').mockResolvedValueOnce('hash')
     const mock = mockedUsers[0]
 
     await expect(usersRepository.createUser(mock)).resolves.not.toThrow()
@@ -99,7 +97,13 @@ describe("Basic operations in Users Repository", () => {
   test("UPDATE Method", async () => {
     const mock = mockedUsers[0]
     const spy = vi.spyOn(db, 'none').mockResolvedValueOnce(null)
-    const fieldValues = getFieldsWithValues(mock).toString()
+    vi.spyOn(cryptoUtil, 'hasher').mockResolvedValueOnce('hash')
+
+    const fieldValues = getFieldsWithValues({
+      name: mock.name,
+      email: mock.email,
+      password: 'hash'
+    }).toString()
 
     await expect(usersRepository.updateUser(7, mock))
       .resolves.not.toThrow()
