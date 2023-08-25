@@ -1,6 +1,6 @@
 import { UsersRepository } from "@/infra/db/PgPromise/Users";
 import { env } from "@/utils/env";
-import * as crypto from "@/utils/hasher";
+import * as cryptoUtils from "@/utils/hasher";
 import jwt, { sign } from "jsonwebtoken";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { authentication, verifyToken } from "./authController";
@@ -22,7 +22,7 @@ describe("Auth Controller test", () => {
     test("Auth user with success", async () => {
       vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
         .mockResolvedValueOnce(mock)
-      vi.spyOn(crypto, 'compareHash').mockResolvedValueOnce(true)
+      vi.spyOn(cryptoUtils, 'compareHash').mockResolvedValueOnce(true)
       vi.spyOn(jwt, 'sign').mockImplementation(() => ('valid-access-token'))
 
       const result = await authentication({
@@ -51,7 +51,7 @@ describe("Auth Controller test", () => {
     test("Fail on try auth user with invalid password", async () => {
       vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
         .mockResolvedValueOnce(mock)
-      vi.spyOn(crypto, 'compareHash').mockResolvedValueOnce(false)
+      vi.spyOn(cryptoUtils, 'compareHash').mockResolvedValueOnce(false)
 
       await expect(authentication({
         parameters: { email: mock.email, password: 'invalidpass' }
