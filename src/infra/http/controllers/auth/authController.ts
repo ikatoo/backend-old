@@ -16,7 +16,9 @@ async function authentication(handlerProps?: HandlerProps): ControllerResponse {
   const { email, password } = validParameters.data
   try {
     const userExists = await usersRepository.getUserByEmail(email)
-    const verify = await compareHash(password, userExists?.password ?? '')
+    if(!userExists) throw new Error()
+    const {password: hash, ...user} = userExists
+    const verify = await compareHash(password, hash ?? '')
 
     if (!verify) throw new Error()
 
@@ -26,12 +28,10 @@ async function authentication(handlerProps?: HandlerProps): ControllerResponse {
       { expiresIn: '1h' }
     )
 
-    return { statusCode: 200, body: { accessToken } }
-  } catch (error) {
-    throw new UnauthorizedError('Invalid email or password')
+    return { statusCode: 200, body: { accessToken, user } }
+  } catch {
+    throw new UnauthorizedError('Unauthorized')
   }
-
-  return { statusCode: 500 }
 }
 
 const verifyToken = async (handlerProps?: HandlerProps): ControllerResponse => {

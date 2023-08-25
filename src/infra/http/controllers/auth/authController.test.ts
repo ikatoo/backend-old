@@ -45,7 +45,7 @@ describe("Auth Controller test", () => {
 
       await expect(authentication({
         parameters: { email: 'invalid@email.com', password: 'somepass' }
-      })).rejects.toThrowError('Invalid email or password')
+      })).rejects.toThrowError('Unauthorized')
     })
 
     test("Fail on try auth user with invalid password", async () => {
@@ -55,7 +55,7 @@ describe("Auth Controller test", () => {
 
       await expect(authentication({
         parameters: { email: mock.email, password: 'invalidpass' }
-      })).rejects.toThrowError('Invalid email or password')
+      })).rejects.toThrowError('Unauthorized')
     })
 
     test("Fail on try auth user when database access is fail", async () => {
