@@ -1,11 +1,10 @@
 import { UsersRepository } from '@/infra/db/PgPromise/Users'
-import * as AuthController from '@/infra/http/controllers/auth/authController'
 import { User } from '@/repository/IUser'
-import * as crypto from "@/utils/hasher"
+import * as cryptoUtils from "@/utils/hasher"
+import jwt from 'jsonwebtoken'
 import request from 'supertest'
 import { describe, expect, test, vi } from "vitest"
 import { app } from '../../server'
-import jwt from 'jsonwebtoken'
 
 describe("EXPRESS: /auth routes", () => {
   test("PUT Method: responds with 405 code when try use put method", async () => {
@@ -17,9 +16,19 @@ describe("EXPRESS: /auth routes", () => {
   })
 
   test("POST Method: responds with 204 code when sucess on verify token", async () => {
-    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce({ statusCode: 200 })
+    const mockedUser = {
+      id: 1,
+      name: 'test name1',
+      email: 'teste1@email.com',
+      password: 'pass'
+    }
+    vi.spyOn(jwt, 'verify').mockImplementation(() => ({ id: mockedUser.id }))
+    vi.spyOn(UsersRepository.prototype, 'getUserByID')
+      .mockResolvedValueOnce(mockedUser)
+
     const { statusCode } = await request(app)
       .post("/auth/verify-token")
+      .set("authorization", 'Bearer valid-token')
       .send()
 
     expect(statusCode).toEqual(204);
@@ -54,7 +63,7 @@ describe("EXPRESS: /auth routes", () => {
         id: 7
       }
       vi.spyOn(UsersRepository.prototype, 'getUserByEmail').mockResolvedValueOnce(mockedUser)
-      vi.spyOn(crypto, 'compareHash').mockResolvedValueOnce(true)
+      vi.spyOn(cryptoUtils, 'compareHash').mockResolvedValueOnce(true)
       vi.spyOn(jwt, 'sign').mockImplementation(() => ('valid-access-token'))
 
       const { statusCode, body } = await request(app)
