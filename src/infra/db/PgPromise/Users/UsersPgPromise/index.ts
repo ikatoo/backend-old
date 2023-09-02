@@ -8,12 +8,14 @@ export default class UsersPgPromise implements IUser {
     await db.none('delete from users;')
   }
 
-  async createUser(user: User): Promise<void> {
+  async createUser(user: User): Promise<{ id: number }> {
     const hashPassword = await hasher(10, user.password)
-    db.none(
-      'insert into users (name, email, password) values ($1, $2, $3)',
+    const result = await db.one(
+      'insert into users (name, email, password) values ($1, $2, $3) returning id',
       [user.name, user.email, hashPassword]
     )
+
+    return result
   }
 
   async listUsers(): Promise<UserWithoutPassword[] | []> {

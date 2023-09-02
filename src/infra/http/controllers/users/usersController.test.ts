@@ -86,7 +86,7 @@ describe("User Controller test", () => {
     }
     vi.spyOn(cryptoUtils, 'hasher').mockResolvedValueOnce('hash')
     const spy = vi.spyOn(UsersRepository.prototype, 'createUser')
-      .mockResolvedValueOnce()
+      .mockResolvedValueOnce({ id: 8 })
     vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
       .mockResolvedValueOnce(undefined)
     const result = await createUser({ parameters: { user: userMock } })

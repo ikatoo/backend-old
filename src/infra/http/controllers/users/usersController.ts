@@ -1,8 +1,10 @@
 import { UsersRepository } from "@/infra/db/PgPromise/Users";
 import NodeMailerImplementation from "@/infra/mailer";
 import { Email, PartialUserSchema, UserSchema } from "@/repository/IUser";
+import { env } from "@/utils/env";
 import { ConflictError, InternalError } from "@/utils/httpErrors";
 import { randomBytes } from "crypto";
+import { sign } from "jsonwebtoken";
 
 const usersRepository = new UsersRepository();
 
@@ -28,8 +30,14 @@ async function createUser(handlerProps?: HandlerProps): ControllerResponse {
   if (alredyExists) throw new ConflictError('This email already exists')
 
   const { id: _, ...userWithoutID } = validUser.data
-  await usersRepository.createUser(userWithoutID)
-  return { statusCode: 201 }
+  const { id } = await usersRepository.createUser(userWithoutID)
+  const accessToken = sign(
+    { id },
+    env.JWT_SECRET,
+    { expiresIn: '1h' }
+  )
+
+  return { statusCode: 201, body: { accessToken } }
 }
 
 async function updateUser(handlerProps?: HandlerProps): ControllerResponse {

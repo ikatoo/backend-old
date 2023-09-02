@@ -17,7 +17,7 @@ export type User = z.infer<typeof UserSchema>
 export type UserWithoutPassword = Omit<User, 'password'>
 
 export default interface IUser {
-  createUser(user: User): Promise<void>;
+  createUser(user: User): Promise<{ id: number }>;
   listUsers(): Promise<UserWithoutPassword[] | []>;
   getUserByID(id: number): Promise<User | undefined>
   getUserByEmail(email: Email): Promise<User | undefined>
