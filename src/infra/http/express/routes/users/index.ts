@@ -30,7 +30,6 @@ usersRoutes.get(
 
 usersRoutes.post(
   '/user',
-  verifyTokenMiddleware,
   expressAdapter(usersController.createUser)
 )
 
