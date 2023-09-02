@@ -3,6 +3,7 @@ import * as AuthController from '@/infra/http/controllers/auth/authController';
 import { app } from "@/infra/http/express/server";
 import NodeMailerImplementation from "@/infra/mailer";
 import { User } from "@/repository/IUser";
+import jwt from 'jsonwebtoken';
 import request from "supertest";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
@@ -133,29 +134,21 @@ describe("EXPRESS: /users routes", () => {
     expect(spy).toHaveBeenCalledTimes(1)
   });
 
-  // test("POST Method: should expect 401 statusCode when without token", async () => {
-  //   const { statusCode, body } = await request(app)
-  //     .post("/user")
-  //     .send({ user: usersMock[1] })
-
-  //   expect(statusCode).toEqual(401)
-  //   expect(body.message).toEqual('Unauthorized')
-  // })
-
   test("POST Method: create user with 204 statusCode", async () => {
-    // vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const spy = vi.spyOn(UsersRepository.prototype, 'createUser')
-      .mockResolvedValueOnce()
+      .mockResolvedValueOnce({ id: 7 })
     vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
       .mockResolvedValueOnce(undefined)
+    vi.spyOn(jwt, 'sign').mockImplementation(() => ('valid-access-token'))
 
-    const { statusCode } = await request(app)
+    const { statusCode, body } = await request(app)
       .post("/user")
       .send({ user: usersMock[1] })
 
     expect(statusCode).toBe(201);
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(usersMock[1])
+    expect(body).toEqual({ accessToken: 'valid-access-token' })
   });
 
   test("POST Method: responds with 409 when try create user with existent email", async () => {
@@ -289,7 +282,7 @@ describe("EXPRESS: /users routes", () => {
     expect(statusCode).toBe(409)
     expect(body.message).toEqual('Invalid parameters.')
   });
-  
+
   test("POST Method: response with status 500 when fail on send email", async () => {
     const userMock = { id: 7, ...usersMock[0] }
     vi.spyOn(UsersRepository.prototype, 'getUserByEmail')

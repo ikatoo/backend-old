@@ -32,14 +32,16 @@ describe("Basic operations in Users Repository", () => {
   })
 
   test("CREATE Method", async () => {
-    const mockedFn = vi.spyOn(db, 'none')
+    const mockedFn = vi.spyOn(db, 'one').mockResolvedValueOnce({ id: 9 })
     vi.spyOn(cryptoUtil, 'hasher').mockResolvedValueOnce('hash')
     const mock = mockedUsers[0]
 
-    await expect(usersRepository.createUser(mock)).resolves.not.toThrow()
+    const result = await usersRepository.createUser(mock)
+
+    expect(result.id).toEqual(9)
     expect(mockedFn).toHaveBeenCalledTimes(1)
     expect(mockedFn).toHaveBeenCalledWith(
-      'insert into users (name, email, password) values ($1, $2, $3)',
+      'insert into users (name, email, password) values ($1, $2, $3) returning id',
       [mock.name, mock.email, 'hash']
     )
   });
