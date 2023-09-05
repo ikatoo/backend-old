@@ -7,6 +7,7 @@ import request from "supertest";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { app } from "../../server";
 import * as AuthController from '@/infra/http/controllers/auth/authController'
+import { TokenBlacklistRepository } from "@/infra/db/PgPromise/TokenBlacklist";
 
 describe("EXPRESS: /about routes", () => {
   const userMock = {
@@ -62,6 +63,8 @@ describe("EXPRESS: /about routes", () => {
     const spy = vi.spyOn(AboutPageRepository.prototype, 'createAboutPage').mockResolvedValueOnce()
     vi.spyOn(UsersRepository.prototype, 'getUserByID')
       .mockResolvedValueOnce(userMock)
+    vi.spyOn(TokenBlacklistRepository.prototype, 'isBlacklisted')
+      .mockResolvedValueOnce(false)
 
     const accessToken = sign(
       { id: userMock.id },
@@ -121,6 +124,9 @@ describe("EXPRESS: /about routes", () => {
     vi.spyOn(AboutPageRepository.prototype, 'createAboutPage').mockResolvedValueOnce()
     vi.spyOn(UsersRepository.prototype, 'getUserByID')
       .mockResolvedValueOnce(userMock)
+    vi.spyOn(TokenBlacklistRepository.prototype, 'isBlacklisted')
+      .mockResolvedValueOnce(false)
+
     const accessToken = sign(
       { id: userMock.id },
       env.JWT_SECRET,
@@ -173,6 +179,9 @@ describe("EXPRESS: /about routes", () => {
   test("DELETE Method: responde with status 204", async () => {
     vi.spyOn(UsersRepository.prototype, 'getUserByID')
       .mockResolvedValueOnce(userMock)
+    vi.spyOn(TokenBlacklistRepository.prototype, 'isBlacklisted')
+      .mockResolvedValueOnce(false)
+
     const accessToken = sign(
       { id: userMock.id },
       env.JWT_SECRET,

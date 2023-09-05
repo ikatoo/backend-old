@@ -3,7 +3,8 @@ import { env } from "@/utils/env";
 import * as cryptoUtils from "@/utils/hasher";
 import jwt, { sign } from "jsonwebtoken";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { authentication, verifyToken } from "./authController";
+import { authentication, signout, verifyToken } from "./authController";
+import { TokenBlacklistRepository } from "@/infra/db/PgPromise/TokenBlacklist";
 
 describe("Auth Controller test", () => {
   const mock = {
@@ -104,9 +105,19 @@ describe("Auth Controller test", () => {
       })).rejects.toThrowError('Unauthorized')
     })
 
+    test('should fail on use a blacklisted token', async () => {
+      vi.spyOn(TokenBlacklistRepository.prototype, 'isBlacklisted')
+        .mockResolvedValueOnce(true)
+
+      await expect(verifyToken({ parameters: { token: 'blacklisted-token' } }))
+        .rejects.toThrowError('Unauthorized')
+    })
+
     test('should return statusCode 200 on use a valid token', async () => {
       vi.spyOn(UsersRepository.prototype, 'getUserByID')
         .mockResolvedValueOnce(mock)
+      vi.spyOn(TokenBlacklistRepository.prototype, 'isBlacklisted')
+        .mockResolvedValueOnce(false)
 
       const accessToken = sign(
         { id: mock.id },
@@ -142,5 +153,25 @@ describe("Auth Controller test", () => {
         }
       })).rejects.toThrowError('Unauthorized')
     })
+  })
+
+  test('should return status 204 when success on signout', async () => {
+    vi.spyOn(TokenBlacklistRepository.prototype, 'isBlacklisted')
+      .mockResolvedValueOnce(false)
+    vi.spyOn(TokenBlacklistRepository.prototype, 'add')
+      .mockResolvedValueOnce()
+
+    const result = await signout({ parameters: { token: 'valid-token' } })
+
+    expect(result?.statusCode).toEqual(204)
+  })
+
+  test('should fail when when token always in then blacklist', async () => {
+    vi.spyOn(TokenBlacklistRepository.prototype, 'isBlacklisted')
+      .mockResolvedValueOnce(true)
+
+    await expect(signout({ parameters: { token: 'valid-token' } }))
+      .rejects.toThrowError('This token always blacklisted.')
+
   })
 });

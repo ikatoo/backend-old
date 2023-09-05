@@ -1,5 +1,5 @@
 import { expressAdapter } from "@/infra/http/adapters/expressAdapter"
-import { authentication } from "@/infra/http/controllers/auth/authController"
+import { authentication, signout } from "@/infra/http/controllers/auth/authController"
 import { Router } from "express"
 import verifyTokenMiddleware from "../../middlewares/verifyTokenMiddleware"
 
@@ -16,6 +16,11 @@ authRoutes.post(
 authRoutes.post(
   '/auth/sign-in',
   expressAdapter(authentication)
+)
+
+authRoutes.post(
+  '/auth/sign-out',
+  expressAdapter(signout)
 )
 
 export { authRoutes }
