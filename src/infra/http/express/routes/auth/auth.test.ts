@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken'
 import request from 'supertest'
 import { describe, expect, test, vi } from "vitest"
 import { app } from '../../server'
+import { TokenBlacklistRepository } from '@/infra/db/PgPromise/TokenBlacklist'
 
 describe("EXPRESS: /auth routes", () => {
   test("PUT Method: responds with 405 code when try use put method", async () => {
@@ -25,6 +26,8 @@ describe("EXPRESS: /auth routes", () => {
     vi.spyOn(jwt, 'verify').mockImplementation(() => ({ id: mockedUser.id }))
     vi.spyOn(UsersRepository.prototype, 'getUserByID')
       .mockResolvedValueOnce(mockedUser)
+    vi.spyOn(TokenBlacklistRepository.prototype, 'isBlacklisted')
+      .mockResolvedValueOnce(false)
 
     const { statusCode } = await request(app)
       .post("/auth/verify-token")
@@ -76,4 +79,31 @@ describe("EXPRESS: /auth routes", () => {
       expect(statusCode).toEqual(200);
       expect(body.accessToken).toEqual('valid-access-token')
     })
+
+
+  test("POST Method: responds with 204 code when sucess on signout", async () => {
+    vi.spyOn(TokenBlacklistRepository.prototype, 'isBlacklisted')
+      .mockResolvedValueOnce(false)
+    vi.spyOn(TokenBlacklistRepository.prototype, 'add')
+      .mockResolvedValueOnce()
+
+    const { statusCode } = await request(app)
+      .post("/auth/sign-out")
+      .set("authorization", 'Bearer valid-token')
+      .send()
+
+    expect(statusCode).toEqual(204);
+  })
+
+  test("POST Method: responds with 409 code when token always blacklisted", async () => {
+    vi.spyOn(TokenBlacklistRepository.prototype, 'isBlacklisted')
+      .mockResolvedValueOnce(true)
+
+    const { statusCode } = await request(app)
+      .post("/auth/sign-out")
+      .set("authorization", 'Bearer valid-token')
+      .send()
+
+    expect(statusCode).toEqual(409);
+  })
 })
