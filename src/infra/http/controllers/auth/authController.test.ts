@@ -130,7 +130,10 @@ describe("Auth Controller test", () => {
         }
       })
 
+      const { password: _, ...user } = mock
+
       expect(result?.statusCode).toEqual(200)
+      expect(result?.body).toEqual({ user })
     })
 
     test('shold fail on use a expired token', async () => {
