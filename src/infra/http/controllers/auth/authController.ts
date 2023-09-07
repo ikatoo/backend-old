@@ -42,16 +42,17 @@ const verifyToken = async (handlerProps?: HandlerProps): ControllerResponse => {
 
   try {
     const { id } = verify(token, env.JWT_SECRET) as { id: number }
-    const user = await usersRepository.getUserByID(id) as User
+    const { password: _, ...user } = await usersRepository.getUserByID(id) as User
     const isBlacklisted = await tokenBlacklistRepository.isBlacklisted(token)
 
     if (!user || isBlacklisted)
       throw new Error()
+
+    return { statusCode: 200, body: { user } }
   } catch {
     throw new UnauthorizedError('Unauthorized')
   }
 
-  return { statusCode: 200 }
 }
 
 const signout = async (handlerProps?: HandlerProps): ControllerResponse => {
