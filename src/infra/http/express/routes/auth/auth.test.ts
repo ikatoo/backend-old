@@ -16,7 +16,7 @@ describe("EXPRESS: /auth routes", () => {
     expect(statusCode).toEqual(405);
   })
 
-  test("POST Method: responds with 204 code when sucess on verify token", async () => {
+  test("POST Method: responds with 200 code and user data when sucess on verify token", async () => {
     const mockedUser = {
       id: 1,
       name: 'test name1',
@@ -29,12 +29,15 @@ describe("EXPRESS: /auth routes", () => {
     vi.spyOn(TokenBlacklistRepository.prototype, 'isBlacklisted')
       .mockResolvedValueOnce(false)
 
-    const { statusCode } = await request(app)
+    const { statusCode, body } = await request(app)
       .post("/auth/verify-token")
       .set("authorization", 'Bearer valid-token')
       .send()
 
-    expect(statusCode).toEqual(204);
+    const { password: _, ...user } = mockedUser
+
+    expect(statusCode).toEqual(200);
+    expect(body).toEqual({ user });
   })
 
   test("POST Method: responds with 401 code when fail on verify token", async () => {
