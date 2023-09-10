@@ -38,11 +38,17 @@ async function authentication(handlerProps?: HandlerProps): ControllerResponse {
 
 const verifyToken = async (handlerProps?: HandlerProps): ControllerResponse => {
   const parameters = handlerProps?.parameters ?? {}
-  const token = `${Object.values(parameters)[0]}`
+  const token = Object.values(parameters)[0]
 
   try {
-    const { id } = verify(token, env.JWT_SECRET) as { id: number }
-    const { password: _, ...user } = await usersRepository.getUserByID(id) as User
+    const payload = verify(token, env.JWT_SECRET)
+    if (!(typeof payload === 'object' && 'id' in payload))
+      throw new Error()
+
+    const result = await usersRepository.getUserByID(payload.id)
+    if (!result)
+      throw new Error()
+    const { password: _, ...user } = result
     const isBlacklisted = await tokenBlacklistRepository.isBlacklisted(token)
 
     if (!user || isBlacklisted)
