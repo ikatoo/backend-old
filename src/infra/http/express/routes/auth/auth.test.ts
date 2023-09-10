@@ -23,7 +23,8 @@ describe("EXPRESS: /auth routes", () => {
       email: 'teste1@email.com',
       password: 'pass'
     }
-    vi.spyOn(jwt, 'verify').mockImplementation(() => ({ id: mockedUser.id }))
+    const { password: _, ...user } = mockedUser
+    vi.spyOn(jwt, 'verify').mockImplementation(() => ({ id: mockedUser.id, user }))
     vi.spyOn(UsersRepository.prototype, 'getUserByID')
       .mockResolvedValueOnce(mockedUser)
     vi.spyOn(TokenBlacklistRepository.prototype, 'isBlacklisted')
@@ -34,13 +35,12 @@ describe("EXPRESS: /auth routes", () => {
       .set("authorization", 'Bearer valid-token')
       .send()
 
-    const { password: _, ...user } = mockedUser
-
     expect(statusCode).toEqual(200);
     expect(body).toEqual({ user });
   })
 
   test("POST Method: responds with 401 code when fail on verify token", async () => {
+    vi.spyOn(jwt, 'verify').mockImplementation(() => ({}))
     const { statusCode } = await request(app)
       .post("/auth/verify-token")
       .send()
