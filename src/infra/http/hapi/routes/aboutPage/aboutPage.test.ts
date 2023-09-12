@@ -41,7 +41,7 @@ describe("/about routes", () => {
     expect(spy).toHaveBeenCalledTimes(1)
   });
 
-  test("GET Method: responds with 204 statusCode when there is no data to return", async () => {
+  test("GET Method: responds with 200 statusCode when there is no data to return", async () => {
     const spy = vi.spyOn(AboutPageRepository.prototype, 'getAboutPage')
       .mockResolvedValueOnce(undefined)
 
@@ -50,12 +50,12 @@ describe("/about routes", () => {
       url: "/about",
     });
 
-    expect(statusCode).toBe(204);
-    expect(result).toEqual(null)
+    expect(statusCode).toBe(200);
+    expect(result).toEqual({})
     expect(spy).toHaveBeenCalledTimes(1)
   });
 
-  test("POST Method: responds with 204", async () => {
+  test("POST Method: responds with 201", async () => {
     const spy = vi.spyOn(AboutPageRepository.prototype, 'createAboutPage')
       .mockResolvedValueOnce()
 

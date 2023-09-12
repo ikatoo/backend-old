@@ -7,13 +7,8 @@ const projectsRepository = new ProjectsRepository();
 async function getProjectsHandler(): ControllerResponse {
   try {
     const projects = await projectsRepository.getProjects()
-    if (!projects.length) {
-      return {
-        statusCode: 204
-      }
-    }
     return {
-      body: projects,
+      body: [...projects],
       statusCode: 200
     }
   } catch {
@@ -28,7 +23,7 @@ async function getProjectsByTitleHandler(handlerProps?: HandlerProps<{ title: st
     statusCode: 400
   }
 
-  const projects = await projectsRepository.getProjectsByPartialTitle(partialTitle)
+  const projects = await projectsRepository.getProjectsByPartialTitle(partialTitle) ?? []
 
   return {
     body: projects,
@@ -41,10 +36,7 @@ async function getProjectByIDHandler(handlerProps?: HandlerProps<{ id: number }>
   if (!id) return {
     statusCode: 400
   }
-  const project = await projectsRepository.getProjectById(+id)
-  if (!project) {
-    return { statusCode: 404 }
-  }
+  const project = await projectsRepository.getProjectById(+id) ?? {}
   return {
     body: project,
     statusCode: 200

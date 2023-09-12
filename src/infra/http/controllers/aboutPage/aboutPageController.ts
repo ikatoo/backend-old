@@ -5,10 +5,7 @@ import { ConflictError } from "@/utils/httpErrors";
 const aboutPageRepository = new AboutPageRepository();
 
 async function getAboutPageHandler(): Promise<HandlerResponse> {
-  const body = await aboutPageRepository.getAboutPage()
-  if (!body) {
-    return { statusCode: 204 }
-  }
+  const body = await aboutPageRepository.getAboutPage() ?? {}
 
   return { body, statusCode: 200 }
 }

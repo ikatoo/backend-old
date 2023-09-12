@@ -11,9 +11,6 @@ async function getImageHandler(handlerProps?: HandlerProps<{ id: string }>): Con
   }
 
   const url = await repository.getImage(publicId)
-  if (!url) {
-    return { statusCode: 204 }
-  }
   return {
     body: { url },
     statusCode: 200
