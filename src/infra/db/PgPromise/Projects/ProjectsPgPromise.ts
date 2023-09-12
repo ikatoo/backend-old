@@ -24,7 +24,7 @@ export default class ProjectsPgPromise implements IProjects {
     return mappedProject
   }
 
-  async getProjectsByTitle(title: string): Promise<ProjectWithId[] | undefined> {
+  async getProjectsByPartialTitle(title: string): Promise<ProjectWithId[] | undefined> {
     const projects = await db.manyOrNone(
       `select * from projects where title ilike '%$1:value%'`,
       title

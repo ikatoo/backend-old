@@ -24,7 +24,7 @@ describe("EXPRESS: /image routes", () => {
     const { body, statusCode } = await request(app)
       .get("/image")
       .send({
-        publicId: 'image.jpg'
+        id: 'image.jpg'
       })
 
     expect(body).toEqual({ url: mockedUrl });
@@ -46,6 +46,7 @@ describe("EXPRESS: /image routes", () => {
     const { body, statusCode } = await request(app)
       .post("/image")
       .set("Content-Type", "multipart/form-data")
+      .set('authorization', 'Bearer valid-token')
       .attach('file', 'shared/fixtures/test-image.jpg')
     expect(body).toEqual({ url: mock.secure_url, publicId: mock.public_id });
     expect(uploadSpy).toHaveBeenCalledTimes(1)
@@ -56,6 +57,7 @@ describe("EXPRESS: /image routes", () => {
     const { body, statusCode } = await request(app)
       .post("/image")
       .set("Content-Type", "multipart/form-data")
+      .set('authorization', 'Bearer valid-token')
       .attach('file', 'shared/fixtures/test-image.jpg')
 
     expect(body.message).toEqual('Unauthorized')
@@ -65,7 +67,8 @@ describe("EXPRESS: /image routes", () => {
   test("DELETE Method: fail on try delete when request without token", async () => {
     const { statusCode, body } = await request(app)
       .delete("/image")
-      .send({ publicId: 'folder/image.png' })
+      .set('authorization', 'Bearer valid-token')
+      .send({ id: 'folder/image.png' })
 
     expect(statusCode).toEqual(401)
     expect(body.message).toEqual('Unauthorized')
@@ -78,7 +81,8 @@ describe("EXPRESS: /image routes", () => {
 
     const { statusCode } = await request(app)
       .delete("/image")
-      .send({ publicId })
+      .set('authorization', 'Bearer valid-token')
+      .send({ id: publicId })
 
     expect(statusCode).toEqual(204)
     expect(spyDestroyFn).toHaveBeenCalledTimes(1)

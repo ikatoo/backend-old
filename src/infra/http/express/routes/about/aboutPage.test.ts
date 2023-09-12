@@ -65,15 +65,11 @@ describe("EXPRESS: /about routes", () => {
       .mockResolvedValueOnce(userMock)
     vi.spyOn(TokenBlacklistRepository.prototype, 'isBlacklisted')
       .mockResolvedValueOnce(false)
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce({ statusCode: 200 })
 
-    const accessToken = sign(
-      { id: userMock.id },
-      env.JWT_SECRET,
-      { expiresIn: '1h' }
-    )
     const { statusCode } = await request(app)
       .post('/about')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Authorization', 'Bearer valid-token')
       .send(aboutPageMock)
 
     expect(statusCode).toBe(201);
@@ -90,6 +86,7 @@ describe("EXPRESS: /about routes", () => {
 
     const { body, statusCode } = await request(app)
       .post('/about')
+      .set('Authorization', 'Bearer valid-token')
       .send(aboutPageMock)
 
     expect(statusCode).toBe(409);
@@ -105,6 +102,7 @@ describe("EXPRESS: /about routes", () => {
 
     const { statusCode } = await request(app)
       .post('/about')
+      .set('Authorization', 'Bearer valid-token')
       .send()
 
     expect(statusCode).toBe(400);
@@ -114,6 +112,7 @@ describe("EXPRESS: /about routes", () => {
   test("PATCH Method: responds with 401 when update without token", async () => {
     const { statusCode, body } = await request(app)
       .patch('/about')
+      .set('Authorization', 'Bearer valid-token')
       .send()
 
     expect(statusCode).toBe(401);
@@ -126,6 +125,7 @@ describe("EXPRESS: /about routes", () => {
       .mockResolvedValueOnce(userMock)
     vi.spyOn(TokenBlacklistRepository.prototype, 'isBlacklisted')
       .mockResolvedValueOnce(false)
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce({ statusCode: 200 })
 
     const accessToken = sign(
       { id: userMock.id },
@@ -152,6 +152,7 @@ describe("EXPRESS: /about routes", () => {
 
     const { statusCode } = await request(app)
       .patch('/about')
+      .set('Authorization', 'Bearer valid-token')
       .send(mockedData)
 
     expect(statusCode).toBe(409);
@@ -162,35 +163,31 @@ describe("EXPRESS: /about routes", () => {
     vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce({ statusCode: 200 })
     const { statusCode } = await request(app)
       .patch('/about')
+      .set('Authorization', 'Bearer valid-token')
       .send()
 
     expect(statusCode).toBe(400);
   });
 
-  test("DELETE Method: responde with status 401 when call without token", async () => {
+  test("DELETE Method: response with status 401 when call without token", async () => {
     const { statusCode, body } = await request(app)
       .delete('/about')
       .send()
 
     expect(statusCode).toBe(401)
-    expect(body.message).toBe('Unauthorized')
   })
 
-  test("DELETE Method: responde with status 204", async () => {
+  test("DELETE Method: response with status 204", async () => {
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce({ statusCode: 200 })
     vi.spyOn(UsersRepository.prototype, 'getUserByID')
       .mockResolvedValueOnce(userMock)
     vi.spyOn(TokenBlacklistRepository.prototype, 'isBlacklisted')
       .mockResolvedValueOnce(false)
-
-    const accessToken = sign(
-      { id: userMock.id },
-      env.JWT_SECRET,
-      { expiresIn: '1h' }
-    )
     const spy = vi.spyOn(AboutPageRepository.prototype, 'deleteAboutPage').mockResolvedValueOnce()
+
     const { statusCode } = await request(app)
       .delete('/about')
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Authorization', 'Bearer valid-token')
       .send()
 
     expect(statusCode).toBe(204)

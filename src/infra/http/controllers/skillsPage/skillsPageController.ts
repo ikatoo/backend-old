@@ -1,5 +1,5 @@
 import { SkillsPageRepository } from "@/infra/db";
-import { PartialSkillsPageSchema, SkillsPageSchema } from "@/repository/ISkillsPage";
+import { PartialSkillsPageSchema, SkillsPage, SkillsPageSchema } from "@/repository/ISkillsPage";
 import { ConflictError } from "@/utils/httpErrors";
 
 const skillsPageRepository = new SkillsPageRepository();
@@ -15,12 +15,14 @@ async function getSkillsPageHandler(): ControllerResponse {
   }
 }
 
-async function createSkillsPageHandler(handlerProps?: HandlerProps): ControllerResponse {
-  if (!Object.keys(handlerProps?.parameters!).length) return {
+async function createSkillsPageHandler(handlerProps?: HandlerProps<SkillsPage>): ControllerResponse {
+  const skillsPage = handlerProps?.parameters?.data
+
+  if (!skillsPage || !Object.keys(skillsPage).length) return {
     statusCode: 400
   }
 
-  const validPage = SkillsPageSchema.safeParse(handlerProps?.parameters)
+  const validPage = SkillsPageSchema.safeParse(skillsPage)
   if (!validPage.success)
     throw new ConflictError('Invalid type.')
   try {
@@ -32,12 +34,14 @@ async function createSkillsPageHandler(handlerProps?: HandlerProps): ControllerR
   }
 }
 
-async function updateSkillsPageHandler(handlerProps?: HandlerProps): ControllerResponse {
-  if (!Object.keys(handlerProps?.parameters!).length) return {
+async function updateSkillsPageHandler(handlerProps?: HandlerProps<Partial<SkillsPage>>): ControllerResponse {
+  const skillsPage = handlerProps?.parameters?.data
+
+  if (!skillsPage || !Object.keys(skillsPage).length) return {
     statusCode: 400
   }
 
-  const validPage = PartialSkillsPageSchema.safeParse(handlerProps?.parameters)
+  const validPage = PartialSkillsPageSchema.safeParse(skillsPage)
   if (!validPage.success || Object.keys(validPage.data).length === 0)
     throw new ConflictError('Invalid type.')
   try {

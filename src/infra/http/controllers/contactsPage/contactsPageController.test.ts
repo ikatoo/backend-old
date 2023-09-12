@@ -20,7 +20,7 @@ describe("ContactsPage Controller test", () => {
   test("Create contacts page data without error", async () => {
     const spy = vi.spyOn(ContactPageRepository.prototype, 'createContactPage').mockResolvedValueOnce()
 
-    await expect(createContactsPageHandler({ parameters: contactPageMock }))
+    await expect(createContactsPageHandler({ parameters: { data: contactPageMock } }))
       .resolves.not.toThrow()
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(contactPageMock)
@@ -33,7 +33,7 @@ describe("ContactsPage Controller test", () => {
     }
     const spy = vi.spyOn(ContactPageRepository.prototype, 'updateContactPage').mockResolvedValueOnce()
 
-    await expect(updateContactsPageHandler({ parameters: mockedData }))
+    await expect(updateContactsPageHandler({ parameters: { data: mockedData } }))
       .resolves.not.toThrow()
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(mockedData)

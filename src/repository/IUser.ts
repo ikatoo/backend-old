@@ -1,13 +1,13 @@
 import { z } from "zod"
 
-export const Email = z.string().email("is not valid format of email")
+export const EmailSchema = z.string().email("is not valid format of email")
 
-type Email = z.infer<typeof Email>
+export type Email = z.infer<typeof EmailSchema>
 
 export const UserSchema = z.object({
   id: z.number().optional(),
   name: z.string(),
-  email: Email,
+  email: EmailSchema,
   password: z.string(),
 })
 

@@ -3,11 +3,10 @@ import { ConflictError, HttpError } from "@/utils/httpErrors";
 
 const repository = new StorageRepository()
 
-async function getImageHandler(handlerProps?: HandlerProps): ControllerResponse {
-  const field = Object.keys(handlerProps?.parameters!).find(e => e === 'publicId')
-  const publicId = Object.values(handlerProps?.parameters!)[0]
+async function getImageHandler(handlerProps?: HandlerProps<{ id: string }>): ControllerResponse {
+  const publicId = handlerProps?.parameters?.data?.id
 
-  if (!field || !publicId) return {
+  if (!publicId) return {
     statusCode: 400
   }
 
@@ -21,15 +20,15 @@ async function getImageHandler(handlerProps?: HandlerProps): ControllerResponse 
   }
 }
 
-async function uploadImageHandler(handlerProps?: HandlerProps): ControllerResponse {
-  const file = Object.values(handlerProps?.parameters!)[0]
+async function uploadImageHandler(handlerProps?: HandlerProps<{ path: string }>): ControllerResponse {
+  const path = handlerProps?.parameters?.data?.path
 
-  if (!Object.keys(handlerProps?.parameters!).find(key => key === 'file') || !file) return {
+  if (!path) return {
     statusCode: 400
   }
 
   try {
-    const result = await repository.uploadImage(file.path)
+    const result = await repository.uploadImage(path)
     return {
       statusCode: 201, body: {
         url: result.url,
@@ -45,11 +44,10 @@ async function uploadImageHandler(handlerProps?: HandlerProps): ControllerRespon
   }
 }
 
-async function deleteImageHandler(handlerProps?: HandlerProps): ControllerResponse {
-  const field = Object.keys(handlerProps?.parameters!).find(e => e === 'publicId')
-  const publicId = Object.values(handlerProps?.parameters!)[0]
+async function deleteImageHandler(handlerProps?: HandlerProps<{ id: string }>): ControllerResponse {
+  const publicId = handlerProps?.parameters?.data?.id
 
-  if (!field || !publicId) return {
+  if (!publicId) return {
     statusCode: 400
   }
 

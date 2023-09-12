@@ -41,7 +41,7 @@ describe("/contact routes", () => {
     expect(spy).toHaveBeenCalledTimes(1)
   });
 
-  test("GET Method: responds with 204 when not found data", async () => {
+  test("GET Method: responds with 200 when not found data", async () => {
     const spy = vi.spyOn(ContactPageRepository.prototype, 'getContactPage')
       .mockResolvedValueOnce(undefined)
 
@@ -50,7 +50,7 @@ describe("/contact routes", () => {
       url: "/contact",
     });
 
-    expect(statusCode).toBe(204);
+    expect(statusCode).toBe(200);
     expect(result).toEqual(null)
     expect(spy).toHaveBeenCalledTimes(1)
   });

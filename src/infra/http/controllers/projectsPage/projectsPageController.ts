@@ -1,5 +1,5 @@
 import { ProjectsRepository } from "@/infra/db";
-import { PartialProjectSchema, ProjectSchema } from "@/repository/IProject";
+import { PartialProject, PartialProjectSchema, Project, ProjectSchema, ProjectWithId } from "@/repository/IProject";
 import { ConflictError, InternalError } from "@/utils/httpErrors";
 
 const projectsRepository = new ProjectsRepository();
@@ -21,18 +21,14 @@ async function getProjectsHandler(): ControllerResponse {
   }
 }
 
-async function getProjectsByTitleHandler(handlerProps?: HandlerProps): ControllerResponse {
-  if (!Object.keys(handlerProps?.parameters!).length) return {
+async function getProjectsByTitleHandler(handlerProps?: HandlerProps<{ title: string }>): ControllerResponse {
+  const partialTitle = handlerProps?.parameters?.data?.title
+
+  if (!partialTitle) return {
     statusCode: 400
   }
-  const title = (handlerProps?.parameters as { title: string }).title
-  if (!title)
-    throw new ConflictError('Invalid type')
 
-  const projects = await projectsRepository.getProjectsByTitle(title)
-  if (!projects || !projects.length) {
-    return { statusCode: 204 }
-  }
+  const projects = await projectsRepository.getProjectsByPartialTitle(partialTitle)
 
   return {
     body: projects,
@@ -40,8 +36,8 @@ async function getProjectsByTitleHandler(handlerProps?: HandlerProps): Controlle
   }
 }
 
-async function getProjectByIDHandler(handlerProps?: HandlerProps): ControllerResponse {
-  const { id } = (handlerProps?.parameters as { id: string })
+async function getProjectByIDHandler(handlerProps?: HandlerProps<{ id: number }>): ControllerResponse {
+  const id = handlerProps?.parameters?.data?.id
   if (!id) return {
     statusCode: 400
   }
@@ -55,12 +51,13 @@ async function getProjectByIDHandler(handlerProps?: HandlerProps): ControllerRes
   }
 }
 
-async function createProjectHandler(handlerProps?: HandlerProps): ControllerResponse {
-  if (!Object.keys(handlerProps?.parameters!).length) return {
+async function createProjectHandler(handlerProps?: HandlerProps<Project>): ControllerResponse {
+  const project = handlerProps?.parameters?.data
+  if (!project || !Object.keys(project).length) return {
     statusCode: 400
   }
 
-  const validPage = ProjectSchema.safeParse(handlerProps?.parameters)
+  const validPage = ProjectSchema.safeParse(project)
   if (!validPage.success)
     throw new ConflictError('Invalid type')
   try {
@@ -72,13 +69,14 @@ async function createProjectHandler(handlerProps?: HandlerProps): ControllerResp
   }
 }
 
-async function updateProjectHandler(handlerProps?: HandlerProps): ControllerResponse {
-  const { id } = (handlerProps?.parameters as { id: string })
-  if (Object.keys(handlerProps?.parameters!).length < 2 || !+id) return {
+async function updateProjectHandler(handlerProps?: HandlerProps<PartialProject & { id: number }>): ControllerResponse {
+  const project = handlerProps?.parameters?.data
+  const id = project?.id
+  if (!id || Object.keys(project).length <= 1) return {
     statusCode: 400
   }
 
-  const validPage = PartialProjectSchema.safeParse(handlerProps?.parameters)
+  const validPage = PartialProjectSchema.safeParse(project)
   if (!validPage.success || !Object.keys(validPage.data).length)
     throw new ConflictError('Invalid type')
   await projectsRepository.updateProject(+id, validPage.data)
@@ -86,9 +84,9 @@ async function updateProjectHandler(handlerProps?: HandlerProps): ControllerResp
   return { statusCode: 204 }
 }
 
-async function deleteProjectHandler(handlerProps?: HandlerProps): ControllerResponse {
-  const id = Object.values(handlerProps?.parameters!)[0]
-  if (!+id) return {
+async function deleteProjectHandler(handlerProps?: HandlerProps<{ id: number }>): ControllerResponse {
+  const id = handlerProps?.parameters?.data?.id
+  if (!id) return {
     statusCode: 400
   }
 

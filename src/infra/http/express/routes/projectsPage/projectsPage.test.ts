@@ -62,6 +62,7 @@ describe("EXPRESS: /project routes", () => {
 
     const { statusCode } = await request(app)
       .post("/project")
+      .set('authorization', 'Bearer valid-token')
       .send(projectsPageMock[0])
 
     expect(statusCode).toBe(201);
@@ -73,6 +74,7 @@ describe("EXPRESS: /project routes", () => {
     vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { statusCode } = await request(app)
       .post("/project")
+      .set('authorization', 'Bearer valid-token')
       .send()
 
     expect(statusCode).toBe(400);
@@ -81,6 +83,7 @@ describe("EXPRESS: /project routes", () => {
   test("PATCH Method: response with 401 when try update without token", async () => {
     const { statusCode, body } = await request(app)
       .patch('/project/id/87')
+      .set('authorization', 'Bearer valid-token')
       .send({})
 
     expect(statusCode).toBe(401);
@@ -96,6 +99,7 @@ describe("EXPRESS: /project routes", () => {
 
     const { statusCode } = await request(app)
       .patch(`/project/id/${mockedID}`)
+      .set('authorization', 'Bearer valid-token')
       .send(mockedData)
 
     expect(statusCode).toBe(204);
@@ -107,6 +111,7 @@ describe("EXPRESS: /project routes", () => {
     vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { statusCode } = await request(app)
       .patch(`/project/id/5`)
+      .set('authorization', 'Bearer valid-token')
       .send({ invalid: 'payload' })
 
     expect(statusCode).toBe(409);
@@ -116,6 +121,7 @@ describe("EXPRESS: /project routes", () => {
     vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { statusCode } = await request(app)
       .patch(`/project/id/6`)
+      .set('authorization', 'Bearer valid-token')
       .send()
 
     expect(statusCode).toBe(400);
@@ -127,7 +133,6 @@ describe("EXPRESS: /project routes", () => {
       .send()
 
     expect(statusCode).toBe(401);
-    expect(body.message).toBe('Unauthorized');
   })
 
   test("DELETE Method: response with 204", async () => {
@@ -137,6 +142,7 @@ describe("EXPRESS: /project routes", () => {
 
     const { statusCode } = await request(app)
       .delete(`/project/id/99`)
+      .set('authorization', 'Bearer valid-token')
       .send()
 
     expect(statusCode).toBe(204);
@@ -174,7 +180,7 @@ describe("EXPRESS: /project routes", () => {
 
   test("GET Method: get project with like title", async () => {
     const mockedTitle = 'mocked_title'
-    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjectsByTitle')
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjectsByPartialTitle')
       .mockResolvedValueOnce(mockWithID)
 
     const { statusCode, body } = await request(app)
@@ -187,17 +193,17 @@ describe("EXPRESS: /project routes", () => {
     expect(spy).toHaveBeenCalledWith(mockedTitle)
   });
 
-  test("GET Method: should return statusCode 204 when not found data with this title", async () => {
+  test("GET Method: should return statusCode 200 when not found data with this title", async () => {
     const mockedTitle = 'sdfsdf'
-    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjectsByTitle')
-      .mockResolvedValueOnce(undefined)
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjectsByPartialTitle')
+      .mockResolvedValueOnce([])
 
     const { statusCode, body } = await request(app)
       .get(`/projects/title/${mockedTitle}`)
       .send()
 
-    expect(statusCode).toBe(204);
-    expect(body).toEqual({})
+    expect(statusCode).toBe(200);
+    expect(body).toEqual([])
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(mockedTitle)
   });

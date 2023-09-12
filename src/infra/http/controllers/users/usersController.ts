@@ -1,6 +1,6 @@
 import { UsersRepository } from "@/infra/db/PgPromise/Users";
 import NodeMailerImplementation from "@/infra/mailer";
-import { Email, PartialUserSchema, UserSchema } from "@/repository/IUser";
+import { Email, EmailSchema, PartialUserSchema, User, UserSchema } from "@/repository/IUser";
 import { env } from "@/utils/env";
 import { ConflictError, InternalError } from "@/utils/httpErrors";
 import { randomBytes } from "crypto";
@@ -10,20 +10,17 @@ const usersRepository = new UsersRepository();
 
 async function listUsers(): ControllerResponse {
   const users = await usersRepository.listUsers()
-  if (!users.length) {
-    return { statusCode: 204 }
-  }
+
   return {
-    body: users,
+    body: [...users],
     statusCode: 200
   }
 }
 
-async function createUser(handlerProps?: HandlerProps): ControllerResponse {
-  const validParameter = Object.keys(handlerProps?.parameters!).includes('user')
-  const user = Object.values(handlerProps?.parameters!)[0]
+async function createUser(handlerProps?: HandlerProps<Omit<User, 'id'>>): ControllerResponse {
+  const user = handlerProps?.parameters?.data
   const validUser = UserSchema.safeParse(user)
-  if (!user || !validParameter || !validUser.success)
+  if (!validUser.success)
     throw new ConflictError('Invalid parameters.')
 
   const alredyExists = !!(await usersRepository.getUserByEmail(validUser.data.email))
@@ -40,33 +37,31 @@ async function createUser(handlerProps?: HandlerProps): ControllerResponse {
   return { statusCode: 201, body: { accessToken } }
 }
 
-async function updateUser(handlerProps?: HandlerProps): ControllerResponse {
-  const validParameter = Object.keys(handlerProps?.parameters!).includes('user')
-  const user = Object.values(handlerProps?.parameters!)[0]
+async function updateUser(handlerProps?: HandlerProps<Partial<User> & { id: number }>): ControllerResponse {
+  const user = handlerProps?.parameters?.data
   const validUser = PartialUserSchema.safeParse(user)
-  if (!user || !validParameter || !validUser.success)
+  if (!validUser.success || !validUser.data.id)
     throw new ConflictError('Invalid parameters.')
 
-  await usersRepository.updateUser(validUser.data.id ?? 0, validUser.data)
+  const { id, ...data } = validUser.data
+  await usersRepository.updateUser(id, data)
 
   return {
     statusCode: 204
   }
 }
 
-async function deleteUser(handlerProps?: HandlerProps): ControllerResponse {
-  const validParameter = Object.keys(handlerProps?.parameters!).includes('id')
-  const id = `${Object.values(handlerProps?.parameters!)[0]}`
-  if (!id.length || !validParameter) throw new ConflictError('Invalid parameters.')
+async function deleteUser(handlerProps?: HandlerProps<{ id: number }>): ControllerResponse {
+  const id = handlerProps?.parameters?.data?.id
+  if (!id) throw new ConflictError('Invalid parameters.')
 
   await usersRepository.deleteUser(+id)
   return { statusCode: 204 }
 }
 
-async function getUserByEmail(handlerProps?: HandlerProps): ControllerResponse {
-  const validParameter = Object.keys(handlerProps?.parameters!).includes('email')
-  const email = `${Object.values(handlerProps?.parameters!)[0]}`
-  if (!email.length || !validParameter) throw new ConflictError('Invalid parameters.')
+async function getUserByEmail(handlerProps?: HandlerProps<{ email: Email }>): ControllerResponse {
+  const email = handlerProps?.parameters?.data?.email
+  if (!email) throw new ConflictError('Invalid parameters.')
   const user = await usersRepository.getUserByEmail(email)
   const body = !!user ? {
     id: user.id,
@@ -77,23 +72,24 @@ async function getUserByEmail(handlerProps?: HandlerProps): ControllerResponse {
   return { statusCode: 200, body }
 }
 
-async function findUsersByName(handlerProps?: HandlerProps): ControllerResponse {
-  const validParameter = Object.keys(handlerProps?.parameters!).includes('partialName')
-  const partialName = `${Object.values(handlerProps?.parameters!)[0]}`
-  if (!partialName.length || !validParameter) throw new ConflictError('Invalid parameters.')
+async function findUsersByName(handlerProps?: HandlerProps<{ partialName: string }>): ControllerResponse {
+  const partialName = handlerProps?.parameters?.data?.partialName
+  if (!partialName) throw new ConflictError('Invalid parameters.')
 
   const users = await usersRepository.findUsersByName(`${partialName}`)
 
   return { statusCode: 200, body: users }
 }
 
-async function passwordRecovery(handlerProps?: HandlerProps): ControllerResponse {
-  const validParameter = Object.keys(handlerProps?.parameters!).includes('email')
-  const email = `${Object.values(handlerProps?.parameters!)[0]}`
-  const validEmail = Email.safeParse(email)
-  const user = await usersRepository.getUserByEmail(email)
+async function passwordRecovery(handlerProps?: HandlerProps<{ email: Email }>): ControllerResponse {
+  const email = handlerProps?.parameters?.data?.email
+  const validEmail = EmailSchema.safeParse(email)
+  if (!validEmail.success)
+    throw new ConflictError('Invalid parameters.')
 
-  if (!email || !validParameter || !validEmail.success || !user?.id)
+  const user = await usersRepository.getUserByEmail(validEmail.data)
+
+  if (!user?.id)
     throw new ConflictError('Invalid parameters.')
 
   const newPassword = randomBytes(8).toString('hex')
@@ -102,7 +98,7 @@ async function passwordRecovery(handlerProps?: HandlerProps): ControllerResponse
   const mailer = new NodeMailerImplementation()
   const { accepted } = await mailer.send({
     from: 'iKatoo',
-    to: email,
+    to: validEmail.data,
     subject: 'Recovery password',
     message: `Your new password is: ${newPassword}`
   })
@@ -120,4 +116,5 @@ export {
   listUsers,
   passwordRecovery,
   updateUser
-}
+};
+

@@ -31,7 +31,7 @@ describe("ProjectsPage Controller test", () => {
     const mockedData = projectsPageMock[0]
     const spy = vi.spyOn(ProjectsRepository.prototype, 'createProject').mockResolvedValueOnce()
 
-    await expect(createProjectHandler({ parameters: mockedData }))
+    await expect(createProjectHandler({ parameters: { data: mockedData } }))
       .resolves.not.toThrow()
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(mockedData)
@@ -46,7 +46,14 @@ describe("ProjectsPage Controller test", () => {
     }
     const spy = vi.spyOn(ProjectsRepository.prototype, 'updateProject').mockResolvedValueOnce()
 
-    await expect(updateProjectHandler({ parameters: { id: 7, ...mockedData } }))
+    await expect(updateProjectHandler({
+      parameters: {
+        data: {
+          id: 7,
+          ...mockedData
+        }
+      }
+    }))
       .resolves.not.toThrow()
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(7, mockedData)
@@ -55,18 +62,18 @@ describe("ProjectsPage Controller test", () => {
   test("Delete projects page with 204 status code", async () => {
     const spy = vi.spyOn(ProjectsRepository.prototype, 'deleteProject').mockResolvedValueOnce()
 
-    await expect(deleteProjectHandler({ parameters: { id: 9 } }))
+    await expect(deleteProjectHandler({ parameters: { data: { id: 9 } } }))
       .resolves.not.toThrow()
     expect(spy).toHaveBeenCalledTimes(1)
   });
 
   test("Get projects with similar title", async () => {
     const expected = [mockWithId[1]]
-    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjectsByTitle')
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjectsByPartialTitle')
       .mockResolvedValueOnce(expected)
     const title = mockWithId[1].description.title
 
-    const result = await getProjectsByTitleHandler({ parameters: { title } })
+    const result = await getProjectsByTitleHandler({ parameters: { data: { title } } })
 
     expect(result?.body).toEqual(expected);
     expect(spy).toHaveBeenCalledTimes(1)
@@ -77,7 +84,7 @@ describe("ProjectsPage Controller test", () => {
     const expected = mockWithId[1]
     const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjectById')
       .mockResolvedValueOnce(expected)
-    const result = await getProjectByIDHandler({ parameters: { id: expected.id } })
+    const result = await getProjectByIDHandler({ parameters: { data: { id: expected.id } } })
 
     expect(result?.body).toEqual(expected);
     expect(spy).toHaveBeenCalledTimes(1)

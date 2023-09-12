@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { Email } from "./IUser";
+import { EmailSchema } from "./IUser";
 
 export const AuthSchema = z.object({
-  email: Email,
+  email: EmailSchema,
   password: z.string(),
 })
 

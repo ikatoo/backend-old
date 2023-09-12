@@ -2,9 +2,10 @@ import { Request, Response } from "express"
 
 export const expressAdapter = (handler: HandlerFunction) => {
   const expressHandler = async (request: Request, response: Response) => {
-    const parameters = { ...request.body, ...request.params }
-    const result = await handler({ parameters })
-    if(!result) return
+    const { authorization } = request.headers
+    const data = { ...request.body, ...request.params }
+    const result = await handler({ parameters: { data, authorization } })
+    if (!result) return
     const { statusCode, body } = result
 
     return statusCode
