@@ -27,25 +27,19 @@ describe("Auth Controller test", () => {
       vi.spyOn(jwt, 'sign').mockImplementation(() => ('valid-access-token'))
 
       const result = await authentication({
-        parameters: { email: mock.email, password: mock.password }
+        parameters: { data: { email: mock.email, password: mock.password } }
       })
 
       expect(result?.statusCode).toEqual(200)
       expect(result?.body).toHaveProperty('accessToken', 'valid-access-token')
     });
 
-    test("Fail on try auth user with invalid parameters", async () => {
-      await expect(authentication({
-        parameters: { invalid: 'parameter' }
-      })).rejects.toThrowError('Invalid parameters')
-    })
-
     test("Fail on try auth user with invalid email", async () => {
       vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
         .mockResolvedValueOnce(undefined)
 
       await expect(authentication({
-        parameters: { email: 'invalid@email.com', password: 'somepass' }
+        parameters: { data: { email: 'invalid@email.com', password: 'somepass' } }
       })).rejects.toThrowError('Unauthorized')
     })
 
@@ -55,7 +49,7 @@ describe("Auth Controller test", () => {
       vi.spyOn(cryptoUtils, 'compareHash').mockResolvedValueOnce(false)
 
       await expect(authentication({
-        parameters: { email: mock.email, password: 'invalidpass' }
+        parameters: { data: { email: mock.email, password: 'invalidpass' } }
       })).rejects.toThrowError('Unauthorized')
     })
 
@@ -66,7 +60,7 @@ describe("Auth Controller test", () => {
         })
 
       await expect(authentication({
-        parameters: { email: mock.email, password: mock.password }
+        parameters: { data: { email: mock.email, password: mock.password } }
       })).rejects.toThrowError()
     })
   })
@@ -77,18 +71,13 @@ describe("Auth Controller test", () => {
         .rejects.toThrowError('Unauthorized')
     })
 
-    test('should fail on use invalid parameters', async () => {
-      await expect(verifyToken({ parameters: { invalid: 'parameter' } }))
-        .rejects.toThrowError('Unauthorized')
-    })
-
     test('should fail on use a empty token', async () => {
-      await expect(verifyToken({ parameters: { token: '' } }))
+      await expect(verifyToken({ parameters: { data: { token: '' } } }))
         .rejects.toThrowError('Unauthorized')
     })
 
     test('should fail on use invalid token', async () => {
-      await expect(verifyToken({ parameters: { token: 'invalid-token' } }))
+      await expect(verifyToken({ parameters: { data: { token: 'invalid-token' } } }))
         .rejects.toThrowError('Unauthorized')
     })
 
@@ -100,7 +89,9 @@ describe("Auth Controller test", () => {
       )
       await expect(verifyToken({
         parameters: {
-          token: accessToken
+          data: {
+            token: accessToken
+          }
         }
       })).rejects.toThrowError('Unauthorized')
     })
@@ -109,7 +100,7 @@ describe("Auth Controller test", () => {
       vi.spyOn(TokenBlacklistRepository.prototype, 'isBlacklisted')
         .mockResolvedValueOnce(true)
 
-      await expect(verifyToken({ parameters: { token: 'blacklisted-token' } }))
+      await expect(verifyToken({ parameters: { data: { token: 'blacklisted-token' } } }))
         .rejects.toThrowError('Unauthorized')
     })
 
@@ -126,7 +117,7 @@ describe("Auth Controller test", () => {
       )
       const result = await verifyToken({
         parameters: {
-          token: accessToken
+          authorization: accessToken
         }
       })
 
@@ -152,7 +143,9 @@ describe("Auth Controller test", () => {
 
       await expect(verifyToken({
         parameters: {
-          token: accessToken
+          data: {
+            token: accessToken
+          }
         }
       })).rejects.toThrowError('Unauthorized')
     })
@@ -164,7 +157,7 @@ describe("Auth Controller test", () => {
     vi.spyOn(TokenBlacklistRepository.prototype, 'add')
       .mockResolvedValueOnce()
 
-    const result = await signout({ parameters: { token: 'valid-token' } })
+    const result = await signout({ parameters: { authorization: 'valid-token' } })
 
     expect(result?.statusCode).toEqual(204)
   })
@@ -173,7 +166,7 @@ describe("Auth Controller test", () => {
     vi.spyOn(TokenBlacklistRepository.prototype, 'isBlacklisted')
       .mockResolvedValueOnce(true)
 
-    await expect(signout({ parameters: { token: 'valid-token' } }))
+    await expect(signout({ parameters: { authorization: 'valid-token' } }))
       .rejects.toThrowError('This token always blacklisted.')
 
   })

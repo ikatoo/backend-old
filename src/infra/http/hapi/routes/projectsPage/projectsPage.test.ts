@@ -178,7 +178,7 @@ describe("/project routes", () => {
 
   test("GET Method: get project with like title", async () => {
     const mockedTitle = 'mocked_title'
-    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjectsByTitle')
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjectsByPartialTitle')
       .mockResolvedValueOnce(mockWithID)
 
     const { result, statusCode } = await server.inject({
@@ -192,18 +192,18 @@ describe("/project routes", () => {
     expect(spy).toHaveBeenCalledWith(mockedTitle)
   });
 
-  test("GET Method: should return statusCode 204 when not found data with this title", async () => {
+  test("GET Method: should return statusCode 200 when not found data with this title", async () => {
     const mockedTitle = 'sdfsdf'
-    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjectsByTitle')
-      .mockResolvedValueOnce(undefined)
+    const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjectsByPartialTitle')
+      .mockResolvedValueOnce([])
 
     const { result, statusCode } = await server.inject({
       method: "get",
       url: `/projects/title/${mockedTitle}`,
     });
 
-    expect(statusCode).toBe(204);
-    expect(result).toBeNull();
+    expect(statusCode).toBe(200);
+    expect(result).toEqual([]);
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(mockedTitle)
   });

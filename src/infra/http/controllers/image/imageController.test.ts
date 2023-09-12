@@ -19,7 +19,7 @@ describe("Image Controller test", () => {
     vi.spyOn(v2, 'url').mockResolvedValue(urlMock)
     const result = await getImageHandler({
       parameters: {
-        publicId: publicIdMock
+        data: { id: publicIdMock }
       }
     })
 
@@ -56,7 +56,9 @@ describe("Image Controller test", () => {
     })
     const result = await uploadImageHandler({
       parameters: {
-        file: "shared/fixtures/test-image.jpg"
+        data: {
+          path: "shared/fixtures/test-image.jpg"
+        }
       }
     })
 
@@ -68,7 +70,7 @@ describe("Image Controller test", () => {
   test('should delete the image without error', async () => {
     const publicId = 'folder/image.jpg'
     const spyDestroyFn = vi.spyOn(v2.uploader, "destroy").mockResolvedValue({ result: "ok" })
-    const result = await deleteImageHandler({ parameters: { publicId } })
+    const result = await deleteImageHandler({ parameters: { data: { id: publicId } } })
 
     expect(spyDestroyFn).toHaveBeenCalledTimes(1)
     expect(spyDestroyFn).toHaveBeenCalledWith(publicId, {

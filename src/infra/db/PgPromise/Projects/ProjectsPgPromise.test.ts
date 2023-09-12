@@ -79,7 +79,7 @@ describe("Basic operations in Projects Postgres Database", () => {
       snapshot: project.snapshot,
     }])
 
-    await expect(repository.getProjectsByTitle(project.description.title))
+    await expect(repository.getProjectsByPartialTitle(project.description.title))
       .resolves.not.toThrow()
     expect(mockedFn).toHaveBeenCalledTimes(1)
     expect(mockedFn).toHaveBeenCalledWith(

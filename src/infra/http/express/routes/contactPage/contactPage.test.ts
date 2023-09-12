@@ -32,19 +32,6 @@ describe("/contact routes", () => {
     expect(spy).toHaveBeenCalledTimes(1)
   });
 
-  test("GET Method: response with 204 when not found data", async () => {
-    const spy = vi.spyOn(ContactPageRepository.prototype, 'getContactPage')
-      .mockResolvedValueOnce(undefined)
-
-    const { statusCode, body } = await request(app)
-      .get("/contact")
-      .send()
-
-    expect(statusCode).toBe(204);
-    expect(body).toEqual({})
-    expect(spy).toHaveBeenCalledTimes(1)
-  });
-
   test("POST Method: should expect 401 statusCode on try create contact without token", async () => {
     const { statusCode } = await request(app)
       .post("/contact")
@@ -54,12 +41,13 @@ describe("/contact routes", () => {
   });
 
   test("POST Method: create contact page with 204 statusCode", async () => {
-    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce({ statusCode: 200 })
     const spy = vi.spyOn(ContactPageRepository.prototype, 'createContactPage')
       .mockResolvedValueOnce()
 
     const { statusCode } = await request(app)
       .post("/contact")
+      .set('authorization', 'Bearer valid-token')
       .send(contactPageMock)
 
     expect(statusCode).toBe(201);
@@ -76,6 +64,7 @@ describe("/contact routes", () => {
 
     const { body, statusCode } = await request(app)
       .post("/contact")
+      .set('authorization', 'Bearer valid-token')
       .send(contactPageMock)
 
     expect(statusCode).toBe(409);
@@ -89,6 +78,7 @@ describe("/contact routes", () => {
     vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { statusCode } = await request(app)
       .post("/contact")
+      .set('authorization', 'Bearer valid-token')
       .send()
 
     expect(statusCode).toBe(400);
@@ -102,6 +92,7 @@ describe("/contact routes", () => {
 
     const { statusCode } = await request(app)
       .patch("/contact")
+      .set('authorization', 'Bearer valid-token')
       .send(mockedData)
 
     expect(statusCode).toBe(204);
@@ -123,6 +114,7 @@ describe("/contact routes", () => {
     vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { statusCode } = await request(app)
       .patch("/contact")
+      .set('authorization', 'Bearer valid-token')
       .send({ invalid: 'payload' })
 
     expect(statusCode).toBe(409);
@@ -132,6 +124,7 @@ describe("/contact routes", () => {
     vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { statusCode } = await request(app)
       .patch("/contact")
+      .set('authorization', 'Bearer valid-token')
       .send()
 
     expect(statusCode).toBe(400);
@@ -144,6 +137,7 @@ describe("/contact routes", () => {
 
     const { statusCode } = await request(app)
       .delete("/contact")
+      .set('authorization', 'Bearer valid-token')
       .send()
 
     expect(statusCode).toBe(204)

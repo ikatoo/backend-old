@@ -1,5 +1,5 @@
 import { AboutPageRepository } from "@/infra/db";
-import { AboutPageSchema, PartialAboutPageSchema } from "@/repository/IAboutPage";
+import { AboutPage, AboutPageSchema, PartialAboutPageSchema } from "@/repository/IAboutPage";
 import { ConflictError } from "@/utils/httpErrors";
 
 const aboutPageRepository = new AboutPageRepository();
@@ -13,11 +13,12 @@ async function getAboutPageHandler(): Promise<HandlerResponse> {
   return { body, statusCode: 200 }
 }
 
-async function createAboutPageHandler(handlerProps?: HandlerProps): Promise<HandlerResponse | void> {
-  if (!Object.keys(handlerProps?.parameters!).length) return {
+async function createAboutPageHandler(handlerProps?: HandlerProps<AboutPage>): Promise<HandlerResponse | void> {
+  const aboutPage = handlerProps?.parameters?.data
+  if (!aboutPage || !Object.keys(aboutPage).length) return {
     statusCode: 400
   }
-  const validPage = AboutPageSchema.safeParse(handlerProps?.parameters)
+  const validPage = AboutPageSchema.safeParse(aboutPage)
   if (!validPage.success)
     throw new ConflictError('Invalid type.')
 
@@ -31,12 +32,13 @@ async function createAboutPageHandler(handlerProps?: HandlerProps): Promise<Hand
   }
 }
 
-async function updateAboutPageHandler(handlerProps?: HandlerProps): Promise<HandlerResponse | void> {
-  if (!Object.keys(handlerProps?.parameters!).length) return {
+async function updateAboutPageHandler(handlerProps?: HandlerProps<Partial<AboutPage>>): Promise<HandlerResponse | void> {
+  const aboutPage = handlerProps?.parameters?.data
+  if (!aboutPage || !Object.keys(aboutPage).length) return {
     statusCode: 400
   }
 
-  const validPage = PartialAboutPageSchema.safeParse(handlerProps?.parameters)
+  const validPage = PartialAboutPageSchema.safeParse(aboutPage)
   if (!validPage.success || Object.keys(validPage.data).length === 0)
     throw new ConflictError('Invalid type.')
 

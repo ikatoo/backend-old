@@ -20,7 +20,7 @@ describe("AboutPage Controller test", () => {
   test("Create about page without error", async () => {
     const spy = vi.spyOn(AboutPageRepository.prototype, 'createAboutPage').mockResolvedValueOnce()
 
-    await expect(createAboutPageHandler({ parameters: aboutPageMock }))
+    await expect(createAboutPageHandler({ parameters: { data: aboutPageMock } }))
       .resolves.not.toThrow()
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(aboutPageMock)
@@ -30,7 +30,7 @@ describe("AboutPage Controller test", () => {
     const mockedData = { title: 'new title' }
     const spy = vi.spyOn(AboutPageRepository.prototype, 'updateAboutPage').mockResolvedValueOnce()
 
-    await expect(updateAboutPageHandler({ parameters: mockedData }))
+    await expect(updateAboutPageHandler({ parameters: { data: mockedData } }))
       .resolves.not.toThrow()
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(mockedData)
@@ -38,7 +38,7 @@ describe("AboutPage Controller test", () => {
 
   test("Delete about page", async () => {
     const spy = vi.spyOn(AboutPageRepository.prototype, 'deleteAboutPage').mockResolvedValueOnce()
-    
+
     await expect(deleteAboutPageHandler())
       .resolves.not.toThrow()
     expect(spy).toHaveBeenCalledTimes(1)

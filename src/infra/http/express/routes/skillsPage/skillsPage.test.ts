@@ -51,7 +51,6 @@ describe("EXPRESS: /skills routes", () => {
       .send(skillPageMock)
 
     expect(statusCode).toBe(401);
-    expect(body.message).toBe('Unauthorized');
   });
 
   test("POST Method: create skills page with 204 statusCode", async () => {
@@ -61,6 +60,7 @@ describe("EXPRESS: /skills routes", () => {
 
     const { statusCode } = await request(app)
       .post("/skills")
+      .set('authorization', 'Bearer valid-token')
       .send(skillPageMock)
 
     expect(statusCode).toBe(201);
@@ -75,6 +75,7 @@ describe("EXPRESS: /skills routes", () => {
 
     const { statusCode } = await request(app)
       .post("/skills")
+      .set('authorization', 'Bearer valid-token')
       .send(skillPageMock)
 
     expect(statusCode).toBe(409);
@@ -86,6 +87,7 @@ describe("EXPRESS: /skills routes", () => {
     vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { statusCode } = await request(app)
       .post("/skills")
+      .set('authorization', 'Bearer valid-token')
       .send()
 
     expect(statusCode).toBe(400);
@@ -99,17 +101,18 @@ describe("EXPRESS: /skills routes", () => {
       .send(mockedData)
 
     expect(statusCode).toBe(401);
-    expect(body.message).toBe('Unauthorized');
   });
 
   test("PATCH Method: response with 204 when update", async () => {
     vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
-    const mockedData = { title: 'new title' }
+    const mockedData = { title: 'new title' }   
+
     const spy = vi.spyOn(SkillsPageRepository.prototype, 'updateSkillsPage')
       .mockResolvedValueOnce()
 
     const { statusCode } = await request(app)
       .patch("/skills")
+      .set('authorization', 'Bearer valid-token')
       .send(mockedData)
 
     expect(statusCode).toBe(204);
@@ -121,6 +124,7 @@ describe("EXPRESS: /skills routes", () => {
     vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { statusCode } = await request(app)
       .patch("/skills")
+      .set('authorization', 'Bearer valid-token')
       .send({ invalid: 'payload' })
 
     expect(statusCode).toBe(409);
@@ -130,6 +134,7 @@ describe("EXPRESS: /skills routes", () => {
     vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { statusCode } = await request(app)
       .patch("/skills")
+      .set('authorization', 'Bearer valid-token')
       .send()
 
     expect(statusCode).toBe(400);
@@ -141,7 +146,6 @@ describe("EXPRESS: /skills routes", () => {
       .send()
 
     expect(statusCode).toBe(401)
-    expect(body.message).toBe('Unauthorized')
   });
 
   test("DELETE Method: responde with status 204", async () => {
@@ -151,6 +155,7 @@ describe("EXPRESS: /skills routes", () => {
 
     const { statusCode } = await request(app)
       .delete("/skills")
+      .set('authorization', 'Bearer valid-token')
       .send()
 
     expect(statusCode).toBe(204)

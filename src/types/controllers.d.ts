@@ -3,8 +3,8 @@ declare type HandlerResponse = {
   body?: object
 }
 
-declare type HandlerProps = {
-  parameters?: unknown
+declare type HandlerProps<T = any> = {
+  parameters?: { data?: T, authorization?: string }
 }
 
 declare type ControllerResponse = Promise<HandlerResponse | void>

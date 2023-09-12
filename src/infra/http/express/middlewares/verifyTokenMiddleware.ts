@@ -5,8 +5,11 @@ import { NextFunction, Request, Response } from "express"
 export default async (request: Request, response: Response, next: NextFunction) => {
   const { authorization } = request.headers
   const token = authorization?.replace('Bearer ', '')
+
+  if (!token) return response.status(401).send()
+
   try {
-    await verifyToken({ parameters: { token } })
+    await verifyToken({ parameters: { data: { token } } })
     next()
   } catch (error) {
     if (error instanceof UnauthorizedError) {

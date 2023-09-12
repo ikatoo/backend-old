@@ -23,7 +23,7 @@ describe("SkillsPage Controller test", () => {
     const spy = vi.spyOn(SkillsPageRepository.prototype, 'createSkillsPage')
       .mockResolvedValueOnce()
 
-    await expect(createSkillsPageHandler({ parameters: skillPageMock }))
+    await expect(createSkillsPageHandler({ parameters: { data: skillPageMock } }))
       .resolves.not.toThrow()
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(skillPageMock)
@@ -37,7 +37,7 @@ describe("SkillsPage Controller test", () => {
       description: 'new Description'
     }
 
-    await expect(updateSkillsPageHandler({ parameters: mockedData }))
+    await expect(updateSkillsPageHandler({ parameters: { data: mockedData } }))
       .resolves.toEqual({ statusCode: 204 })
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(mockedData)

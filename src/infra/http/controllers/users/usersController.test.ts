@@ -13,7 +13,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { createUser, deleteUser, findUsersByName, getUserByEmail, listUsers, passwordRecovery, updateUser } from "./usersController";
 
 describe("User Controller test", () => {
-  const usersMock: User[] = [
+  const usersMock: Required<User>[] = [
     {
       id: 1,
       name: 'test name1',
@@ -53,7 +53,7 @@ describe("User Controller test", () => {
     const { password, ...expected } = usersMock[1]
     const spy = vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
       .mockResolvedValueOnce(usersMock[1])
-    const result = await getUserByEmail({ parameters: { email: expected.email } })
+    const result = await getUserByEmail({ parameters: { data: { email: expected.email } } })
 
     expect(result?.statusCode).toEqual(200)
     expect(result?.body).toEqual(expected)
@@ -70,7 +70,7 @@ describe("User Controller test", () => {
     const spy = vi.spyOn(UsersRepository.prototype, 'findUsersByName')
       .mockResolvedValueOnce(expected)
 
-    const result = await findUsersByName({ parameters: { partialName: 'name1' } })
+    const result = await findUsersByName({ parameters: { data: { partialName: 'name1' } } })
 
     expect(result?.statusCode).toEqual(200)
     expect(result?.body).toEqual(expected)
@@ -79,7 +79,7 @@ describe("User Controller test", () => {
   });
 
   test("Create user without error", async () => {
-    const userMock: User = {
+    const userMock = {
       name: `test user ${new Date().getTime()}`,
       email: 'test@user.com',
       password: 'pass'
@@ -89,7 +89,7 @@ describe("User Controller test", () => {
       .mockResolvedValueOnce({ id: 8 })
     vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
       .mockResolvedValueOnce(undefined)
-    const result = await createUser({ parameters: { user: userMock } })
+    const result = await createUser({ parameters: { data: userMock } })
 
     expect(result?.statusCode).toEqual(201)
     expect(spy).toHaveBeenCalledTimes(1)
@@ -97,22 +97,23 @@ describe("User Controller test", () => {
   });
 
   test("Update users data with 204 status code", async () => {
-    const { id, ...userMock } = usersMock[0]
+    const userMock = usersMock[0]
     const spy = vi.spyOn(UsersRepository.prototype, 'updateUser')
       .mockResolvedValueOnce()
 
-    const result = await updateUser({ parameters: { user: userMock } })
+    const result = await updateUser({ parameters: { data: userMock } })
 
     expect(result?.statusCode).toEqual(204)
     expect(spy).toHaveBeenCalledTimes(1)
-    expect(spy).toHaveBeenCalledWith(0, userMock)
+    const { id, ...data } = userMock
+    expect(spy).toHaveBeenCalledWith(id, data)
   });
 
   test("Delete user data with 204 status code", async () => {
     const spy = vi.spyOn(UsersRepository.prototype, 'deleteUser')
       .mockResolvedValueOnce()
 
-    const result = await deleteUser({ parameters: { id: 8 } })
+    const result = await deleteUser({ parameters: { data: { id: 8 } } })
 
     expect(result?.statusCode).toEqual(204)
     expect(spy).toHaveBeenCalledTimes(1)
@@ -133,7 +134,7 @@ describe("User Controller test", () => {
           response: 'ok'
         })
 
-      const result = await passwordRecovery({ parameters: { email: mockedUser.email } })
+      const result = await passwordRecovery({ parameters: { data: { email: mockedUser.email } } })
 
       expect(result?.statusCode).toEqual(204)
       expect(spy).toHaveBeenCalledTimes(1)
@@ -152,7 +153,7 @@ describe("User Controller test", () => {
       vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
         .mockResolvedValueOnce(undefined)
 
-      await expect(passwordRecovery({ parameters: { email: 'invalid-email' } }))
+      await expect(passwordRecovery({ parameters: { data: { email: 'invalid-email' } } }))
         .rejects.toThrowError('Invalid parameters.')
     }
   )
@@ -163,7 +164,8 @@ describe("User Controller test", () => {
       vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
         .mockResolvedValueOnce(undefined)
 
-      await expect(passwordRecovery({ parameters: { email: 'invalid@emai.com' } }))
+      // await expect(passwordRecovery({ parameters: { email: 'invalid@emai.com' } }))
+      await expect(passwordRecovery({ parameters: { data: { email: 'invalid@emai.com' } } }))
         .rejects.toThrowError('Invalid parameters.')
     }
   )

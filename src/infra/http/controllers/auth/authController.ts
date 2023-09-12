@@ -1,6 +1,6 @@
 import { TokenBlacklistRepository } from "@/infra/db/PgPromise/TokenBlacklist";
 import { UsersRepository } from "@/infra/db/PgPromise/Users";
-import { AuthSchema } from "@/repository/IAuth";
+import { Auth, AuthSchema } from "@/repository/IAuth";
 import { User } from "@/repository/IUser";
 import { env } from "@/utils/env";
 import { compareHash } from "@/utils/hasher";
@@ -10,8 +10,8 @@ import { sign, verify } from "jsonwebtoken";
 const usersRepository = new UsersRepository();
 const tokenBlacklistRepository = new TokenBlacklistRepository()
 
-async function authentication(handlerProps?: HandlerProps): ControllerResponse {
-  const validParameters = AuthSchema.safeParse(handlerProps?.parameters)
+async function authentication(handlerProps?: HandlerProps<Auth>): ControllerResponse {
+  const validParameters = AuthSchema.safeParse(handlerProps?.parameters?.data)
   if (!validParameters.success)
     throw new BadRequestError('Invalid parameters')
 
@@ -37,33 +37,33 @@ async function authentication(handlerProps?: HandlerProps): ControllerResponse {
 }
 
 const verifyToken = async (handlerProps?: HandlerProps): ControllerResponse => {
-  const parameters = handlerProps?.parameters ?? {}
-  const token = Object.values(parameters)[0]
+  const token = handlerProps?.parameters?.authorization
 
-  try {
-    const payload = verify(token, env.JWT_SECRET)
-    if (!(typeof payload === 'object' && 'id' in payload))
-      throw new Error()
+    try {
+      if (!token) throw new Error()
+  const payload = verify(token, env.JWT_SECRET)
+  if (!(typeof payload === 'object' && 'id' in payload))
+    throw new Error()
 
-    const result = await usersRepository.getUserByID(payload.id)
-    if (!result)
-      throw new Error()
-    const { password: _, ...user } = result
-    const isBlacklisted = await tokenBlacklistRepository.isBlacklisted(token)
+  const result = await usersRepository.getUserByID(payload.id)
+  if (!result)
+    throw new Error()
+  const { password: _, ...user } = result
+  const isBlacklisted = await tokenBlacklistRepository.isBlacklisted(token)
 
-    if (!user || isBlacklisted)
-      throw new Error()
+  if (!user || isBlacklisted)
+    throw new Error()
 
-    return { statusCode: 200, body: { user } }
-  } catch {
-    throw new UnauthorizedError('Unauthorized')
-  }
+  return { statusCode: 200, body: { user } }
+} catch {
+  throw new UnauthorizedError('Unauthorized')
+}
 
 }
 
-const signout = async (handlerProps?: HandlerProps): ControllerResponse => {
-  const parameters = handlerProps?.parameters ?? {}
-  const token = `${Object.values(parameters)[0]}`
+const signout = async (handlerProps?: HandlerProps<{ token: string }>): ControllerResponse => {
+  const token = handlerProps?.parameters?.authorization
+  if (!token) throw new BadRequestError('Invalid parameters')
 
   try {
     const isBlacklisted = await tokenBlacklistRepository.isBlacklisted(token)
