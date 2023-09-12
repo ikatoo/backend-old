@@ -13,8 +13,8 @@ export default (handler: HandlerFunction) => {
       const { statusCode, body } = result
 
       return statusCode
-        ? h.response(body).code(statusCode)
-        : h.response(body)
+        ? h.response(body ?? {}).code(statusCode)
+        : h.response(body ?? {})
     } catch (error) {
       if (error instanceof HttpError) {
         const { message, statusCode } = error

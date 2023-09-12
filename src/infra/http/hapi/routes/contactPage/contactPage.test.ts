@@ -51,7 +51,7 @@ describe("/contact routes", () => {
     });
 
     expect(statusCode).toBe(200);
-    expect(result).toEqual(null)
+    expect(result).toEqual({})
     expect(spy).toHaveBeenCalledTimes(1)
   });
 

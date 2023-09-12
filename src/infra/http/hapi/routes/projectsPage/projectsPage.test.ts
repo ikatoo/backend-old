@@ -43,7 +43,7 @@ describe("/project routes", () => {
     expect(spy).toHaveBeenCalledTimes(1)
   });
 
-  test("GET Method: responds with 204 when not found data", async () => {
+  test("GET Method: responds with 200 when not found data", async () => {
     const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjects')
       .mockResolvedValueOnce([])
 
@@ -52,8 +52,8 @@ describe("/project routes", () => {
       url: "/projects",
     });
 
-    expect(statusCode).toBe(204);
-    expect(result).toEqual(null)
+    expect(statusCode).toBe(200);
+    expect(result).toEqual([])
     expect(spy).toHaveBeenCalledTimes(1)
   })
 
@@ -166,12 +166,13 @@ describe("/project routes", () => {
     const spy = vi.spyOn(ProjectsRepository.prototype, 'getProjectById')
       .mockResolvedValueOnce(undefined)
 
-    const { statusCode } = await server.inject({
+    const { statusCode, result } = await server.inject({
       method: "get",
       url: '/project/id/1000000',
     });
 
-    expect(statusCode).toBe(404);
+    expect(statusCode).toBe(200);
+    expect(result).toEqual({});
     expect(spy).toHaveBeenCalledTimes(1)
     expect(spy).toHaveBeenCalledWith(1000000)
   });
