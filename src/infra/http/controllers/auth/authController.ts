@@ -1,7 +1,6 @@
 import { TokenBlacklistRepository } from "@/infra/db/PgPromise/TokenBlacklist";
 import { UsersRepository } from "@/infra/db/PgPromise/Users";
 import { Auth, AuthSchema } from "@/repository/IAuth";
-import { User } from "@/repository/IUser";
 import { env } from "@/utils/env";
 import { compareHash } from "@/utils/hasher";
 import { BadRequestError, ConflictError, UnauthorizedError } from "@/utils/httpErrors";
@@ -37,27 +36,28 @@ async function authentication(handlerProps?: HandlerProps<Auth>): ControllerResp
 }
 
 const verifyToken = async (handlerProps?: HandlerProps): ControllerResponse => {
-  const token = handlerProps?.parameters?.authorization
+  const token = handlerProps?.parameters?.authorization?.replace('Bearer ', '')
 
-    try {
-      if (!token) throw new Error()
-  const payload = verify(token, env.JWT_SECRET)
-  if (!(typeof payload === 'object' && 'id' in payload))
-    throw new Error()
+  try {
+    if (!token) throw new Error()
+    const payload = verify(token, env.JWT_SECRET)
+    console.log('payload ===>', payload)
+    if (!(typeof payload === 'object' && 'id' in payload))
+      throw new Error()
 
-  const result = await usersRepository.getUserByID(payload.id)
-  if (!result)
-    throw new Error()
-  const { password: _, ...user } = result
-  const isBlacklisted = await tokenBlacklistRepository.isBlacklisted(token)
+    const result = await usersRepository.getUserByID(payload.id)
+    if (!result)
+      throw new Error()
+    const { password: _, ...user } = result
+    const isBlacklisted = await tokenBlacklistRepository.isBlacklisted(token)
 
-  if (!user || isBlacklisted)
-    throw new Error()
+    if (!user || isBlacklisted)
+      throw new Error()
 
-  return { statusCode: 200, body: { user } }
-} catch {
-  throw new UnauthorizedError('Unauthorized')
-}
+    return { statusCode: 200, body: { user } }
+  } catch {
+    throw new UnauthorizedError('Unauthorized')
+  }
 
 }
 
@@ -79,7 +79,6 @@ const signout = async (handlerProps?: HandlerProps<{ token: string }>): Controll
 }
 
 export {
-  authentication,
-  verifyToken,
-  signout
+  authentication, signout, verifyToken
 };
+
