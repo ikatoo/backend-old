@@ -16,6 +16,7 @@
     "dev:hapi": "cross-env NODE_ENV=dev tsx watch src/infra/http/hapi/main.ts",
     "dev:express": "cross-env NODE_ENV=dev tsx watch src/infra/http/express/main.ts",
     "dev": "cross-env NODE_ENV=dev tsx watch src/infra/http/index.ts --no-cache",
+    "dev:codespaces": "cross-env NODE_ENV=github tsx watch src/infra/http/index.ts --no-cache",
     "build": "rimraf dist && tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "repository": {

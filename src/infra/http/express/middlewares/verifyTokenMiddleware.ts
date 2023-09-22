@@ -9,7 +9,7 @@ export default async (request: Request, response: Response, next: NextFunction) 
   if (!token) return response.status(401).send()
 
   try {
-    await verifyToken({ parameters: { data: { token } } })
+    await verifyToken({ parameters: { authorization: token } })
     next()
   } catch (error) {
     if (error instanceof UnauthorizedError) {
