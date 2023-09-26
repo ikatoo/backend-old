@@ -8,15 +8,11 @@ export default class AboutPagePgPromise implements IAboutPage {
   }
 
   async createAboutPage(page: AboutPage): Promise<void> {
+    const keys = Object.keys(page)
+    const values = Object.values(page)
     await db.none(
-      'insert into about_page (title, description, illustration_url, illustration_alt, skills) values ($1,$2,$3,$4,$5);',
-      [
-        page.title,
-        page.description,
-        page.illustrationURL,
-        page.illustrationALT,
-        JSON.stringify(page.skills)
-      ])
+      'insert into about_page ($1) values ($2);',
+      [ keys, values ])
   }
 
   async getAboutPage(): Promise<AboutPage | undefined> {

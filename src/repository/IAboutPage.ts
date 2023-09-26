@@ -6,8 +6,8 @@ export const AboutPageSchema = z.object({
   skills: z.array(z.object({
     title: z.string()
   })),
-  illustrationURL: z.string(),
-  illustrationALT: z.string(),
+  illustrationURL: z.string().optional(),
+  illustrationALT: z.string().optional(),
 })
 
 export const PartialAboutPageSchema = AboutPageSchema.partial()
