@@ -41,7 +41,6 @@ const verifyToken = async (handlerProps?: HandlerProps): ControllerResponse => {
   try {
     if (!token) throw new Error()
     const payload = verify(token, env.JWT_SECRET)
-    console.log('payload ===>', payload)
     if (!(typeof payload === 'object' && 'id' in payload))
       throw new Error()
 

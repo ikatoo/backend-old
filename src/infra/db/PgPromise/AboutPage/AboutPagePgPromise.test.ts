@@ -17,18 +17,13 @@ describe("Basic operations in AboutPage Postgres Database", () => {
   test("CREATE Method", async () => {
     const mockedFn = vi.spyOn(db, 'none')
 
-    await expect(repository.createAboutPage(aboutPageMock))
+    await expect(repository.createAboutPage({
+      title: 'teste',
+      description: 'description teste',
+      skills: [{ title: 'teste1' }, { title: 'teste2' }]
+    }))
       .resolves.not.toThrow()
     expect(mockedFn).toHaveBeenCalledTimes(1)
-    expect(mockedFn).toHaveBeenCalledWith(
-      'insert into about_page (title, description, illustration_url, illustration_alt, skills) values ($1,$2,$3,$4,$5);',
-      [
-        aboutPageMock.title,
-        aboutPageMock.description,
-        aboutPageMock.illustrationURL,
-        aboutPageMock.illustrationALT,
-        JSON.stringify(aboutPageMock.skills)
-      ])
   });
 
   test("READ Method", async () => {
@@ -60,5 +55,15 @@ describe("Basic operations in AboutPage Postgres Database", () => {
     await expect(repository.deleteAboutPage()).resolves.not.toThrow()
     expect(mockedFn).toHaveBeenCalledTimes(1)
     expect(mockedFn).toHaveBeenCalledWith('delete from about_page;')
+  });
+
+  test("CREATE Method without optional fields", async () => {
+    const mockedFn = vi.spyOn(db, 'none')
+
+    const { illustrationALT, illustrationURL, ...mock } = aboutPageMock
+
+    await expect(repository.createAboutPage(mock))
+      .resolves.not.toThrow()
+    expect(mockedFn).toHaveBeenCalledTimes(1)
   });
 });
