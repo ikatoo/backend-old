@@ -506,6 +506,84 @@
           }
         }
       }
+    },
+    "/projects/title/:title": {
+       "get": {
+        "tags": [
+          "Projects"
+        ],
+        "responses": {
+          "200": {
+            "description": "Retorna os projetos contendo o título",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Projects"
+                },
+                "examples": {
+                  "Projects": {
+                    "value": [
+                      {
+                        "snapshot": "/images/snap-calm.png",
+                        "description": {
+                          "title": "Calm Organizador de Criptomoedas",
+                          "subTitle": "Last update: 2022 - 03",
+                          "content": "Personal project for learn nextjs."
+                        },
+                        "githubLink": "https://github.com/mckatoo/calm"
+                      },
+                      {
+                        "snapshot": "/images/ikatoo.png",
+                        "description": {
+                          "title": "iKatoo - Site pessoal",
+                          "subTitle": "Last update: 2022 - 08",
+                          "content": "Personal Web Site."
+                        },
+                        "githubLink": "https://github.com/mckatoo/ikatoo-frontend"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/project": {
+      "post": {
+        "tags": [
+          "Projects"
+        ],
+        "description": "Cadastra projeto",
+        "responses": {
+          "204": {
+            "description": "Não retorna nada."
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Project"
+              },
+              "examples": {
+                "Project": {
+                  "value": {
+                    "snapshot": "/images/snap-calm.png",
+                    "description": {
+                      "title": "Calm Organizador de Criptomoedas",
+                      "subTitle": "Last update: 2022 - 03",
+                      "content": "Personal project for learn nextjs."
+                    },
+                    "githubLink": "https://github.com/mckatoo/calm"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
