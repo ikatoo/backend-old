@@ -135,15 +135,25 @@ describe("EXPRESS: /users routes", () => {
     expect(body).toEqual([]);
   });
 
+  test("POST Method: not create user with and return unauthorized status 401", async () => {
+    const { statusCode } = await request(app)
+      .post("/user")
+      .send(usersMock[1])
+
+    expect(statusCode).toBe(401);
+  });
+
   test("POST Method: create user with 204 statusCode", async () => {
     const spy = vi.spyOn(UsersRepository.prototype, 'createUser')
       .mockResolvedValueOnce({ id: 7 })
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
       .mockResolvedValueOnce(undefined)
     vi.spyOn(jwt, 'sign').mockImplementation(() => ('valid-access-token'))
 
     const { statusCode, body } = await request(app)
       .post("/user")
+      .set('authorization', 'Bearer valid-access-token')
       .send(usersMock[1])
 
     expect(statusCode).toBe(201);
@@ -153,12 +163,22 @@ describe("EXPRESS: /users routes", () => {
   });
 
   test("POST Method: responds with 409 when try create user with existent email", async () => {
-    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
+    vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce({
+      statusCode: 200,
+      body: {
+        user: {
+          name: 'Teste',
+          email: 'teste@teste.com',
+          id: 7
+        }
+      }
+    })
     vi.spyOn(UsersRepository.prototype, 'getUserByEmail')
       .mockResolvedValueOnce(usersMock[1])
 
     const { statusCode } = await request(app)
       .post("/user")
+      .set('authorization', 'Bearer valid-token')
       .send({ user: usersMock[1] })
 
     expect(statusCode).toBe(409);
@@ -168,6 +188,7 @@ describe("EXPRESS: /users routes", () => {
     vi.spyOn(AuthController, 'verifyToken').mockResolvedValueOnce()
     const { body, statusCode } = await request(app)
       .post("/user")
+      .set('Authorization', 'Bearer valid-token')
       .send()
 
     expect(statusCode).toBe(409);
@@ -176,7 +197,7 @@ describe("EXPRESS: /users routes", () => {
 
   test("PATCH Method: should expect 401 statusCode when without token", async () => {
     const mockedData = { id: 4, name: 'new name' }
-    const { statusCode, body } = await request(app)
+    const { statusCode } = await request(app)
       .patch("/user")
       .send({ user: mockedData })
 
