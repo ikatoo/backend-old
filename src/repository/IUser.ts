@@ -1,8 +1,5 @@
+import { Email, EmailSchema } from "@/types/custom"
 import { z } from "zod"
-
-export const EmailSchema = z.string().email("is not valid format of email")
-
-export type Email = z.infer<typeof EmailSchema>
 
 export const UserSchema = z.object({
   id: z.number().optional(),

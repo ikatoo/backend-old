@@ -6,8 +6,9 @@ import morgan from 'morgan';
 import { errorMiddleware } from './middlewares/errorMiddleware';
 import { routes } from './routes';
 
-import swaggerDoc from '@/infra/docs/swagger.json';
+// import swaggerDoc from '@/infra/http/docs/swagger.json';
 import swaggerUi from 'swagger-ui-express';
+import { swaggerDoc } from '../docs/swaggerDocBuilder';
 
 const app = express()
 
