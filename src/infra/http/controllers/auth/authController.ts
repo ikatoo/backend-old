@@ -19,7 +19,7 @@ async function authentication(handlerProps?: HandlerProps<Auth>): ControllerResp
     const userExists = await usersRepository.getUserByEmail(email)
     if (!userExists) throw new Error()
     const { password: hash, ...user } = userExists
-    const verify = await compareHash(password, hash ?? '')
+    const verify = await compareHash(`${password}`, hash ?? '')
 
     if (!verify) throw new Error()
 
