@@ -1,6 +1,7 @@
 import { UsersRepository } from "@/infra/db/PgPromise/Users";
 import NodeMailerImplementation from "@/infra/mailer";
-import { Email, EmailSchema, PartialUserSchema, User, UserSchema } from "@/repository/IUser";
+import { PartialUserSchema, User, UserSchema } from "@/repository/IUser";
+import { Email, EmailSchema } from "@/types/custom";
 import { env } from "@/utils/env";
 import { ConflictError, InternalError } from "@/utils/httpErrors";
 import { randomBytes } from "crypto";
