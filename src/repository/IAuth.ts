@@ -1,5 +1,5 @@
+import { EmailSchema } from "@/types/custom";
 import { z } from "zod";
-import { EmailSchema } from "./IUser";
 
 export const AuthSchema = z.object({
   email: EmailSchema,
