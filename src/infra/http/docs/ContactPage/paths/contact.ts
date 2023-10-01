@@ -1,5 +1,6 @@
 import { PathItemObject } from "openapi3-ts/dist/oas30";
 import { ContactPagePartialSwaggerSchema, ContactPageSwaggerSchema } from "../ContactPageSchema";
+import bearerAuth from "../../Auth/bearerAuth";
 
 export const contactPath: PathItemObject = {
   get: {
@@ -34,6 +35,7 @@ export const contactPath: PathItemObject = {
     tags: [
       "Contact Page"
     ],
+    security: bearerAuth,
     description: "Cadastra dados da página de contato",
     responses: {
       "204": {
@@ -65,6 +67,7 @@ export const contactPath: PathItemObject = {
     tags: [
       "Contact Page"
     ],
+    security: bearerAuth,
     description: "Atualiza dados da página de contato",
     responses: {
       "204": {
@@ -96,6 +99,7 @@ export const contactPath: PathItemObject = {
     tags: [
       "Contact Page"
     ],
+    security: bearerAuth,
     description: "Apaga dados da página de contato",
     responses: {
       "204": {

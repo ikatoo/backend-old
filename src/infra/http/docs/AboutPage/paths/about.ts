@@ -3,6 +3,7 @@ import { NoContent } from "../../responses/NoContent";
 import { GetAboutPageSwaggerResponse } from "../responses/GetAboutPage";
 import { CreateAboutPageSwaggerSchema } from "../resquests/CreateAboutPage";
 import { UpdateAboutPageSwaggerSchema } from "../resquests/UpdateAboutPage";
+import bearerAuth from "../../Auth/bearerAuth";
 
 export const aboutPath: PathItemObject = {
   get: {
@@ -13,17 +14,20 @@ export const aboutPath: PathItemObject = {
     tags: ["About Page"],
     description: "Cadastra dados da página sobre",
     responses: NoContent,
-    requestBody: CreateAboutPageSwaggerSchema
+    requestBody: CreateAboutPageSwaggerSchema,
+    security: bearerAuth
   },
   patch: {
     tags: ["About Page"],
     description: "Atualiza dados da página sobre",
     responses: NoContent,
-    requestBody: UpdateAboutPageSwaggerSchema
+    requestBody: UpdateAboutPageSwaggerSchema,
+    security: bearerAuth
   },
   delete: {
     tags: ["About Page"],
     description: "Apaga todos os dados da página sobre",
     responses: NoContent,
+    security: bearerAuth
   }
 }

@@ -1,5 +1,6 @@
 import { PathItemObject } from "openapi3-ts/dist/oas30";
 import { ProjectSwaggerSchema } from "../ProjectSchema";
+import bearerAuth from "../../Auth/bearerAuth";
 
 export const projectByIdPath: PathItemObject = {
   "get": {
@@ -34,6 +35,7 @@ export const projectByIdPath: PathItemObject = {
     tags: [
       "Projects"
     ],
+    security: bearerAuth,
     responses: {
       "204": {
         description: "Não retorna nada"
@@ -64,6 +66,7 @@ export const projectByIdPath: PathItemObject = {
     tags: [
       "Projects"
     ],
+    security: bearerAuth,
     responses: {
       "204": {
         description: "Não retorna nada"
