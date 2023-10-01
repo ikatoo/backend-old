@@ -5,6 +5,7 @@ import { UploadImageSwaggerResponse } from "../responses/UploadImage";
 import { DeleteImageSwaggerSchema } from "../resquests/DeleteImage";
 import { GetImageSwaggerSchema } from "../resquests/GetImage";
 import { UploadImageSwaggerSchema } from "../resquests/UploadImage";
+import bearerAuth from "../../Auth/bearerAuth";
 
 export const imagePath: PathItemObject = {
   get: {
@@ -16,12 +17,14 @@ export const imagePath: PathItemObject = {
   post: {
     description: "Cria os dados da página Habilidades.",
     tags: ['Image'],
+    security: bearerAuth,
     responses: UploadImageSwaggerResponse,
     requestBody: UploadImageSwaggerSchema
   },
   delete: {
     description: "Apaga a imagem",
     tags: ['Image'],
+    security: bearerAuth,
     responses: NoContent,
     requestBody: DeleteImageSwaggerSchema
   },

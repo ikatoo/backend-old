@@ -1,11 +1,13 @@
 import { PathItemObject } from "openapi3-ts/dist/oas30";
 import { ProjectSwaggerSchema } from "../ProjectSchema";
+import bearerAuth from "../../Auth/bearerAuth";
 
 export const projectPath: PathItemObject = {
   "post": {
     tags: [
       "Projects"
     ],
+    security: bearerAuth,
     description: "Cadastra projeto",
     responses: {
       "204": {
